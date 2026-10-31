@@ -6,7 +6,7 @@ RSpec.describe "Pages", type: :request do
       get root_path
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Elections without strategies.")
+      expect(response.body).to include("Elections without spoiled plans")
       expect(response.body).to include("For Philanthropic Partners")
       expect(response.body).to include("About Approval Voting")
       expect(response.body).to include("Expressive Voting turns elections into a collaboration.")

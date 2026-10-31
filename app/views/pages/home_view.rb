@@ -24,7 +24,9 @@ class Views::Pages::HomeView < Views::ApplicationView
     section(class: "story-hero") do
       p(class: "story-kicker") { hero.fetch(:kicker) }
       h1(class: "story-title") { hero.fetch(:title) }
-      p(class: "story-lead") { hero.fetch(:lead).squish }
+      Array(hero.fetch(:lead)).each do |paragraph|
+        p(class: "story-lead") { paragraph.squish }
+      end
 
       div(class: "story-actions") do
         link_to hero.fetch(:mountains_link), mountains_path, class: "btn-primary"

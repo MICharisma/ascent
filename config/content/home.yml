@@ -1,10 +1,12 @@
 hero:
-  kicker: Civic simulation for approval voting and policy clarity
-  title: Elections without strategies.
-  lead: >
-    The project models elections, expressive ratings, and issue positions in one
-    place so researchers, organizers, and donors can study how voter choice,
-    candidate coalitions, and policy responsibility actually interact.
+  kicker: Expressive Approval Voting
+  title: Elections without spoiled plans
+  lead:
+    - This site implements Expressive Voting - each voter is allowed to support multiple candidates.
+    - >
+      The hard part is deciding where to draw the line.  Ascent helps: you draw a
+      “mountain” with your favorites at the top, then raise your baseline until
+      you’re happy with your mix of Yes and No.
   mountains_link: Explore the Mountain Demo
   approval_voting_link: About Approval Voting
   supporters_link: For Philanthropic Partners
