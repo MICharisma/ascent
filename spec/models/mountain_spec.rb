@@ -8,9 +8,9 @@ RSpec.describe Mountain do
   include_context "Port Merritt ballot"
 
   let(:race) { create_race_for(office_in(port_merritt, "Mayor"), :active) }
-  let(:ventura_quinn) { create(:candidacy, race: race, person: create(:person, first_name: "Marisol", last_name: "Ventura-Quinn")) }
-  let(:lindqvist) { create(:candidacy, race: race, person: create(:person, first_name: "Theo", last_name: "Lindqvist")) }
-  let(:okafor) { create(:candidacy, race: race, person: create(:person, first_name: "Dana", last_name: "Okafor")) }
+  let(:ventura_quinn) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Marisol", last_name: "Ventura-Quinn")) }
+  let(:lindqvist) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Theo", last_name: "Lindqvist")) }
+  let(:okafor) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Dana", last_name: "Okafor")) }
   let(:mountain) { described_class.new(voter: voter, race: race) }
 
   before { [ ventura_quinn, lindqvist, okafor ] }

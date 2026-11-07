@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# A side card linking the official accounts a person or their campaigns speak through, if there are any.
-#   OfficialChannels(owners: [ person, *person.candidacies ])
+# A side card linking the official accounts a citizen or their campaigns speak through, if there are any.
+#   OfficialChannels(owners: [ citizen, *citizen.candidacies ])
 class Views::Components::OfficialChannels < Views::ApplicationView
   prop :owners, Array
 
@@ -19,7 +19,7 @@ class Views::Components::OfficialChannels < Views::ApplicationView
               case channel.owner
               when Candidacy then "Campaign · #{channel.owner.election.election_date.year}"
               when Organization then "Organization"
-              else "Personal"
+              else "Citizenal"
               end
             end
           end

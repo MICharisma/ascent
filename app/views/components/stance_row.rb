@@ -10,7 +10,7 @@ class Views::Components::StanceRow < Views::ApplicationView
 
   def view_template
     candidacy = @stance.candidacy
-    ListRow(record: @stance, title: candidacy.person.full_name,
+    ListRow(record: @stance, title: candidacy.citizen.full_name,
       meta: @meta || "#{@stance.approach.title} · #{candidacy.race.office.position.title}", detail: @detail) do
       span(class: "row-badge row-badge-priority") { "#{@stance.priority_level} priority" } if @stance.priority_level.present?
       span(class: "row-badge") { pluralize(@stance.stance_evidences.size, "source") } if @stance.stance_evidences.any?

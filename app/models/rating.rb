@@ -25,7 +25,7 @@ class Rating < ApplicationRecord
   end
 
   def name
-    "#{voter.name} rating for #{candidacy.person.name}"
+    "#{voter.name} rating for #{candidacy.citizen.name}"
   end
 
   def rating_percentage

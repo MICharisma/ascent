@@ -16,7 +16,7 @@ FactoryBot.define do
 
   factory :image_placement do
     image
-    association :subject, factory: :person
+    association :subject, factory: :citizen
     position { 0 }
   end
 end

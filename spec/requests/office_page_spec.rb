@@ -7,7 +7,7 @@ RSpec.describe "Office page", type: :request do
   let(:office) { office_in(port_merritt, "Mayor") }
   let!(:next_race) { create_race_for(office, :active, name: "Port Merritt Municipal Election") }
   let!(:earlier_race) { create_race_for(office, :completed, name: "Port Merritt Municipal Election 2022", election_date: Date.new(2022, 11, 8)) }
-  let!(:okafor) { create(:candidacy, race: next_race, status: "active", person: create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
+  let!(:okafor) { create(:candidacy, race: next_race, status: "active", citizen: create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
 
   it "places the office under its place and leads with its next race" do
     get office_path(office)

@@ -223,7 +223,7 @@ RSpec.describe Race, type: :model do
         candidacy2 => 7
       })
       allow(race).to receive(:approval_winner).and_return(candidacy2)
-      allow(candidacy2.person).to receive(:name).and_return("Jane Smith")
+      allow(candidacy2.citizen).to receive(:name).and_return("Jane Smith")
     end
 
     it 'returns comprehensive race statistics' do

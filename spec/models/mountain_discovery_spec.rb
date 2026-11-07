@@ -23,8 +23,8 @@ RSpec.describe MountainDiscovery do
     create(:candidacy, race: single, participation: "inactive")
     create(:candidacy, race: single, participation: "off_ballot", primary_candidacy: create(:candidacy))
     duplicate = create(:race, :active)
-    person = create(:person)
-    create_list(:candidacy, 2, race: duplicate, person: person)
+    citizen = create(:citizen)
+    create_list(:candidacy, 2, race: duplicate, citizen: citizen)
     contested_race(status: "completed")
 
     expect(ranked.pluck(:id)).to eq([ eligible.id ])

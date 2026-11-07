@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_010000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -125,16 +125,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
     t.datetime "created_at", null: false
     t.string "entity_code"
     t.string "participation", default: "active", null: false
-    t.bigint "person_id", null: false
+    t.bigint "citizen_id", null: false
     t.text "platform_summary"
     t.bigint "race_id", null: false
     t.string "status"
     t.datetime "updated_at", null: false
     t.bigint "primary_candidacy_id"
+    t.index ["citizen_id"], name: "index_candidacies_on_citizen_id"
     t.index ["entity_code"], name: "index_candidacies_on_entity_code", unique: true
-    t.index ["person_id"], name: "index_candidacies_on_person_id"
     t.index ["primary_candidacy_id"], name: "index_candidacies_on_primary_candidacy_id"
-    t.index ["race_id", "person_id"], name: "index_candidacies_from_primaries_once_per_race_and_person", unique: true, where: "(primary_candidacy_id IS NOT NULL)"
+    t.index ["race_id", "citizen_id"], name: "index_candidacies_from_primaries_once_per_race_and_citizen", unique: true, where: "(primary_candidacy_id IS NOT NULL)"
     t.index ["race_id"], name: "index_candidacies_on_race_id"
   end
 
@@ -166,6 +166,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
     t.index ["platform", "handle"], name: "index_channels_on_platform_and_handle", unique: true
     t.index ["review_status"], name: "index_channels_on_review_status"
     t.index ["reviewed_by_id"], name: "index_channels_on_reviewed_by_id"
+  end
+
+  create_table "citizens", force: :cascade do |t|
+    t.text "bio"
+    t.date "birth_date"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "entity_code"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "middle_name"
+    t.datetime "updated_at", null: false
+    t.string "username"
+    t.string "username_status"
+    t.boolean "fictional", default: false, null: false
+    t.index ["entity_code"], name: "index_citizens_on_entity_code", unique: true
+    t.index ["username"], name: "index_citizens_on_username", unique: true
   end
 
   create_table "communication_features", force: :cascade do |t|
@@ -492,23 +509,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
     t.check_constraint "type::text <> 'Party'::text OR state_id IS NOT NULL", name: "parties_have_a_state"
   end
 
-  create_table "people", force: :cascade do |t|
-    t.text "bio"
-    t.date "birth_date"
-    t.datetime "created_at", null: false
-    t.string "email"
-    t.string "entity_code"
-    t.string "first_name"
-    t.string "last_name"
-    t.string "middle_name"
-    t.datetime "updated_at", null: false
-    t.string "username"
-    t.string "username_status"
-    t.boolean "fictional", default: false, null: false
-    t.index ["entity_code"], name: "index_people_on_entity_code", unique: true
-    t.index ["username"], name: "index_people_on_username", unique: true
-  end
-
   create_table "policies", force: :cascade do |t|
     t.bigint "approach_id", null: false
     t.bigint "area_of_concern_id", null: false
@@ -821,7 +821,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
   add_foreign_key "ballot_lines", "candidacies"
   add_foreign_key "ballot_lines", "organizations", column: "party_id"
   add_foreign_key "candidacies", "candidacies", column: "primary_candidacy_id"
-  add_foreign_key "candidacies", "people"
+  add_foreign_key "candidacies", "citizens"
   add_foreign_key "candidacies", "races"
   add_foreign_key "chambers", "governing_bodies"
   add_foreign_key "channels", "voters", column: "reviewed_by_id"

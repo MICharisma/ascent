@@ -4,14 +4,14 @@
 # to reduce data duplication in development while maintaining realistic diversity.
 #
 # Example usage:
-#   SmartFactory.create_or_reuse(:person, count: 5, reuse_likelihood: 7)
+#   SmartFactory.create_or_reuse(:citizen, count: 5, reuse_likelihood: 7)
 #   SmartFactory.create_or_reuse(:candidacy, :democrat, count: 3, reuse_likelihood: 4, race: race)
 #
 module SmartFactory
   class << self
     # Creates or reuses factory objects based on reuse likelihood
     #
-    # @param factory_name [Symbol] The factory name (e.g., :person, :candidacy)
+    # @param factory_name [Symbol] The factory name (e.g., :citizen, :candidacy)
     # @param traits [Array<Symbol>] Factory traits to apply
     # @param count [Integer] Number of objects needed (default: 1)
     # @param reuse_likelihood [Integer] Likelihood of reusing existing objects (1-10, default: 5)
@@ -49,7 +49,7 @@ module SmartFactory
     def create_for_mountain_simulation(factory_name, traits = [], count: 1, **attributes)
       # Reuse patterns optimized for mountain simulation
       reuse_patterns = {
-        person: 3,           # Low reuse - want diverse candidates
+        citizen: 3,           # Low reuse - want diverse candidates
         candidacy: 2,        # Very low reuse - each candidacy should be unique
         rating: 1,           # No reuse - each rating is voter-specific
         stance: 1,           # No reuse - each stance is candidacy-specific

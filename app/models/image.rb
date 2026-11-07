@@ -11,7 +11,7 @@ class Image < ApplicationRecord
   end
 
   has_many :image_placements, dependent: :restrict_with_error
-  has_many :people, through: :image_placements, source: :subject, source_type: "Person"
+  has_many :citizens, through: :image_placements, source: :subject, source_type: "Citizen"
   has_many :candidacies, through: :image_placements, source: :subject, source_type: "Candidacy"
 
   normalizes :url, with: -> { it.presence }

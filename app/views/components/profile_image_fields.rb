@@ -4,7 +4,7 @@ class Views::Components::ProfileImageFields < Views::ApplicationView
   def view_template
     section(class: "place-section") do
       h2 { "Images" }
-      p(class: "card-text") { "Images can be shared with other people and candidacies. Editing image details updates them wherever that image is used. Lower display orders appear first." }
+      p(class: "card-text") { "Images can be shared with other citizens and candidacies. Editing image details updates them wherever that image is used. Lower display orders appear first." }
       placements = @record.image_placements.to_a
       placements.each_with_index { |placement, index| placement_fields(placement, index) }
       placement_fields(ImagePlacement.new, placements.size, existing: true)

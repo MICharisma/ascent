@@ -69,7 +69,7 @@ end
 # Every list with a page design of its own offers admins the same New link in its header.
 RSpec.describe "New links on designed lists", type: :request do
   {
-    races: :new_race_path, people: :new_person_path, offices: :new_office_path, candidacies: :new_candidacy_path,
+    races: :new_race_path, citizens: :new_citizen_path, offices: :new_office_path, candidacies: :new_candidacy_path,
     states: :new_state_path, counties: :new_county_path, districts: :new_district_path, municipalities: :new_municipality_path,
     topics: :new_topic_path, issues: :new_issue_path, approaches: :new_approach_path, stances: :new_stance_path,
     governing_bodies: :new_governing_body_path, policies: :new_policy_path, official_codes: :new_official_code_path

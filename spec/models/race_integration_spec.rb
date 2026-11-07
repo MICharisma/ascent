@@ -73,8 +73,8 @@ RSpec.describe Race, type: :model do
 
     expect(office.current_office_holder).to eq(candidacy)
     expect(candidacy.election).to eq(election)
-    expect(candidacy.person.elections).to contain_exactly(election)
-    expect(Person.with_recent_candidacies).to include(candidacy.person)
+    expect(candidacy.citizen.elections).to contain_exactly(election)
+    expect(Citizen.with_recent_candidacies).to include(candidacy.citizen)
     expect(Voter.with_voting_activity.find(voter.id).ratings).to be_present
   end
 

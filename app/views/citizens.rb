@@ -1,3 +1,3 @@
-module Views::People
+module Views::Citizens
   extend Phlex::Kit
 end

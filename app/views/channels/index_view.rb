@@ -42,8 +42,8 @@ class Views::Channels::IndexView < Views::ApplicationView
     parts = []
     parts << case channel.owner
     when Candidacy
-      "#{channel.owner.person.full_name} (Candidacy)"
-    when Person
+      "#{channel.owner.citizen.full_name} (Candidacy)"
+    when Citizen
       channel.owner.full_name
     when Organization
       channel.owner.name

@@ -53,7 +53,7 @@ Rails.application.routes.draw do
   resources :channels, only: %i[index update]
   resources :residences
   resources :candidacies
-  resources :people
+  resources :citizens
   resources :organizations, only: %i[index show]
   resources :parties, only: %i[index show]
   resources :endorsements, only: %i[index show]

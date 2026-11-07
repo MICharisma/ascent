@@ -42,8 +42,8 @@ groups:
         code: PARTY-USA-NY-WORKING_FAMILIES
         attributes:
           name: Working Families
-      - type: Person
-        code: PERSON-KELLES_AN_2R
+      - type: Citizen
+        code: CITIZEN-KELLES_AN_2R
         attributes:
           username: kelles_an_2r
           username_status: provisional
@@ -89,4 +89,4 @@ groups:
               party: PARTY-USA-NY-WORKING_FAMILIES
         references:
           race: RACE-USA-NY-ASSEMBLY-AD_125-2024_GENERAL
-          person: PERSON-KELLES_AN_2R
+          citizen: CITIZEN-KELLES_AN_2R

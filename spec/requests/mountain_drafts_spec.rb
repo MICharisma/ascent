@@ -5,8 +5,8 @@ require "rails_helper"
 RSpec.describe "Mountain drafts", type: :request do
   let(:race) { create(:race, :active) }
   let(:voter) { create(:voter, first_name: "Rosa", last_name: "Delgado") }
-  let!(:okafor) { create(:candidacy, race: race, person: create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
-  let!(:lindqvist) { create(:candidacy, race: race, person: create(:person, first_name: "Theo", middle_name: nil, last_name: "Lindqvist")) }
+  let!(:okafor) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
+  let!(:lindqvist) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Theo", middle_name: nil, last_name: "Lindqvist")) }
 
   before { sign_in voter }
 

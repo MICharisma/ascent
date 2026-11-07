@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Views::Components::ProfilePortrait < Views::ApplicationView
-  prop :person, Person
+  prop :citizen, Citizen
   prop :image, _Nilable(::Image), default: nil
   prop :variant, Symbol, default: :portrait
 
@@ -11,7 +11,7 @@ class Views::Components::ProfilePortrait < Views::ApplicationView
     figure(class: "profile-portrait") do
       if @image
         source = @image.file.attached? ? url_for(@image.file.variant(@variant)) : @image.url
-        img(src: source, alt: @image.alt_text.presence || "Photo of #{@person.full_name}", class: "profile-portrait-image",
+        img(src: source, alt: @image.alt_text.presence || "Photo of #{@citizen.full_name}", class: "profile-portrait-image",
           width: 400, height: 500, decoding: "async", referrerpolicy: "no-referrer")
         span(class: "row-badge row-badge-mock") { "AI-generated illustration" } if @image.ai_generated?
         if @image.credit.present? || @image.source_url.present?
@@ -24,8 +24,8 @@ class Views::Components::ProfilePortrait < Views::ApplicationView
           end
         end
       else
-        div(class: "profile-portrait-placeholder", role: "img", aria: { label: "No portrait for #{@person.full_name}" }) do
-          [ @person.first_name, @person.last_name ].compact_blank.map { it.first }.join
+        div(class: "profile-portrait-placeholder", role: "img", aria: { label: "No portrait for #{@citizen.full_name}" }) do
+          [ @citizen.first_name, @citizen.last_name ].compact_blank.map { it.first }.join
         end
       end
     end

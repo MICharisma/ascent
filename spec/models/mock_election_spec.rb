@@ -1,7 +1,7 @@
 require "rails_helper"
 
 # Anyone can make a mock election for a class or a test: invented candidates in a real place. Its offices
-# stay inactive and its people are marked fictional, and removing it removes them too.
+# stay inactive and its citizens are marked fictional, and removing it removes them too.
 RSpec.describe MockElection do
   let(:teacher) { create(:voter, first_name: "Imani", last_name: "Brooks") }
   let(:city) { create(:jurisdiction, jurisdictionable: create(:municipality, name: "Port Merritt")) }
@@ -32,14 +32,14 @@ RSpec.describe MockElection do
     expect(mock.errors[:races]).to include("each need a title and at least two candidates")
   end
 
-  it "removes the election with the offices and people invented for it" do
+  it "removes the election with the offices and citizens invented for it" do
     election = described_class.new(**attributes).save!
-    real_person = create(:person, first_name: "Dana", last_name: "Okafor")
+    real_citizen = create(:citizen, first_name: "Dana", last_name: "Okafor")
 
     expect { election.destroy_mock! }.to change(Election, :count).by(-1)
       .and change(Office, :count).by(-1)
-      .and change(Person.fictional, :count).by(-2)
-    expect(real_person.reload).to be_persisted
+      .and change(Citizen.fictional, :count).by(-2)
+    expect(real_citizen.reload).to be_persisted
   end
 end
 

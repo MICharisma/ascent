@@ -1,4 +1,4 @@
-class Person < ApplicationRecord
+class Citizen < ApplicationRecord
   include Engageable
   include Illustrated
 
@@ -26,8 +26,8 @@ class Person < ApplicationRecord
   scope :named_like, ->(query) {
     where("concat_ws(' ', first_name, middle_name, last_name) ILIKE ?", "%#{sanitize_sql_like(query.strip)}%")
   }
-  # People with a candidacy in any of the races given.
-  scope :ran_in, ->(races) { where(id: Candidacy.where(race: races).select(:person_id)) }
+  # Citizens with a candidacy in any of the races given.
+  scope :ran_in, ->(races) { where(id: Candidacy.where(race: races).select(:citizen_id)) }
 
   def full_name
     [ first_name, middle_name, last_name ].compact.join(" ")

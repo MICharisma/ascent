@@ -34,7 +34,7 @@ RSpec.describe Seeds::BallotRows do
     }.each do |printed_name, parts|
       it "splits #{printed_name.inspect} so the full name reads as printed" do
         expect(described_class.name_parts(printed_name)).to eq(parts)
-        expect(Person.new(parts).full_name).to eq(printed_name)
+        expect(Citizen.new(parts).full_name).to eq(printed_name)
       end
     end
   end

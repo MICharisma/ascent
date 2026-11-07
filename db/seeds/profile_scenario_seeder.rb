@@ -39,7 +39,7 @@ class ProfileScenarioSeeder
     [ "Environment", "Neighborhood flood risk", "Prepare streets and homes for heavy rain", [
       "Prioritize drainage repairs, street trees, and basement-flood prevention in repeatedly flooded neighborhoods. Publish the project schedule.",
       "Rank projects by expected damage avoided per dollar. Fund maintenance before starting expensive new infrastructure.",
-      "Start with homes occupied by older residents and people with mobility needs. Pair drainage improvements with emergency transport and public-health plans."
+      "Start with homes occupied by older residents and citizens with mobility needs. Pair drainage improvements with emergency transport and public-health plans."
     ] ]
   ].freeze
 
@@ -55,14 +55,14 @@ class ProfileScenarioSeeder
         election_date: Date.new(2026, 11, 3), races: [ { title: "Governor", candidates: CANDIDATES.map { it[:name] } } ]).save!
       CANDIDATES.each_with_index { |candidate, index| populate_candidate(candidate, index) }
     end
-    { election_id: @election.id, candidacy_ids: @election.candidacies.ids, person_ids: @election.candidates.ids }
+    { election_id: @election.id, candidacy_ids: @election.candidacies.ids, citizen_ids: @election.candidates.ids }
   end
 
   private
 
   def populate_candidate(candidate, index)
-    candidacy = @election.candidacies.includes(:person).find { it.person.full_name == candidate[:name] }
-    candidacy.person.update!(bio: candidate[:bio])
+    candidacy = @election.candidacies.includes(:citizen).find { it.citizen.full_name == candidate[:name] }
+    candidacy.citizen.update!(bio: candidate[:bio])
     candidacy.update!(platform_summary: candidate[:platform])
     website = Channel.find_or_initialize_by(platform: "website", handle: "#{candidate[:slug]}-civic-forum")
     website.update!(owner: candidacy, official: true, url: "https://ascent.test/profiles/#{candidate[:slug]}.html")
@@ -82,9 +82,9 @@ class ProfileScenarioSeeder
       image.file.attach(io: StringIO.new(File.binread(Rails.root.join("public/portraits/marisol-vega.png"))),
         filename: "marisol-vega.png", content_type: "image/png", metadata: { ai_generated: true })
     end
-    candidacy.person.image_placements.find_or_create_by!(image: image)
+    candidacy.citizen.image_placements.find_or_create_by!(image: image)
     social = Channel.find_or_initialize_by(platform: "bluesky", handle: "marisolvega.example")
-    social.update!(owner: candidacy.person, official: true, url: "https://bsky.app/profile/marisolvega.example")
+    social.update!(owner: candidacy.citizen, official: true, url: "https://bsky.app/profile/marisolvega.example")
     video = Communication.find_or_initialize_by(url: "https://ascent.test/media/marisol-vega-introduction.mp4")
     video.update!(channel: website, kind: "video", title: "Meet Marisol Vega", published_on: Date.new(2026, 10, 15),
       summary: "A campaign introduction covering housing, school funding, and primary care. A generated portrait with synthesized narration for this invented candidate.")

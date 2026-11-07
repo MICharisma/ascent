@@ -6,9 +6,9 @@ class PublicMountain < ApplicationRecord
   validates :snapshot, :preview_png, presence: true
 
   def refresh!(mountain)
-    candidates = mountain.candidacies.active.includes(:person).order(:id).map do |candidacy|
+    candidates = mountain.candidacies.active.includes(:citizen).order(:id).map do |candidacy|
       {
-        "name" => candidacy.person.full_name,
+        "name" => candidacy.citizen.full_name,
         "rating" => mountain.saved_ratings[candidacy.id],
         "off_ballot" => candidacy.primary_candidacy_id.present?
       }

@@ -2,7 +2,7 @@ class RatingsController < ApplicationController
   before_action :set_rating, only: %i[ show edit update destroy ]
 
   def index
-    @pagy, @ratings = pagy(Rating.includes(:voter, candidacy: [ :person, { race: { office: [ :position, { jurisdiction: :jurisdictionable } ] } } ]).order(created_at: :desc))
+    @pagy, @ratings = pagy(Rating.includes(:voter, candidacy: [ :citizen, { race: { office: [ :position, { jurisdiction: :jurisdictionable } ] } } ]).order(created_at: :desc))
     render Views::Ratings::IndexView.new(ratings: @ratings, pagy: @pagy)
   end
 

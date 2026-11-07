@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-# Visitors save, favorite, follow, and hide candidacies, races, issues, stances, and people.
+# Visitors save, favorite, follow, and hide candidacies, races, issues, stances, and citizens.
 # Each button toggles one Engagement, and the bar updates in place through a Turbo Stream.
 RSpec.describe "Engagements", type: :request do
   let(:lansing_voter) { create(:voter, first_name: "Dana", last_name: "Okoro", email: "dana.okoro@example.com") }

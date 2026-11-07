@@ -224,7 +224,7 @@ class StanceSeeder
       if stance.persisted?
         print "."
       else
-        puts "\n❌ Failed to create stance for #{candidacy.person.first_name} #{candidacy.person.last_name} on #{issue.title}"
+        puts "\n❌ Failed to create stance for #{candidacy.citizen.first_name} #{candidacy.citizen.last_name} on #{issue.title}"
         puts "   Errors: #{stance.errors.full_messages.join(', ')}"
       end
     end

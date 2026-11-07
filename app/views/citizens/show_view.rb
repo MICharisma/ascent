@@ -1,29 +1,29 @@
 # frozen_string_literal: true
 
-# A person who has stood for office: who they are, every candidacy as a timeline from the latest back,
+# A citizen who has stood for office: who they are, every candidacy as a timeline from the latest back,
 # and where their latest candidacy stands. Their channels and the races they ran in sit beside.
-class Views::People::ShowView < Views::ApplicationView
-  prop :person, Person
+class Views::Citizens::ShowView < Views::ApplicationView
+  prop :citizen, Citizen
 
   def view_template
-    div(class: "record-page person-page", id: dom_id(@person, :show)) do
+    div(class: "record-page citizen-page", id: dom_id(@citizen, :show)) do
       div(class: "profile-header") do
-        PageHeader(title: @person.full_name, trail: trail_for(@person), eyebrow: eyebrow, lede: lede, record: @person,
+        PageHeader(title: @citizen.full_name, trail: trail_for(@citizen), eyebrow: eyebrow, lede: lede, record: @citizen,
           chips: method(:chips)) do
           PillLink(label: "Latest candidacy", path: candidacy_path(latest), icon: :badge_check) if latest
         end
-        ProfilePortrait(person: @person, image: images.first)
+        ProfilePortrait(citizen: @citizen, image: images.first)
       end
       div(class: "place-layout") do
         div(class: "place-main") do
-          ProfileImages(person: @person, images: images)
+          ProfileImages(citizen: @citizen, images: images)
           CommunicationGallery(communications: communications)
           candidacies_section
           latest_stances
         end
-        aside(class: "place-aside", aria: { label: "About #{@person.full_name}" }) do
+        aside(class: "place-aside", aria: { label: "About #{@citizen.full_name}" }) do
           facts_card
-          OfficialChannels(owners: [ @person, *candidacies ])
+          OfficialChannels(owners: [ @citizen, *candidacies ])
           admin_card
         end
       end
@@ -34,7 +34,7 @@ class Views::People::ShowView < Views::ApplicationView
 
   # Latest election first.
   def candidacies
-    @candidacies ||= @person.candidacies.includes(:ballot_lines, race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ])
+    @candidacies ||= @citizen.candidacies.includes(:ballot_lines, race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ])
       .sort_by { -it.race.election.election_date.jd }
   end
 
@@ -43,37 +43,37 @@ class Views::People::ShowView < Views::ApplicationView
   end
 
   def communications
-    Communication.for_profile(@person, candidacies).includes(:channel).order(published_on: :desc, id: :desc).limit(8).to_a
+    Communication.for_profile(@citizen, candidacies).includes(:channel).order(published_on: :desc, id: :desc).limit(8).to_a
   end
 
   def images
-    @images ||= @person.images.to_a
+    @images ||= @citizen.images.to_a
   end
 
   def eyebrow
-    latest ? "Candidate · #{latest.race.office.jurisdiction.name}" : "Person"
+    latest ? "Candidate · #{latest.race.office.jurisdiction.name}" : "Citizen"
   end
 
   def lede
-    return @person.bio if @person.bio.present?
-    return "#{@person.full_name} has no candidacies on Ascent yet." unless latest
+    return @citizen.bio if @citizen.bio.present?
+    return "#{@citizen.full_name} has no candidacies on Ascent yet." unless latest
 
     "Running for #{latest.race.office.name} in the #{latest.race.election.name}." +
       (candidacies.many? ? " #{pluralize(candidacies.size - 1, "earlier candidacy", plural: "earlier candidacies")} below." : "")
   end
 
   def chips
-    span(class: "row-badge row-badge-mock") { "Invented for a mock election" } if @person.fictional
+    span(class: "row-badge row-badge-mock") { "Invented for a mock election" } if @citizen.fictional
     latest&.ballot_lines&.each { |line| span(class: "place-chip") { line.label } }
   end
 
   def candidacies_section
-    section(class: "place-section", id: "person-candidacies") do
+    section(class: "place-section", id: "citizen-candidacies") do
       section_heading("Candidacies", pluralize(candidacies.size, "race"))
       if candidacies.any?
         ol(class: "list-rows", data: { controller: "reveal" }) { candidacies.each { candidacy_row(it) } }
       else
-        p(class: "card-text") { "No candidacies are recorded for #{@person.full_name}." }
+        p(class: "card-text") { "No candidacies are recorded for #{@citizen.full_name}." }
       end
     end
   end
@@ -111,6 +111,6 @@ class Views::People::ShowView < Views::ApplicationView
   def admin_card
     return unless current_voter&.admin?
 
-    SideCard(heading: "Admin", modifier: "admin-card") { Ui::ResourceActions(resource: @person) }
+    SideCard(heading: "Admin", modifier: "admin-card") { Ui::ResourceActions(resource: @citizen) }
   end
 end

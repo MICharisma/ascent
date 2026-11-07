@@ -31,7 +31,7 @@ class Views::Offices::ShowView < Views::ApplicationView
   private
 
   def races
-    @races ||= @office.races.includes(:election, candidacies: [ :person, :ballot_lines ]).sort_by { -it.election.election_date.jd }
+    @races ||= @office.races.includes(:election, candidacies: [ :citizen, :ballot_lines ]).sort_by { -it.election.election_date.jd }
   end
 
   def next_race
@@ -77,12 +77,12 @@ class Views::Offices::ShowView < Views::ApplicationView
   def next_race_section
     return unless next_race
 
-    candidacies = next_race.candidacies.reject(&:primary_candidacy_id).sort_by { it.person.last_name.to_s }
+    candidacies = next_race.candidacies.reject(&:primary_candidacy_id).sort_by { it.citizen.last_name.to_s }
     section(class: "place-section", id: "office-next-race") do
       section_heading("On the ballot next", "#{next_race.election.name} · #{next_race.election.election_date.strftime("%b %-d, %Y")}")
       if candidacies.any?
         ul(class: "list-rows", data: { controller: "reveal" }) do
-          candidacies.each { ListRow(record: it, title: it.person.full_name, meta: it.ballot_labels) }
+          candidacies.each { ListRow(record: it, title: it.citizen.full_name, meta: it.ballot_labels) }
         end
       else
         p(class: "card-text") { "No candidates have filed yet." }
@@ -123,7 +123,7 @@ class Views::Offices::ShowView < Views::ApplicationView
     winner = @office.current_office_holder
     return unless winner
 
-    FactRow(label: "Approval winner, last race") { link_to winner.person.full_name, winner.person, class: "text-link" }
+    FactRow(label: "Approval winner, last race") { link_to winner.citizen.full_name, winner.citizen, class: "text-link" }
   end
 
   def nominations_card

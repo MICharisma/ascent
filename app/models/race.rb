@@ -8,7 +8,7 @@ class Race < ApplicationRecord
   belongs_to :election
   belongs_to :office
   has_many :candidacies, dependent: :destroy
-  has_many :candidates, through: :candidacies, source: :person
+  has_many :candidates, through: :candidacies, source: :citizen
   has_many :voter_race_baselines, dependent: :destroy
   has_many :voter_race_baseline_archives, dependent: :delete_all
   has_many :voter_race_preferences, dependent: :delete_all
@@ -40,7 +40,7 @@ class Race < ApplicationRecord
   # Races a search for an office, election, candidate, or place finds.
   scope :findable, ->(query) { where(id: matching(query).select(:id)).or(where(id: in_place_named(query).select(:id))) }
   scope :with_full_details, -> { includes(:office, :candidates, :candidacies) }
-  scope :with_candidacy_details, -> { includes(candidacies: [ :person, :ratings ]) }
+  scope :with_candidacy_details, -> { includes(candidacies: [ :citizen, :ratings ]) }
   scope :with_office_context, -> { includes(office: :position) }
   scope :with_naming_details, -> { includes(election: :year, office: [ :position, { jurisdiction: :jurisdictionable } ]) }
 
@@ -65,8 +65,8 @@ class Race < ApplicationRecord
 
   scope :matching, ->(query) {
     pattern = "%#{sanitize_sql_like(query.strip)}%"
-    candidates = Candidacy.joins(:person)
-      .where("concat_ws(' ', people.first_name, people.middle_name, people.last_name) ILIKE ?", pattern)
+    candidates = Candidacy.joins(:citizen)
+      .where("concat_ws(' ', citizens.first_name, citizens.middle_name, citizens.last_name) ILIKE ?", pattern)
     joins(:election, office: :position).where(
       "positions.title ILIKE :pattern OR elections.name ILIKE :pattern OR races.description ILIKE :pattern OR races.id IN (:candidate_races)",
       pattern: pattern, candidate_races: candidates.select(:race_id)
@@ -131,16 +131,16 @@ class Race < ApplicationRecord
   # the data places them on it, so a simulated approval vote can rate those the primary eliminated.
   # Returns the candidacies it added.
   def gather_primary_candidates!
-    running = Candidacy.where(race: nomination_races).still_running.order(:id).group_by(&:person_id)
-    gathered = candidacies.from_primaries.includes(:primary_candidacy).index_by(&:person_id)
-    gathered.each { |person_id, candidacy| candidacy.destroy! unless running.key?(person_id) }
-    placed = candidacies.pluck(:person_id).to_set
-    running.each do |person_id, primary_candidacies|
-      candidacy = gathered[person_id]
+    running = Candidacy.where(race: nomination_races).still_running.order(:id).group_by(&:citizen_id)
+    gathered = candidacies.from_primaries.includes(:primary_candidacy).index_by(&:citizen_id)
+    gathered.each { |citizen_id, candidacy| candidacy.destroy! unless running.key?(citizen_id) }
+    placed = candidacies.pluck(:citizen_id).to_set
+    running.each do |citizen_id, primary_candidacies|
+      candidacy = gathered[citizen_id]
       candidacy.update!(primary_candidacy: primary_candidacies.first) if candidacy && !primary_candidacies.include?(candidacy.primary_candidacy)
     end
-    running.except(*placed).map do |_person_id, primary_candidacies|
-      candidacies.create!(person_id: primary_candidacies.first.person_id, primary_candidacy: primary_candidacies.first, status: "active", participation: "off_ballot")
+    running.except(*placed).map do |_citizen_id, primary_candidacies|
+      candidacies.create!(citizen_id: primary_candidacies.first.citizen_id, primary_candidacy: primary_candidacies.first, status: "active", participation: "off_ballot")
     end
   end
 
@@ -172,7 +172,7 @@ class Race < ApplicationRecord
       total_registered_voters: total_possible_voters,
       total_approval_votes: total_votes_cast,
       average_approvals_per_voter: total_possible_voters.zero? ? 0 : (total_votes_cast.to_f / total_possible_voters).round(2),
-      winner: approval_winner&.person&.name,
+      winner: approval_winner&.citizen&.name,
       winning_vote_count: results.values.max || 0
     }
   end

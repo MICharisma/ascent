@@ -18,7 +18,7 @@ RSpec.describe ProfileScenarioSeeder do
     expect(election.candidates.find_by!(first_name: "Marisol").images.sole.url).to end_with("marisol-vega.png")
     expect(election.candidates.find_by!(first_name: "Marisol").images.sole.file).to be_attached
 
-    expect { described_class.new.seed! }.not_to change { [ Election.count, Person.count, Candidacy.count, Stance.count, Communication.count, Channel.count,
+    expect { described_class.new.seed! }.not_to change { [ Election.count, Citizen.count, Candidacy.count, Stance.count, Communication.count, Channel.count,
       Image.count, ImagePlacement.count, ActiveStorage::Blob.count, ActiveStorage::Attachment.count ] }
   end
 end

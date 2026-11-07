@@ -31,7 +31,7 @@ class Views::Candidacies::IndexView < Views::ApplicationView
 
   def candidacy_row(candidacy)
     race = candidacy.race
-    ListRow(record: candidacy, title: candidacy.person.full_name,
+    ListRow(record: candidacy, title: candidacy.citizen.full_name,
       meta: [ candidacy.ballot_labels, race.office.name, race.election.election_date.strftime("%b %-d, %Y") ].compact.join(" · "),
       detail: candidacy.platform_summary.presence) do
       rated = @rating_counts.fetch(candidacy.id, 0)

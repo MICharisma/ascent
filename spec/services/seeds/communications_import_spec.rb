@@ -18,7 +18,7 @@ RSpec.describe "Importing communications and stance evidence" do
     expect(stance.communications.map(&:kind)).to contain_exactly("video", "debate")
 
     channel = Channel.find_by!(entity_code: "CHANNEL-WEB-AVERYEXAMPLE_EXAMPLE_COM")
-    expect(channel).to have_attributes(official: true, owner: Person.find_by!(username: "example_av_7k"))
+    expect(channel).to have_attributes(official: true, owner: Citizen.find_by!(username: "example_av_7k"))
     expect(stance.candidacy.featured_communications.count).to eq(2)
   end
 
@@ -32,14 +32,14 @@ RSpec.describe "Importing communications and stance evidence" do
     expect(importer.report[:features_added]).to be_empty
   end
 
-  it "attaches worker account submissions in JSON and YAML to existing people and candidacies" do
+  it "attaches worker account submissions in JSON and YAML to existing citizens and candidacies" do
     importer = Seeds::LibraryImporter.new
     importer.call([ town_hall ])
-    person = Person.find_by!(username: "example_av_7k")
-    candidacy = person.candidacies.sole
+    citizen = Citizen.find_by!(username: "example_av_7k")
+    candidacy = citizen.candidacies.sole
     template = Rails.root.join("db/seeds/ascent_seed_data/examples/candidate_accounts.json")
     document = JSON.parse(template.read)
-    document.fetch("records").zip([ person, candidacy ]).each do |record, owner|
+    document.fetch("records").zip([ citizen, candidacy ]).each do |record, owner|
       record.fetch("references")["owner"] = owner.entity_code
     end
 
@@ -50,13 +50,13 @@ RSpec.describe "Importing communications and stance evidence" do
         path
       end
       expect { importer.call([ paths.first ]) }.to change(Channel, :count).by(2)
-      document.fetch("records").zip([ person, candidacy ]).each do |record, owner|
+      document.fetch("records").zip([ citizen, candidacy ]).each do |record, owner|
         channel = Channel.find_by!(entity_code: record.fetch("code"))
         expect(channel).to have_attributes(owner: owner, official: true, url: record.dig("attributes", "url"))
       end
       expect { importer.call(paths) }.not_to change(Channel, :count)
       expect(importer.report[:conflicts]).to be_empty
-      expect(Person.count).to eq(1)
+      expect(Citizen.count).to eq(1)
       expect(Candidacy.count).to eq(1)
     end
   end
@@ -81,11 +81,11 @@ RSpec.describe "Importing communications and stance evidence" do
     expect(Channel.count).to eq(1)
   end
 
-  it "rejects a channel owner that is not a person, organization, or candidacy" do
+  it "rejects a channel owner that is not a citizen, organization, or candidacy" do
     path = Rails.root.join("tmp", "communications_import_spec", "bad_owner.yml")
     FileUtils.mkdir_p(path.dirname)
-    path.write(File.read(town_hall).sub("references: {owner: PERSON-EXAMPLE_AV_7K}", "references: {owner: STATE-USA-NY}"))
+    path.write(File.read(town_hall).sub("references: {owner: CITIZEN-EXAMPLE_AV_7K}", "references: {owner: STATE-USA-NY}"))
 
-    expect { Seeds::LibraryImporter.new.call([ path.to_s ]) }.to raise_error(Seeds::LibraryImporter::Error, /not a Person, Organization, Candidacy, Party code/)
+    expect { Seeds::LibraryImporter.new.call([ path.to_s ]) }.to raise_error(Seeds::LibraryImporter::Error, /not a Citizen, Organization, Candidacy, Party code/)
   end
 end

@@ -3,7 +3,7 @@ class EndorsementsController < ApplicationController
     races = Race.at_level(filters["level"])
     races = races.in_state(State.includes(:jurisdiction).find(filters["state_id"])) if filters["state_id"].present?
     races = races.in_county(County.find(filters["county_id"])) if filters["county_id"].present?
-    endorsements = Endorsement.includes(:endorser, candidacy: [ :person, { race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ] } ])
+    endorsements = Endorsement.includes(:endorser, candidacy: [ :citizen, { race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ] } ])
       .for_races(races)
       .order(endorsed_on: :desc, id: :desc)
     endorsements = endorsements.matching(filters["q"]) if filters["q"].present?
@@ -20,7 +20,7 @@ class EndorsementsController < ApplicationController
   end
 
   def show
-    endorsement = Endorsement.includes(:endorser, candidacy: [ :person, { race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ] } ]).find(params[:id])
+    endorsement = Endorsement.includes(:endorser, candidacy: [ :citizen, { race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ] } ]).find(params[:id])
     render Views::Endorsements::ShowView.new(endorsement: endorsement)
   end
 

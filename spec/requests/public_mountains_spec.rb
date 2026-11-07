@@ -4,7 +4,7 @@ require "vips"
 RSpec.describe "Public mountains", type: :request do
   let(:voter) { create(:voter, first_name: "Rosa", last_name: "Delgado") }
   let(:race) { create(:race, :active) }
-  let!(:candidate) { create(:candidacy, race: race, status: "active", person: create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
+  let!(:candidate) { create(:candidacy, race: race, status: "active", citizen: create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
   let(:mountain) { Mountain.new(voter: voter, race: race) }
 
   def save_mountain

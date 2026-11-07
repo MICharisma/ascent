@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory :person do
+  factory :citizen do
     first_name { Faker::Name.first_name }
     last_name { Faker::Name.last_name }
     middle_name { Faker::Name.middle_name }
@@ -126,6 +126,6 @@ FactoryBot.define do
     factory :community_activist, traits: [ :community_activist ]
     factory :educator_candidate, traits: [ :educator ]
     factory :veteran_candidate, traits: [ :veteran ]
-    factory :person_no_middle_name, traits: [ :no_middle_name ]
+    factory :citizen_no_middle_name, traits: [ :no_middle_name ]
   end
 end

@@ -3,7 +3,7 @@
 class Endorsement < ApplicationRecord
   KINDS = %w[ballot_line public].freeze
   # Stored as each endorser's base class, so a party is an Organization.
-  ENDORSER_TYPES = %w[Organization Person].freeze
+  ENDORSER_TYPES = %w[Organization Citizen].freeze
 
   belongs_to :candidacy
   belongs_to :endorser, polymorphic: true
@@ -26,9 +26,9 @@ class Endorsement < ApplicationRecord
 
   scope :matching, ->(query) {
     organizations = where(endorser_type: "Organization", endorser_id: Organization.named_like(query).select(:id))
-    people = where(endorser_type: "Person", endorser_id: Person.named_like(query).select(:id))
-    candidates = where(candidacy_id: Candidacy.where(person_id: Person.named_like(query).select(:id)).select(:id))
-    organizations.or(people).or(candidates)
+    citizens = where(endorser_type: "Citizen", endorser_id: Citizen.named_like(query).select(:id))
+    candidates = where(candidacy_id: Candidacy.where(citizen_id: Citizen.named_like(query).select(:id)).select(:id))
+    organizations.or(citizens).or(candidates)
   }
 
   def kind_label

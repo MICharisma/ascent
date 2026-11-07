@@ -128,10 +128,10 @@ RSpec.describe "Offices Index", type: :request do
     context "with offices having candidates and elections" do
       let!(:office) { create(:office, :active) }
       let!(:race) { create_race_for(office, :active) }
-      let!(:candidate1) { create(:person, :experienced_politician) }
-      let!(:candidate2) { create(:person, :business_leader) }
-      let!(:candidacy1) { create(:candidacy, race: race, person: candidate1) }
-      let!(:candidacy2) { create(:candidacy, race: race, person: candidate2) }
+      let!(:candidate1) { create(:citizen, :experienced_politician) }
+      let!(:candidate2) { create(:citizen, :business_leader) }
+      let!(:candidacy1) { create(:candidacy, race: race, citizen: candidate1) }
+      let!(:candidacy2) { create(:candidacy, race: race, citizen: candidate2) }
 
       it "displays candidate information when available" do
         get offices_path

@@ -33,20 +33,20 @@ class Views::Mountains::YourVote < Views::ApplicationView
   def approved_item(candidacy)
     li(class: "approved-item") do
       span(class: "approved-check") { icon(:check) }
-      span(class: "approved-name") { candidacy.person.full_name }
+      span(class: "approved-name") { candidacy.citizen.full_name }
       span(class: "approved-rating") { @mountain.ratings[candidacy.id].to_s }
     end
   end
 
   def not_approved_text
-    names = @mountain.not_approved_candidacies.map { it.person.full_name }
+    names = @mountain.not_approved_candidacies.map { it.citizen.full_name }
     names.any? ? names.join(", ") : "no one"
   end
 
   def off_ballot_note
     p(class: "off-ballot-note") do
       strong { "Also above your line, off the ballot: " }
-      plain "#{@mountain.approved_off_ballot_candidacies.map { it.person.full_name }.join(", ")}. "
+      plain "#{@mountain.approved_off_ballot_candidacies.map { it.citizen.full_name }.join(", ")}. "
       plain "This doesn't change your ballot; it shows shared support in the results."
     end
   end

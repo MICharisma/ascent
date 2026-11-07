@@ -5,11 +5,11 @@ require 'rails_helper'
 RSpec.describe "Primary candidates on the mountain", type: :request do
   let!(:race) { create(:race, :active) }
   let!(:voter) { create(:voter) }
-  let(:nominee) { create(:person, first_name: "Marisol", last_name: "Okafor") }
-  let(:eliminated) { create(:person, first_name: "Dwayne", last_name: "Pritchett") }
-  let!(:on_ballot) { create(:candidacy, race: race, person: nominee, status: "active") }
+  let(:nominee) { create(:citizen, first_name: "Marisol", last_name: "Okafor") }
+  let(:eliminated) { create(:citizen, first_name: "Dwayne", last_name: "Pritchett") }
+  let!(:on_ballot) { create(:candidacy, race: race, citizen: nominee, status: "active") }
   let!(:from_primary) do
-    create(:candidacy, race: race, person: eliminated, status: "active", participation: "off_ballot", primary_candidacy: create(:candidacy, person: eliminated))
+    create(:candidacy, race: race, citizen: eliminated, status: "active", participation: "off_ballot", primary_candidacy: create(:candidacy, citizen: eliminated))
   end
 
   before { sign_in voter }

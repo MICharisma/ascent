@@ -1,6 +1,6 @@
 class Views::Candidacies::CandidacyForm < Views::Components::Forms::Base
   def view_template
-    row field(:person_id).collection_select(::Person.all, text: :name, prompt: "Select a person"), label: "Person"
+    row field(:citizen_id).collection_select(::Citizen.all, text: :name, prompt: "Select a citizen"), label: "Citizen"
     row field(:race_id).collection_select(::Race.with_naming_details, text: :name, prompt: "Select a race"), label: "Race"
     row field(:status).text
     row field(:announcement_date).date

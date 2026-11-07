@@ -12,10 +12,10 @@ RSpec.describe "Voting Workflow", type: :system do
   let!(:office) { create(:office, position: create(:position, title: "Mayor"), jurisdiction: springfield.jurisdiction) }
   let!(:race) { create_race_for(office, :active, year: year) }
 
-  let!(:candidate1) { create(:person, first_name: "Alice", middle_name: nil, last_name: "Johnson") }
-  let!(:candidate2) { create(:person, first_name: "Bob", middle_name: nil, last_name: "Smith") }
-  let!(:candidacy1) { create(:candidacy, :active, person: candidate1, race: race) }
-  let!(:candidacy2) { create(:candidacy, :active, person: candidate2, race: race) }
+  let!(:candidate1) { create(:citizen, first_name: "Alice", middle_name: nil, last_name: "Johnson") }
+  let!(:candidate2) { create(:citizen, first_name: "Bob", middle_name: nil, last_name: "Smith") }
+  let!(:candidacy1) { create(:candidacy, :active, citizen: candidate1, race: race) }
+  let!(:candidacy2) { create(:candidacy, :active, citizen: candidate2, race: race) }
 
   let!(:voter) { create(:voter, first_name: "Jane", last_name: "Voter") }
   let!(:baseline) { create(:voter_race_baseline, voter: voter, race: race, baseline: 250) }
@@ -71,16 +71,16 @@ RSpec.describe "Voting Workflow", type: :system do
     end
   end
 
-  describe "viewing people and candidates" do
-    it "shows all people in the system" do
-      visit people_path
+  describe "viewing citizens and candidates" do
+    it "shows all citizens in the system" do
+      visit citizens_path
 
-      expect(page).to have_content("People")
+      expect(page).to have_content("Citizens")
       expect(page).to have_content("Alice Johnson")
       expect(page).to have_content("Bob Smith")
     end
 
-    it "shows candidacies for people" do
+    it "shows candidacies for citizens" do
       visit candidacies_path
 
       expect(page).to have_content("Candidacies")

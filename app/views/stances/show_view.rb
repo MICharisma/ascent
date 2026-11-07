@@ -7,7 +7,7 @@ class Views::Stances::ShowView < Views::ApplicationView
 
   def view_template
     div(class: "record-page policy-page", id: dom_id(@stance, :show)) do
-      PageHeader(title: "#{person.full_name} on #{@stance.approach.title}", trail: trail_for(@stance), current: person.full_name,
+      PageHeader(title: "#{citizen.full_name} on #{@stance.approach.title}", trail: trail_for(@stance), current: citizen.full_name,
         eyebrow: eyebrow, lede: @stance.explanation.presence, record: @stance) do
         PillLink(label: "Their candidacy", path: candidacy_path(candidacy), icon: :badge_check, variant: "outline")
       end
@@ -32,8 +32,8 @@ class Views::Stances::ShowView < Views::ApplicationView
     @stance.candidacy
   end
 
-  def person
-    candidacy.person
+  def citizen
+    candidacy.citizen
   end
 
   def eyebrow
@@ -104,7 +104,7 @@ class Views::Stances::ShowView < Views::ApplicationView
     race = candidacy.race
     SideCard(heading: "The candidacy") do
       dl(class: "place-facts-list") do
-        FactRow(label: "Candidate") { link_to person.full_name, person, class: "text-link" }
+        FactRow(label: "Candidate") { link_to citizen.full_name, citizen, class: "text-link" }
         FactRow(label: "Running for") { link_to race.office.name, race, class: "text-link" }
         FactRow(label: "Election") { link_to race.election.name, race.election, class: "text-link" }
       end

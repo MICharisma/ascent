@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# A candidate as a person running for one seat: who they are and how they appear on the ballot, where they
+# A candidate as a citizen running for one seat: who they are and how they appear on the ballot, where they
 # stand by topic, who endorses them, where they speak for themselves, and how voters rate them, in total
 # only. The side column places the candidacy in its race, and leaves room for evaluations to come.
 class Views::Candidacies::ShowView < Views::ApplicationView
@@ -13,16 +13,16 @@ class Views::Candidacies::ShowView < Views::ApplicationView
   def view_template
     div(class: "record-page candidacy-page", id: dom_id(@candidacy, :show)) do
       div(class: "profile-header") do
-        PageHeader(title: person.full_name, trail: trail_for(@candidacy), eyebrow: eyebrow, lede: lede, record: @candidacy,
+        PageHeader(title: citizen.full_name, trail: trail_for(@candidacy), eyebrow: eyebrow, lede: lede, record: @candidacy,
           chips: method(:chips)) do
           primary_action
-          PillLink(label: "Person page", path: person_path(person), icon: :user_round, variant: "outline")
+          PillLink(label: "Citizen page", path: citizen_path(citizen), icon: :user_round, variant: "outline")
         end
-        ProfilePortrait(person: person, image: images.first)
+        ProfilePortrait(citizen: citizen, image: images.first)
       end
       div(class: "place-layout") do
         div(class: "place-main") do
-          ProfileImages(person: person, images: images)
+          ProfileImages(citizen: citizen, images: images)
           communications_section
           stances_section
           endorsements_section
@@ -31,7 +31,7 @@ class Views::Candidacies::ShowView < Views::ApplicationView
         end
         aside(class: "place-aside", aria: { label: "About this candidacy" }) do
           race_card
-          OfficialChannels(owners: [ person, @candidacy ])
+          OfficialChannels(owners: [ citizen, @candidacy ])
           admin_card
         end
       end
@@ -40,8 +40,8 @@ class Views::Candidacies::ShowView < Views::ApplicationView
 
   private
 
-  def person
-    @candidacy.person
+  def citizen
+    @candidacy.citizen
   end
 
   def race
@@ -57,11 +57,11 @@ class Views::Candidacies::ShowView < Views::ApplicationView
   end
 
   def lede
-    @candidacy.platform_summary.presence || "#{person.full_name} is running for #{race.office.name} in the #{election.name}."
+    @candidacy.platform_summary.presence || "#{citizen.full_name} is running for #{race.office.name} in the #{election.name}."
   end
 
   def chips
-    span(class: "row-badge row-badge-mock") { "Invented for a mock election" } if person.fictional
+    span(class: "row-badge row-badge-mock") { "Invented for a mock election" } if citizen.fictional
     StatusChip(status: @candidacy.status.downcase)
     labels = @candidacy.ballot_lines.map(&:label)
     labels = [ @candidacy.primary_summary ] if labels.empty? && @candidacy.primary_candidacy
@@ -127,13 +127,13 @@ class Views::Candidacies::ShowView < Views::ApplicationView
   end
 
   def communications_section
-    communications = Communication.for_profile(person, [ @candidacy ]).includes(:channel)
+    communications = Communication.for_profile(citizen, [ @candidacy ]).includes(:channel)
       .order(published_on: :desc, id: :desc).limit(COMMUNICATION_LIMIT).to_a
     CommunicationGallery(communications: communications)
   end
 
   def images
-    @images ||= (@candidacy.images.to_a + person.images.to_a).uniq(&:id)
+    @images ||= (@candidacy.images.to_a + citizen.images.to_a).uniq(&:id)
   end
 
   # Only totals: a rating is private to its voter, so no one may see who rated the candidate or how.
@@ -161,10 +161,10 @@ class Views::Candidacies::ShowView < Views::ApplicationView
   end
 
   def rivals
-    others = race.candidacies.where.not(id: @candidacy.id).includes(:person, :ballot_lines).sort_by { it.person.last_name.to_s }
+    others = race.candidacies.where.not(id: @candidacy.id).includes(:citizen, :ballot_lines).sort_by { it.citizen.last_name.to_s }
     RelatedList(heading: "Also running for #{race.office.position.title}", records: others.first(RIVAL_LIMIT), total: others.size,
       see_all: race_path(race, anchor: "race-candidates"), noun: "candidates") do |candidacy|
-      ListRow(record: candidacy, title: candidacy.person.full_name, meta: candidacy.ballot_labels)
+      ListRow(record: candidacy, title: candidacy.citizen.full_name, meta: candidacy.ballot_labels)
     end
   end
 

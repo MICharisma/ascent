@@ -25,14 +25,14 @@ class PortraitGenerator
 
   def call
     raise Disabled, "Portrait generation is disabled pending legal review" unless self.class.enabled?
-    raise ArgumentError, "Subject must be a person or candidacy" unless @subject.is_a?(Person) || @subject.is_a?(Candidacy)
-    person = @subject.is_a?(Candidacy) ? @subject.person : @subject
-    unless @reference_image.file.attached? && @reference_image.image_placements.exists?(subject: [ person, @subject ])
+    raise ArgumentError, "Subject must be a citizen or candidacy" unless @subject.is_a?(Citizen) || @subject.is_a?(Candidacy)
+    citizen = @subject.is_a?(Candidacy) ? @subject.citizen : @subject
+    unless @reference_image.file.attached? && @reference_image.image_placements.exists?(subject: [ citizen, @subject ])
       raise ArgumentError, "Choose an uploaded reference image from this profile"
     end
     style = STYLES.fetch(@style) { raise ArgumentError, "Unknown portrait style" }
     pastime = PASTIMES.sample(random: @random) if @style == "american_pastime"
-    prompt = "Create an AI-generated illustration of #{person.full_name} using the attached image as the identity reference. " \
+    prompt = "Create an AI-generated illustration of #{citizen.full_name} using the attached image as the identity reference. " \
       "Preserve their facial features. #{style.fetch(:scene)} #{"Show the subject #{pastime}." if pastime} " \
       "This is an imagined illustration, not evidence that an event occurred. Do not add claims, slogans, party symbols, or endorsements."
     model = Rails.application.config.x.portrait_generation.model
@@ -40,8 +40,8 @@ class PortraitGenerator
     metadata = { ai_generated: true, portrait_generation: { style: @style, pastime: pastime, prompt: prompt, model: model,
       generated_at: Time.current.iso8601, reference_image_id: @reference_image.id, reference_blob_id: @reference_image.file.blob.id } }
     Image.transaction do
-      image = Image.new(alt_text: "AI-generated #{style.fetch(:label).downcase} of #{person.full_name}", credit: "AI-generated with OpenAI")
-      image.file.attach(io: StringIO.new(bytes), filename: "#{person.full_name.parameterize}-#{@style}.png", content_type: "image/png", metadata: metadata)
+      image = Image.new(alt_text: "AI-generated #{style.fetch(:label).downcase} of #{citizen.full_name}", credit: "AI-generated with OpenAI")
+      image.file.attach(io: StringIO.new(bytes), filename: "#{citizen.full_name.parameterize}-#{@style}.png", content_type: "image/png", metadata: metadata)
       image.save!
       @subject.image_placements.create!(image: image, position: (@subject.image_placements.maximum(:position) || -1) + 1)
       image

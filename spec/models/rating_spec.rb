@@ -117,8 +117,8 @@ RSpec.describe Rating, type: :model do
 
   describe 'instance methods' do
     let(:voter) { create(:voter, first_name: "John", last_name: "Doe") }
-    let(:person) { create(:person, first_name: "Jane", middle_name: nil, last_name: "Smith") }
-    let(:candidacy) { create(:candidacy, person: person) }
+    let(:citizen) { create(:citizen, first_name: "Jane", middle_name: nil, last_name: "Smith") }
+    let(:candidacy) { create(:candidacy, citizen: citizen) }
     let(:rating) { create(:rating, voter: voter, candidacy: candidacy, rating: 350) }
 
     describe '#name' do

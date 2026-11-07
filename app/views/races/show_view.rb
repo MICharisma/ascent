@@ -44,8 +44,8 @@ class Views::Races::ShowView < Views::ApplicationView
   end
 
   def candidacies
-    @candidacies ||= @race.candidacies.includes(:person, :ballot_lines, primary_candidacy: { office: :nominating_organization })
-      .sort_by { [ it.person.last_name.to_s, it.person.first_name.to_s ] }
+    @candidacies ||= @race.candidacies.includes(:citizen, :ballot_lines, primary_candidacy: { office: :nominating_organization })
+      .sort_by { [ it.citizen.last_name.to_s, it.citizen.first_name.to_s ] }
   end
 
   def on_ballot
@@ -146,7 +146,7 @@ class Views::Races::ShowView < Views::ApplicationView
   end
 
   def candidate_row(candidacy, labels)
-    ListRow(record: candidacy, title: candidacy.person.full_name, meta: labels) do
+    ListRow(record: candidacy, title: candidacy.citizen.full_name, meta: labels) do
       StatusChip(status: candidacy.status.downcase) unless %w[active announced].include?(candidacy.status.downcase)
     end
   end
@@ -177,7 +177,7 @@ class Views::Races::ShowView < Views::ApplicationView
     return unless candidacy
 
     li(class: "approval-bar") do
-      span(class: "approval-bar-name") { candidacy.person.full_name }
+      span(class: "approval-bar-name") { candidacy.citizen.full_name }
       span(class: "approval-bar-track", aria: { hidden: true }) do
         span(class: "approval-bar-fill", style: "--share: #{share.round}%")
       end
@@ -211,7 +211,7 @@ class Views::Races::ShowView < Views::ApplicationView
     holder = office.current_office_holder
     return unless holder
 
-    FactRow(label: "Approval winner, last race") { link_to holder.person.full_name, holder.person, class: "text-link" }
+    FactRow(label: "Approval winner, last race") { link_to holder.citizen.full_name, holder.citizen, class: "text-link" }
   end
 
   def election_card

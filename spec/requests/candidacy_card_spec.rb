@@ -1,11 +1,11 @@
 require "rails_helper"
 
 # A name on the ballot opens a card: major endorsements, residents' support from their saved
-# mountains, and links to the person and candidacy pages. It loads lazily into its own Turbo frame.
+# mountains, and links to the citizen and candidacy pages. It loads lazily into its own Turbo frame.
 RSpec.describe "Candidate card", type: :request do
   let(:race) { create(:race, :active) }
-  let(:okafor) { create(:candidacy, race: race, person: create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor"), party_label: nil) }
-  let(:lindqvist) { create(:candidacy, race: race, person: create(:person, first_name: "Theo", middle_name: nil, last_name: "Lindqvist"), party_label: nil) }
+  let(:okafor) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor"), party_label: nil) }
+  let(:lindqvist) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Theo", middle_name: nil, last_name: "Lindqvist"), party_label: nil) }
 
   def mountain!(ratings)
     voter = create(:voter)
@@ -25,7 +25,7 @@ RSpec.describe "Candidate card", type: :request do
     expect(response.body.index("Harbor Workers Union Local 12")).to be < response.body.index("Port Merritt Ledger")
     expect(response.body).to include("Endorsed · Sep 2026")
     expect(response.body).not_to include("Garden Club", "Old Guard PAC")
-    expect(response.body).to include(person_path(okafor.person), candidacy_path(okafor))
+    expect(response.body).to include(citizen_path(okafor.citizen), candidacy_path(okafor))
   end
 
   it "shows support from the first saved mountain, and says when there is none" do

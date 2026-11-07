@@ -2,7 +2,7 @@ class Candidacy < ApplicationRecord
   include Engageable
   include Illustrated
 
-  belongs_to :person
+  belongs_to :citizen
   belongs_to :race
   has_one :election, through: :race
   has_one :office, through: :race
@@ -32,11 +32,11 @@ class Candidacy < ApplicationRecord
   scope :from_primaries, -> { where.not(primary_candidacy_id: nil) }
   scope :not_from_primaries, -> { where(primary_candidacy_id: nil) }
 
-  scope :with_rating_details, -> { includes(:person, :ratings, :ballot_lines) }
+  scope :with_rating_details, -> { includes(:citizen, :ratings, :ballot_lines) }
   scope :with_election_context, -> { includes(race: [ :election, { office: :position } ]) }
 
   def name
-    "#{person.full_name} for #{office.position.title}"
+    "#{citizen.full_name} for #{office.position.title}"
   end
 
   # The printed labels, in ballot order, for display.

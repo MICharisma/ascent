@@ -1,7 +1,7 @@
 # A voter's own mark on a record: saving it for later, favoriting it, following it, or hiding it from lists.
 class Engagement < ApplicationRecord
   # Records visitors can engage with, by the type name stored in engageable_type.
-  ENGAGEABLE_TYPES = %w[Candidacy Race Issue Stance Person Municipality Election].freeze
+  ENGAGEABLE_TYPES = %w[Candidacy Race Issue Stance Citizen Municipality Election].freeze
 
   # Shown to other visitors as a count; bookmarks and hides stay private.
   PUBLIC_KINDS = %w[favorite follow].freeze

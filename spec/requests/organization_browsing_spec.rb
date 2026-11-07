@@ -5,7 +5,7 @@ RSpec.describe "Organizations, parties and endorsements", type: :request do
   let!(:union) { create(:organization, :union, state: calder, abbreviation: "HWU") }
   let!(:party) { Party.create!(name: "Calder Forward Party", abbreviation: "CFP", state: calder) }
   let!(:other_party) { Party.create!(name: "Lakeshore Forward Party", state: create(:state, name: "Lakeshore", code: "LS")) }
-  let(:candidacy) { create(:candidacy, person: create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
+  let(:candidacy) { create(:candidacy, citizen: create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
 
   def page
     Nokogiri::HTML(response.body)
@@ -71,8 +71,8 @@ RSpec.describe "Organizations, parties and endorsements", type: :request do
 
   it "combines endorsement name, kind and withdrawal filters, including personal endorsers" do
     current = create(:endorsement, candidacy: candidacy, endorser: union)
-    person = create(:person, first_name: "Mara", middle_name: nil, last_name: "Delgado")
-    withdrawn = create(:endorsement, :withdrawn, candidacy: candidacy, endorser: person)
+    citizen = create(:citizen, first_name: "Mara", middle_name: nil, last_name: "Delgado")
+    withdrawn = create(:endorsement, :withdrawn, candidacy: candidacy, endorser: citizen)
     BallotLine.create!(candidacy: candidacy, party: party, label: party.name, kind: "party")
 
     get endorsements_path, params: { q: "Okafor", kind: "public", status: "current" }
@@ -110,15 +110,15 @@ RSpec.describe "Organizations, parties and endorsements", type: :request do
   end
 
   it "links organizational and personal endorsers on candidacy pages and cards" do
-    person = create(:person)
+    citizen = create(:citizen)
     create(:endorsement, :major, candidacy: candidacy, endorser: union)
-    create(:endorsement, :major, candidacy: candidacy, endorser: person)
+    create(:endorsement, :major, candidacy: candidacy, endorser: citizen)
     BallotLine.create!(candidacy: candidacy, party: party, label: party.name, kind: "party")
 
     [ candidacy_path(candidacy), candidacy_card_path(candidacy) ].each do |path|
       get path
       expect(response).to have_http_status(:ok)
-      expect(page.css(".endorsement-name a").map { it["href"] }).to contain_exactly(organization_path(union), person_path(person), party_path(party))
+      expect(page.css(".endorsement-name a").map { it["href"] }).to contain_exactly(organization_path(union), citizen_path(citizen), party_path(party))
     end
   end
 

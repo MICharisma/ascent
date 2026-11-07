@@ -34,14 +34,14 @@ class Views::Mountains::ListView < Views::ApplicationView
     candidacy = data[:candidacy]
     div(class: "rating-row", data: { role: "rating-row", candidacy_id: candidacy.id, state: row_state(data), off_ballot: candidacy.primary_candidacy_id.present? }) do
       div(class: "rating-row-name") do
-        span(class: "rating-row-label") { candidacy.person.full_name }
+        span(class: "rating-row-label") { candidacy.citizen.full_name }
         Views::Mountains::PartyEndorsements(candidacy: candidacy)
         labels = candidacy.ballot_lines.reject { it.kind == "party" }.map(&:label).join("; ")
         summary = labels.presence || (candidacy.primary_summary if candidacy.ballot_lines.empty? && candidacy.primary_candidacy)
         span(class: "rating-row-sub") { summary } if summary
       end
       input(type: "range", min: 0, max: 500, step: 5, value: data[:rating_value], class: "rating-slider",
-        aria: { label: "Rate #{candidacy.person.full_name}" },
+        aria: { label: "Rate #{candidacy.citizen.full_name}" },
         data: { action: "input->mountain-editor#rateFromSlider change->mountain-editor#finishRatingSlider", candidacy_id: candidacy.id, role: "rating-slider" })
       span(class: "rating-row-value", data: { role: "row-value" }) { data[:has_rating] ? data[:rating_value].to_s : "—" }
     end

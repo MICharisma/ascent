@@ -1,5 +1,5 @@
 class ImagePlacement < ApplicationRecord
-  SUBJECT_TYPES = %w[Person Candidacy].freeze
+  SUBJECT_TYPES = %w[Citizen Candidacy].freeze
 
   belongs_to :image
   belongs_to :subject, polymorphic: true

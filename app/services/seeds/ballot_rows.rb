@@ -74,7 +74,7 @@ module Seeds
       rows
     end
 
-    # The printed name, split so that Person#full_name reproduces it.
+    # The printed name, split so that Citizen#full_name reproduces it.
     def name_parts(printed_name)
       words = printed_name.split
       suffix = words.pop if words.size > 2 && words.last.match?(NAME_SUFFIX)

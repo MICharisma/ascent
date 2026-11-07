@@ -13,7 +13,7 @@ module Seeds
     MODELS = {
       "Country" => Country, "State" => State, "County" => County, "Municipality" => Municipality,
       "District" => District, "Organization" => Organization, "Party" => Party, "Position" => Position, "Office" => Office,
-      "Election" => Election, "Race" => Race, "Person" => Person, "Candidacy" => Candidacy,
+      "Election" => Election, "Race" => Race, "Citizen" => Citizen, "Candidacy" => Candidacy,
       "Topic" => Topic, "Issue" => Issue, "Approach" => Approach, "Stance" => Stance,
       "Channel" => Channel, "Communication" => Communication, "StanceEvidence" => StanceEvidence,
       "Image" => Image, "ImagePlacement" => ImagePlacement
@@ -22,7 +22,7 @@ module Seeds
     SCOPE_ASSOCIATIONS = {
       "State" => %w[country], "County" => %w[state], "Municipality" => %w[state county],
       "Organization" => %w[state], "Party" => %w[state], "Office" => %w[position jurisdiction], "Election" => %w[jurisdiction year],
-      "Race" => %w[election office], "Candidacy" => %w[race person],
+      "Race" => %w[election office], "Candidacy" => %w[race citizen],
       "Issue" => %w[topic], "Approach" => %w[issue], "Stance" => %w[candidacy approach],
       "Communication" => %w[channel], "StanceEvidence" => %w[stance communication],
       "ImagePlacement" => %w[image]
@@ -35,8 +35,8 @@ module Seeds
     NATURAL_KEYS = {
       Country => %w[code], State => %w[country code], County => %w[state name],
       Municipality => %w[state name], District => %w[name], Organization => %w[state name], Party => %w[state name],
-      Position => %w[title], Person => %w[username], Office => %w[position jurisdiction seat_code],
-      Election => %w[jurisdiction election_date kind], Race => %w[election office], Candidacy => %w[race person],
+      Position => %w[title], Citizen => %w[username], Office => %w[position jurisdiction seat_code],
+      Election => %w[jurisdiction election_date kind], Race => %w[election office], Candidacy => %w[race citizen],
       Topic => %w[title], Issue => %w[topic title], Approach => %w[issue title],
       Stance => %w[candidacy approach], Channel => %w[platform handle], Communication => %w[url],
       StanceEvidence => %w[stance communication], Image => %w[url], ImagePlacement => %w[image subject]
@@ -49,11 +49,11 @@ module Seeds
     DERIVED_REFERENCES = { "Candidacy" => %w[primary_candidacy], "Election" => %w[creator] }.freeze
     # Columns Ascent fills itself, such as a mock election's invented candidates, or that the
     # published contract does not offer yet, like how a historical race was decided.
-    UNSEEDED_ATTRIBUTES = { "Person" => %w[fictional], "Race" => %w[decided_by] }.freeze
+    UNSEEDED_ATTRIBUTES = { "Citizen" => %w[fictional], "Race" => %w[decided_by] }.freeze
     EMPTY_REPORT = { created: [], unchanged: [], conflicts: [], aliases_added: [], ballot_lines_added: [], features_added: [], primary_candidates_added: [] }.freeze
 
-    PERSON_DISAMBIGUATOR = /_[2-9][A-HJ-NP-Z]\z/
-    FULL_PERSON_CODE = /\APERSON-[A-Z0-9]+(?:_[A-Z0-9]+)*#{PERSON_DISAMBIGUATOR.source}/
+    CITIZEN_DISAMBIGUATOR = /_[2-9][A-HJ-NP-Z]\z/
+    FULL_CITIZEN_CODE = /\ACITIZEN-[A-Z0-9]+(?:_[A-Z0-9]+)*#{CITIZEN_DISAMBIGUATOR.source}/
 
     attr_reader :report
 
@@ -129,7 +129,7 @@ module Seeds
           return target
         end
       end
-      model.find_by(entity_code: local_code(code)) || (person_by_name_code(local_code(code)) if type == "Person" && allow_name_code)
+      model.find_by(entity_code: local_code(code)) || (citizen_by_name_code(local_code(code)) if type == "Citizen" && allow_name_code)
     end
 
 
@@ -152,15 +152,15 @@ module Seeds
       EntityCode.find_by(namespace: @namespace, catalog: @catalog, code: code)
     end
 
-    # PERSON-JAMES_LT names the one person whose code adds a disambiguator to JAMES_LT.
-    def person_by_name_code(code)
-      return if code.match?(PERSON_DISAMBIGUATOR)
+    # CITIZEN-JAMES_LT names the one citizen whose code adds a disambiguator to JAMES_LT.
+    def citizen_by_name_code(code)
+      return if code.match?(CITIZEN_DISAMBIGUATOR)
 
-      matches = codes_starting("#{code}_").select { |candidate| candidate.delete_prefix(code).match?(/\A#{PERSON_DISAMBIGUATOR.source}/) }
+      matches = codes_starting("#{code}_").select { |candidate| candidate.delete_prefix(code).match?(/\A#{CITIZEN_DISAMBIGUATOR.source}/) }
                                           .map { |candidate| binding_for(candidate).canonical_code }.uniq
       raise Error, "#{code} could be #{matches.sort.join(" or ")}; use the full code" if matches.many?
 
-      resolve_code("Person", matches.first) if matches.one?
+      resolve_code("Citizen", matches.first) if matches.one?
     end
 
     # A code's binding records its record's base class, so a party's binding says Organization.
@@ -233,13 +233,13 @@ module Seeds
           raise Error, "#{record.location}: invalid local entity code #{code.inspect}"
         end
       end
-      if record.type == "Person"
-        unless record.code.match?(FULL_PERSON_CODE)
-          raise Error, "#{record.location}: Person definition #{record.code} requires a disambiguator; bare name codes are allowed only as references"
+      if record.type == "Citizen"
+        unless record.code.match?(FULL_CITIZEN_CODE)
+          raise Error, "#{record.location}: Citizen definition #{record.code} requires a disambiguator; bare name codes are allowed only as references"
         end
         username = record.attributes["username"]
-        if record.attributes["username_status"] == "provisional" && username != record.code.delete_prefix("PERSON-").downcase
-          raise Error, "#{record.location}: Person #{record.code} provisional username #{username.inspect} does not match its code"
+        if record.attributes["username_status"] == "provisional" && username != record.code.delete_prefix("CITIZEN-").downcase
+          raise Error, "#{record.location}: Citizen #{record.code} provisional username #{username.inspect} does not match its code"
         end
       end
       record.attributes.each_key do |key|

@@ -37,7 +37,7 @@ class Views::Organizations::ShowView < Views::ApplicationView
 
   def endorsements_section
     endorsements = @organization.endorsements.current.strongest_first
-    RelatedList(heading: "Current endorsements", records: endorsements.includes(candidacy: [ :person, { race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ] } ]).limit(10),
+    RelatedList(heading: "Current endorsements", records: endorsements.includes(candidacy: [ :citizen, { race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ] } ]).limit(10),
       total: endorsements.count, empty: "No current endorsements are recorded.") { EndorsementRow(endorsement: it) }
     PillLink(label: "All endorsements", path: endorsements_path(organization_id: @organization.id), icon: :badge_check)
   end

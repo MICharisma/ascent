@@ -4,7 +4,7 @@ class Channel < ApplicationRecord
   PLATFORM_LABELS = { "website" => "Website", "youtube" => "YouTube", "instagram" => "Instagram", "tiktok" => "TikTok",
     "x" => "X", "bluesky" => "Bluesky", "facebook" => "Facebook", "threads" => "Threads", "other" => "Other" }.freeze
   # Stored as each owner's base class, so a party is an Organization.
-  OWNER_TYPES = %w[Person Organization Candidacy].freeze
+  OWNER_TYPES = %w[Citizen Organization Candidacy].freeze
   REVIEW_STATUSES = %w[pending approved rejected].freeze
 
   belongs_to :owner, polymorphic: true, optional: true

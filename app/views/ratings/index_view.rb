@@ -6,7 +6,7 @@ class Views::Ratings::IndexView < Views::ApplicationView
 
   def view_template
     ResourceIndex(collection: @ratings, pagy: @pagy, lede: "Every rating voters have given. Only admins see this list.") do |rating|
-      ListRow(record: rating, title: rating.voter.full_name, meta: "#{rating.candidacy.person.full_name} · #{rating.candidacy.race.office.name} · rated #{rating.rating}")
+      ListRow(record: rating, title: rating.voter.full_name, meta: "#{rating.candidacy.citizen.full_name} · #{rating.candidacy.race.office.name} · rated #{rating.rating}")
     end
   end
 end

@@ -8,7 +8,7 @@ class MountainDiscovery
 
   def races
     candidates = Candidacy.not_from_primaries.still_running.where(participation: "active")
-      .group(:race_id).having("COUNT(DISTINCT person_id) >= 2").select(:race_id, "COUNT(DISTINCT person_id) AS candidate_count")
+      .group(:race_id).having("COUNT(DISTINCT citizen_id) >= 2").select(:race_id, "COUNT(DISTINCT citizen_id) AS candidate_count")
     votes = VoterRaceBaseline.group(:race_id).select(:race_id, "COUNT(*) AS vote_count")
     recent_saves = VoterRaceBaseline.where(updated_at: @recent_since..).select(:race_id, :voter_id)
     recent_ratings = Rating.joins(:candidacy)

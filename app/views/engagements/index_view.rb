@@ -10,7 +10,7 @@ class Views::Engagements::IndexView < Views::ApplicationView
       if @engagements.any?
         SECTIONS.each { |kind, title| saved_section(kind, title) }
       else
-        p(class: "saved-empty") { "Nothing saved yet. Candidacies, races, issues, stances, and people each have Save, Favorite, Follow, and Hide buttons." }
+        p(class: "saved-empty") { "Nothing saved yet. Candidacies, races, issues, stances, and citizens each have Save, Favorite, Follow, and Hide buttons." }
       end
     end
   end

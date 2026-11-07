@@ -178,10 +178,10 @@ RSpec.describe "Roles, heaven-banning, and channel reviews", type: :request do
   end
 
   describe "Candidate social channel reviews" do
-    let(:person) { create(:person, first_name: "Elena", middle_name: nil, last_name: "Rostova") }
+    let(:citizen) { create(:citizen, first_name: "Elena", middle_name: nil, last_name: "Rostova") }
     let!(:pending_channel) do
       Channel.create!(
-        owner: person,
+        owner: citizen,
         platform: "bluesky",
         handle: "elenarostova",
         url: "https://bsky.app/profile/elenarostova",
@@ -243,7 +243,7 @@ RSpec.describe "Roles, heaven-banning, and channel reviews", type: :request do
     end
 
     it "allows a reviewer, moderator, or admin to approve and reject candidate channels" do
-      get person_path(person)
+      get citizen_path(citizen)
       expect(response.body).not_to include("elenarostova · Bluesky")
 
       sign_in reviewer
@@ -260,7 +260,7 @@ RSpec.describe "Roles, heaven-banning, and channel reviews", type: :request do
       )
       expect(pending_channel.reviewed_at).to be_present
 
-      get person_path(person)
+      get citizen_path(citizen)
       expect(response.body).to include("elenarostova · Bluesky")
 
       sign_in moderator
@@ -272,7 +272,7 @@ RSpec.describe "Roles, heaven-banning, and channel reviews", type: :request do
         reviewed_by: moderator
       )
 
-      get person_path(person)
+      get citizen_path(citizen)
       expect(response.body).not_to include("elenarostova · Bluesky")
     end
   end

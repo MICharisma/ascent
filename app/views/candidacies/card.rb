@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # The card a ballot opens on a candidate's name: who they are, their major endorsements, how residents'
-# mountains treat them, and links to their person and candidacy pages.
+# mountains treat them, and links to their citizen and candidacy pages.
 # Rendered into the Turbo frame of the same id; links leave the frame for the whole page.
 class Views::Candidacies::Card < Views::ApplicationView
   ENDORSEMENT_LIMIT = 5
@@ -10,7 +10,7 @@ class Views::Candidacies::Card < Views::ApplicationView
 
   def view_template
     turbo_frame_tag(dom_id(@candidacy, :card), target: "_top") do
-      article(class: "candidate-card", aria: { label: person.full_name }) do
+      article(class: "candidate-card", aria: { label: citizen.full_name }) do
         card_head
         ballot_lines
         endorsements_section
@@ -22,14 +22,14 @@ class Views::Candidacies::Card < Views::ApplicationView
 
   private
 
-  def person
-    @candidacy.person
+  def citizen
+    @candidacy.citizen
   end
 
   def card_head
     header(class: "candidate-card-head") do
       div(class: "candidate-card-title") do
-        h3(class: "candidate-card-name") { PersonName(person: person) }
+        h3(class: "candidate-card-name") { CitizenName(citizen: citizen) }
         span(class: "candidate-card-office") { @candidacy.race.office.name }
       end
       button(type: "button", class: "icon-action candidate-card-close", popovertarget: candidate_popover_id(@candidacy),
@@ -98,7 +98,7 @@ class Views::Candidacies::Card < Views::ApplicationView
 
   def card_links
     footer(class: "candidate-card-links") do
-      PillLink(label: "Person page", path: person_path(person), icon: :user, variant: "outline")
+      PillLink(label: "Citizen page", path: citizen_path(citizen), icon: :user, variant: "outline")
       PillLink(label: "Candidacy page", path: candidacy_path(@candidacy), icon: :file_text, variant: "outline")
     end
   end

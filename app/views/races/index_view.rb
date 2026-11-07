@@ -105,7 +105,7 @@ class Views::Races::IndexView < Views::ApplicationView
   end
 
   def candidate_names(race)
-    names = race.candidacies.reject(&:primary_candidacy_id).map { it.person.full_name }
+    names = race.candidacies.reject(&:primary_candidacy_id).map { it.citizen.full_name }
     return if names.empty?
 
     shown = names.first(CANDIDATE_NAME_LIMIT).join(", ")
