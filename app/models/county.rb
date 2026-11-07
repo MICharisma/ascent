@@ -1,5 +1,6 @@
 class County < ApplicationRecord
   include JurisdictionOwner
+  include AdoptsRizzCode
 
   belongs_to :state
   has_many :municipalities, dependent: :nullify
