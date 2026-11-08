@@ -15,6 +15,11 @@ namespace :rizz do
     placed.each_slice(Rizz::Client::DISPLAY_BATCH_LIMIT) { names.refresh it }
   end
 
+  desc "Import a timed sample (mode random or same_names) of real citizens whose names Rizz can read, listing the rest in tmp/rizz_name_overflow.csv (needs rizz-client, RIZZ_ENDPOINT, RIZZ_API_TOKEN, RIZZ_SCOPE)"
+  task :import_sample, [ :limit, :mode ] => :environment do |_, args|
+    RizzImportSample.new(limit: Integer(args.fetch(:limit, 100)), mode: args.fetch(:mode, "random")).call
+  end
+
   desc "Fetch the names Rizz authorizes for every real citizen into rizz_names (needs RIZZ_ENDPOINT, RIZZ_API_TOKEN, RIZZ_SCOPE)"
   task refresh_names: :environment do
     puts RizzNames.new.revalidate.map { |purpose, result| "#{purpose}: #{result}" }.join(", ")
