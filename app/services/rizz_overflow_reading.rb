@@ -19,11 +19,14 @@ class RizzOverflowReading
     rows = Citizen.real.order(:id).pluck(:id, :first_name, :middle_name, :last_name)
       .reject { |_, first, middle, last| Rizz::Ascent::NameShape.accepted?(Rizz::Ascent::NameShape.classify(first, middle, last)) }
     stored = CitizenNameReading.where(citizen_id: rows.map(&:first)).index_by(&:citizen_id)
-    # A reviewer's decision on the same spelling stands; Jev doesn't read it again.
+    # A reviewer's decision on the same spelling stands; Jev doesn't read it
+    # again. Jev reads a name again when its model or the readings code
+    # proposes for it have changed.
     unread = rows.reject do |id, first, middle, last|
       reading = stored[id]
-      reading && reading.name_text == Rizz::Ascent::NameReader.text(first, middle, last) &&
-        (CitizenNameReading::REVIEWED.include?(reading.outcome) || reading.model == @jev.model)
+      next false unless reading && reading.name_text == Rizz::Ascent::NameReader.text(first, middle, last)
+      next true if CitizenNameReading::REVIEWED.include?(reading.outcome)
+      reading.model == @jev.model && reading.candidates == Rizz::Ascent::NameReader.candidates(first, middle, last).map { Rizz::Ascent::NameReader.describe(it) }
     end
     started = clock
     results = read(unread)

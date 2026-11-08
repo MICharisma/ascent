@@ -60,8 +60,10 @@ class RizzCitizenSync
 
   attr_reader :client
 
-  # Nil when Rizz can read the name columns itself; else the parts Ascent read.
+  # Nil when Rizz can read the name columns itself; else the parts Ascent
+  # read. A fictional citizen is never sent, whatever its name.
   def name_parts(citizen)
+    return nil if citizen.fictional
     shape = Rizz::Ascent::NameShape.classify(citizen.first_name, citizen.middle_name, citizen.last_name)
     return nil if Rizz::Ascent::NameShape.accepted?(shape)
 

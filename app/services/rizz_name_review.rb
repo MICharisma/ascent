@@ -4,6 +4,8 @@
 # settles it with one of them on Rizz's review page, or rejects them all.
 # A decision on the name as it is still spelled becomes the reading's
 # outcome, and the next sync sends a settled name with its chosen parts.
+# A queued name Jev has since read with confidence is withdrawn from the
+# queue, unless a reviewer already decided it: the reviewer's decision wins.
 # Needs rizz-client, RIZZ_ENDPOINT and RIZZ_API_TOKEN.
 class RizzNameReview
   BATCH = 100
@@ -12,9 +14,10 @@ class RizzNameReview
     @client = client
   end
 
-  # { queued:, settled:, rejected:, waiting: }
+  # { queued:, settled:, rejected:, waiting:, withdrawn: }
   def call
     counts = Hash.new(0)
+    withdraw_read_names(counts)
     readings.each_slice(BATCH) do |batch|
       batch.each do |reading|
         submit(reading)
@@ -23,10 +26,24 @@ class RizzNameReview
       decisions = @client.name_readings(batch.map { it.citizen_id.to_s }).index_by { it.fetch("person_external_id") }
       batch.each { counts[apply(it, decisions[it.citizen_id.to_s])] += 1 }
     end
-    counts.slice(:queued, :settled, :rejected, :waiting)
+    counts.slice(:queued, :settled, :rejected, :waiting, :withdrawn)
   end
 
   private
+
+  def withdraw_read_names(counts)
+    CitizenNameReading.where(outcome: "jev").where.not(queued_at: nil).find_each do |reading|
+      result = begin
+        @client.withdraw_name_reading(person_external_id: reading.citizen_id.to_s, name_text: reading.name_text)
+      rescue Rizz::Error => error
+        raise unless error.status == 404
+        {}
+      end
+      outcome = apply(reading, result)
+      counts[outcome == :waiting ? :withdrawn : outcome] += 1
+      reading.update!(queued_at: nil) if outcome == :waiting
+    end
+  end
 
   def readings
     CitizenNameReading.where(outcome: "overflow").includes(:citizen).order(:citizen_id).select(&:current?)
@@ -36,6 +53,7 @@ class RizzNameReview
     citizen = reading.citizen
     candidates = Rizz::Ascent::NameReader.candidates(citizen.first_name, citizen.middle_name, citizen.last_name)
     pick = candidates.index { Rizz::Ascent::NameReader.describe(it) == reading.pick }
+    reading.update!(queued_at: Time.current)
     @client.submit_name_reading(person_external_id: citizen.id.to_s, name_text: reading.name_text, candidates: candidates,
       reason: reading.shape, recorded_as: { first_name: citizen.first_name, middle_name: citizen.middle_name, last_name: citizen.last_name },
       assessment: { model: reading.model, pick: pick, probability: reading.probability }.compact)
