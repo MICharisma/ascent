@@ -15,7 +15,8 @@
 # A name whose columns take a shape Rizz reads on its own (Rizz::Ascent::
 # NameShape) goes as it is, and Rizz derives its parts. Any other name goes
 # with the parts Ascent read for it (CitizenNameReading, from rake
-# rizz:read_overflow); until it has a confident reading, the sync is held.
+# rizz:read_overflow) or a Rizz reviewer chose (rake rizz:review_names);
+# until it has one, the sync is held.
 #
 # Fictional citizens from mock elections are never sent, and Voters are not
 # Citizens. Needs the rizz-client gem, RIZZ_ENDPOINT and RIZZ_API_TOKEN.
@@ -66,7 +67,8 @@ class RizzCitizenSync
 
     reading = citizen.name_reading
     raise NameHeld, "The name needs a reading (#{shape})" unless reading&.current?
-    raise NameHeld, "The name awaits triage (#{shape})" unless reading.outcome == "jev"
+    raise NameHeld, "A reviewer found no reading fits; the name needs correcting (#{shape})" if reading.outcome == "rejected"
+    raise NameHeld, "The name awaits triage (#{shape})" unless CitizenNameReading::READ.include?(reading.outcome)
     reading.parts
   end
 

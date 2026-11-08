@@ -25,6 +25,11 @@ namespace :rizz do
     RizzOverflowReading.new.call
   end
 
+  desc "Send names Jev couldn't read to Rizz's reviewers and take up their decisions (needs rizz-client, RIZZ_ENDPOINT, RIZZ_API_TOKEN)"
+  task review_names: :environment do
+    puts RizzNameReview.new.call.map { |outcome, count| "#{outcome}: #{count}" }.join(", ").presence || "No names waiting for review."
+  end
+
   desc "Fetch the names Rizz authorizes for every real citizen into rizz_names (needs RIZZ_ENDPOINT, RIZZ_API_TOKEN, RIZZ_SCOPE)"
   task refresh_names: :environment do
     puts RizzNames.new.revalidate.map { |purpose, result| "#{purpose}: #{result}" }.join(", ")

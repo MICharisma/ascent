@@ -19,8 +19,11 @@ class RizzOverflowReading
     rows = Citizen.real.order(:id).pluck(:id, :first_name, :middle_name, :last_name)
       .reject { |_, first, middle, last| Rizz::Ascent::NameShape.accepted?(Rizz::Ascent::NameShape.classify(first, middle, last)) }
     stored = CitizenNameReading.where(citizen_id: rows.map(&:first)).index_by(&:citizen_id)
+    # A reviewer's decision on the same spelling stands; Jev doesn't read it again.
     unread = rows.reject do |id, first, middle, last|
-      stored[id] && stored[id].model == @jev.model && stored[id].name_text == Rizz::Ascent::NameReader.text(first, middle, last)
+      reading = stored[id]
+      reading && reading.name_text == Rizz::Ascent::NameReader.text(first, middle, last) &&
+        (CitizenNameReading::REVIEWED.include?(reading.outcome) || reading.model == @jev.model)
     end
     started = clock
     results = read(unread)
@@ -90,8 +93,8 @@ class RizzOverflowReading
       threshold: @threshold, model: @jev.model, overflow_names: rows.size,
       read_now: results.size, errors: results.count { it[1].is_a?(Exception) },
       seconds: seconds.round(1), call_ms: (latencies.any? ? { p50: ms(latencies[latencies.size / 2]), p95: ms(latencies[(latencies.size * 0.95).floor]) } : nil),
-      jev: current.count { it.outcome == "jev" }, overflow: current.count { it.outcome == "overflow" }, unread: rows.size - current.size,
-      by_reason: current.group_by(&:shape).sort_by { -it.last.size }.to_h { |reason, list| [ reason, { names: list.size, jev: list.count { it.outcome == "jev" } } ] }
+      outcomes: current.map(&:outcome).tally, unread: rows.size - current.size,
+      by_reason: current.group_by(&:shape).sort_by { -it.last.size }.to_h { |reason, list| [ reason, list.map(&:outcome).tally ] }
     }
   end
 

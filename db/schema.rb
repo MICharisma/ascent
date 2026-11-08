@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -178,12 +178,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_190000) do
     t.jsonb "parts"
     t.string "pick"
     t.float "probability"
+    t.string "reviewed_by"
     t.string "shape", null: false
     t.datetime "updated_at", null: false
     t.index ["citizen_id"], name: "index_citizen_name_readings_on_citizen_id", unique: true
     t.index ["outcome"], name: "index_citizen_name_readings_on_outcome"
-    t.check_constraint "outcome::text <> 'jev'::text OR parts IS NOT NULL", name: "citizen_name_readings_parts"
-    t.check_constraint "outcome::text = ANY (ARRAY['jev'::character varying, 'overflow'::character varying]::text[])", name: "citizen_name_readings_outcome"
+    t.check_constraint "(outcome::text <> ALL (ARRAY['jev'::character varying, 'settled'::character varying]::text[])) OR parts IS NOT NULL", name: "citizen_name_readings_parts"
+    t.check_constraint "outcome::text = ANY (ARRAY['jev'::character varying, 'overflow'::character varying, 'settled'::character varying, 'rejected'::character varying]::text[])", name: "citizen_name_readings_outcome"
   end
 
   create_table "citizens", force: :cascade do |t|

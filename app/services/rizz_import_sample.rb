@@ -77,7 +77,7 @@ class RizzImportSample
   def sample(shapes)
     accepted = shapes.select { |_, shape| Rizz::Ascent::NameShape.accepted?(shape) }.keys
     return in_seed_order(accepted) if @mode == "random"
-    return in_seed_order(CitizenNameReading.where(outcome: "jev", citizen_id: shapes.keys).pluck(:citizen_id)) if @mode == "jev"
+    return in_seed_order(CitizenNameReading.where(outcome: CitizenNameReading::READ, citizen_id: shapes.keys).pluck(:citizen_id)) if @mode == "jev"
 
     accepted.group_by { @names[it].downcase }.select { |_, ids| ids.size > 1 }.sort.flat_map { |_, ids| ids.sort }.first(@limit)
   end
