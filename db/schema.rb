@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_08_190000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -166,6 +166,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_180000) do
     t.index ["platform", "handle"], name: "index_channels_on_platform_and_handle", unique: true
     t.index ["review_status"], name: "index_channels_on_review_status"
     t.index ["reviewed_by_id"], name: "index_channels_on_reviewed_by_id"
+  end
+
+  create_table "citizen_name_readings", force: :cascade do |t|
+    t.jsonb "candidates", default: [], null: false
+    t.bigint "citizen_id", null: false
+    t.datetime "created_at", null: false
+    t.string "model", null: false
+    t.string "name_text", null: false
+    t.string "outcome", null: false
+    t.jsonb "parts"
+    t.string "pick"
+    t.float "probability"
+    t.string "shape", null: false
+    t.datetime "updated_at", null: false
+    t.index ["citizen_id"], name: "index_citizen_name_readings_on_citizen_id", unique: true
+    t.index ["outcome"], name: "index_citizen_name_readings_on_outcome"
+    t.check_constraint "outcome::text <> 'jev'::text OR parts IS NOT NULL", name: "citizen_name_readings_parts"
+    t.check_constraint "outcome::text = ANY (ARRAY['jev'::character varying, 'overflow'::character varying]::text[])", name: "citizen_name_readings_outcome"
   end
 
   create_table "citizens", force: :cascade do |t|
@@ -653,7 +671,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_180000) do
     t.index ["citizen_id"], name: "index_rizz_syncs_on_citizen_id", unique: true
     t.index ["rizz_entity_id"], name: "index_rizz_syncs_on_rizz_entity_id"
     t.index ["state"], name: "index_rizz_syncs_on_state"
-    t.check_constraint "state::text = ANY (ARRAY['pending'::character varying, 'synced'::character varying, 'review'::character varying, 'merge_needed'::character varying, 'failed'::character varying, 'skipped'::character varying]::text[])", name: "rizz_syncs_state"
+    t.check_constraint "state::text = ANY (ARRAY['pending'::character varying, 'synced'::character varying, 'review'::character varying, 'merge_needed'::character varying, 'failed'::character varying, 'skipped'::character varying, 'held'::character varying]::text[])", name: "rizz_syncs_state"
   end
 
   create_table "rule_conditions", force: :cascade do |t|
@@ -873,6 +891,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_180000) do
   add_foreign_key "candidacies", "races"
   add_foreign_key "chambers", "governing_bodies"
   add_foreign_key "channels", "voters", column: "reviewed_by_id"
+  add_foreign_key "citizen_name_readings", "citizens", on_delete: :cascade
   add_foreign_key "communication_features", "candidacies"
   add_foreign_key "communication_features", "communications"
   add_foreign_key "communications", "channels"

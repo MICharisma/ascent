@@ -9,6 +9,7 @@ class Citizen < ApplicationRecord
 
   has_many :candidacies, dependent: :destroy
   has_one :rizz_sync, dependent: :delete
+  has_one :name_reading, class_name: "CitizenNameReading", dependent: :delete
   has_many :rizz_names, dependent: :delete_all
   has_many :races, -> { distinct }, through: :candidacies
   has_many :elections, -> { distinct }, through: :races

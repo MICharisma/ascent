@@ -15,9 +15,14 @@ namespace :rizz do
     placed.each_slice(Rizz::Client::DISPLAY_BATCH_LIMIT) { names.refresh it }
   end
 
-  desc "Import a timed sample (mode random or same_names) of real citizens whose names Rizz can read, listing the rest in tmp/rizz_name_overflow.csv (needs rizz-client, RIZZ_ENDPOINT, RIZZ_API_TOKEN, RIZZ_SCOPE)"
+  desc "Import a timed sample (mode random, same_names or jev) of real citizens whose names Rizz can read, listing the rest in tmp/rizz_name_overflow.csv (needs rizz-client, RIZZ_ENDPOINT, RIZZ_API_TOKEN, RIZZ_SCOPE)"
   task :import_sample, [ :limit, :mode ] => :environment do |_, args|
     RizzImportSample.new(limit: Integer(args.fetch(:limit, 100)), mode: args.fetch(:mode, "random")).call
+  end
+
+  desc "Ask Jev to read the parts of each name the name-shape switch doesn't accept and store them for the sync, listing every reading in tmp/rizz_name_readings.csv (needs rizz-client, TYPESAFE_API_KEY)"
+  task read_overflow: :environment do
+    RizzOverflowReading.new.call
   end
 
   desc "Fetch the names Rizz authorizes for every real citizen into rizz_names (needs RIZZ_ENDPOINT, RIZZ_API_TOKEN, RIZZ_SCOPE)"

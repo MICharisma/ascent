@@ -5,8 +5,9 @@
 #   merge_needed  Rizz placed the citizen in an entity another Citizen holds
 #   failed        the last attempt could not reach Rizz or conflicted
 #   skipped       nothing Rizz can import (fictional, or no name)
+#   held          the name's parts need a reading, or triage, before it goes to Rizz
 class RizzSync < ApplicationRecord
-  STATES = %w[pending synced review merge_needed failed skipped].freeze
+  STATES = %w[pending synced review merge_needed failed skipped held].freeze
 
   belongs_to :citizen
 

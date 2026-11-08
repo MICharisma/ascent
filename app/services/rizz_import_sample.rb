@@ -7,7 +7,8 @@
 # seed, so a larger sample contains every smaller one and re-runs skip the
 # citizens already synced. The same_names mode samples instead the citizens
 # who share their full name with another accepted citizen, grouped by name,
-# to exercise Rizz's identity reviews. Each Rizz call is timed, and the report goes to
+# to exercise Rizz's identity reviews; the jev mode samples citizens whose
+# names only Jev's reading lets Rizz read (rake rizz:read_overflow first). Each Rizz call is timed, and the report goes to
 # stdout and to a JSON file in tmp/.
 class RizzImportSample
   # Times every Rizz client call, by method name.
@@ -29,7 +30,7 @@ class RizzImportSample
     end
   end
 
-  MODES = %w[random same_names].freeze
+  MODES = %w[random same_names jev].freeze
 
   def initialize(limit:, mode: "random", seed: "rizz-import-sample", client: RizzCitizenSync.client, output: Rails.root.join("tmp"))
     raise ArgumentError, "mode must be one of #{MODES.join(', ')}" unless MODES.include?(mode)
@@ -75,9 +76,14 @@ class RizzImportSample
 
   def sample(shapes)
     accepted = shapes.select { |_, shape| Rizz::Ascent::NameShape.accepted?(shape) }.keys
-    return accepted.sort_by { Digest::SHA256.hexdigest("#{@seed}-#{it}") }.first(@limit) if @mode == "random"
+    return in_seed_order(accepted) if @mode == "random"
+    return in_seed_order(CitizenNameReading.where(outcome: "jev", citizen_id: shapes.keys).pluck(:citizen_id)) if @mode == "jev"
 
     accepted.group_by { @names[it].downcase }.select { |_, ids| ids.size > 1 }.sort.flat_map { |_, ids| ids.sort }.first(@limit)
+  end
+
+  def in_seed_order(ids)
+    ids.sort_by { Digest::SHA256.hexdigest("#{@seed}-#{it}") }.first(@limit)
   end
 
   def import(ids)

@@ -12,16 +12,24 @@
 # local citizens in one entity, the second is left for a local merge rather
 # than given a code another citizen holds.
 #
+# A name whose columns take a shape Rizz reads on its own (Rizz::Ascent::
+# NameShape) goes as it is, and Rizz derives its parts. Any other name goes
+# with the parts Ascent read for it (CitizenNameReading, from rake
+# rizz:read_overflow); until it has a confident reading, the sync is held.
+#
 # Fictional citizens from mock elections are never sent, and Voters are not
 # Citizens. Needs the rizz-client gem, RIZZ_ENDPOINT and RIZZ_API_TOKEN.
 class RizzCitizenSync
+  # The name's parts need a reading, or triage, before the citizen goes to Rizz.
+  class NameHeld < StandardError; end
+
   def self.client
     require "rizz-client"
     Rizz::Client.new(endpoint: ENV.fetch("RIZZ_ENDPOINT"), token: ENV.fetch("RIZZ_API_TOKEN"))
   end
 
   def self.citizens
-    Citizen.real.includes(:rizz_sync, candidacies: { race: [ :office, :election ] })
+    Citizen.real.includes(:rizz_sync, :name_reading, candidacies: { race: [ :office, :election ] })
   end
 
   def initialize(client: self.class.client)
@@ -30,12 +38,15 @@ class RizzCitizenSync
 
   def call(citizen)
     sync = citizen.rizz_sync || citizen.build_rizz_sync
-    record = Rizz::Ascent::CitizenRecord.new(citizen)
+    record = Rizz::Ascent::CitizenRecord.new(citizen, full_name_parts: name_parts(citizen))
     evidence = evidence_for(citizen)
     revision = Digest::SHA256.hexdigest(JSON.generate(record.to_h(source_revision: "", identity_evidence: evidence).sort.to_h))
     return sync if sync.persisted? && sync.state == "synced" && sync.source_revision == revision
 
     attempt(sync, citizen, record, evidence, revision)
+  rescue NameHeld => error
+    sync.update!(state: "held", last_error: error.message.truncate(255))
+    sync
   rescue ArgumentError => error
     sync.update!(state: "skipped", last_error: error.message.truncate(255))
     sync
@@ -47,6 +58,17 @@ class RizzCitizenSync
   private
 
   attr_reader :client
+
+  # Nil when Rizz can read the name columns itself; else the parts Ascent read.
+  def name_parts(citizen)
+    shape = Rizz::Ascent::NameShape.classify(citizen.first_name, citizen.middle_name, citizen.last_name)
+    return nil if Rizz::Ascent::NameShape.accepted?(shape)
+
+    reading = citizen.name_reading
+    raise NameHeld, "The name needs a reading (#{shape})" unless reading&.current?
+    raise NameHeld, "The name awaits triage (#{shape})" unless reading.outcome == "jev"
+    reading.parts
+  end
 
   def attempt(sync, citizen, record, evidence, revision, retried: false)
     expected_version = sync.rizz_version if sync.rizz_entity_id
