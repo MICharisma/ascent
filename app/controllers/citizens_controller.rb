@@ -2,8 +2,8 @@ class CitizensController < ApplicationController
   before_action :set_citizen, only: %i[ show edit update destroy ]
 
   def index
-    citizens_scope = Citizen.includes(candidacies: [ :ballot_lines, { race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ] } ])
-      .visible_to(current_voter).order(:last_name, :first_name, :id)
+    citizens_scope = Citizen.with_names.includes(candidacies: [ :ballot_lines, { race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ] } ])
+      .visible_to(current_voter).by_name
     citizens_scope = citizens_scope.named_like(filters["q"]) if filters["q"].present?
     citizens_scope = citizens_scope.ran_in(Race.in_state(State.includes(:jurisdiction).find(filters["state_id"]))) if filters["state_id"].present?
     @pagy, @citizens = pagy(citizens_scope)

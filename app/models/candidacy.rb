@@ -2,7 +2,8 @@ class Candidacy < ApplicationRecord
   include Engageable
   include Illustrated
 
-  belongs_to :citizen
+  # Loading a candidacy's citizen loads the names Rizz authorizes with it.
+  belongs_to :citizen, -> { with_names }
   belongs_to :race
   has_one :election, through: :race
   has_one :office, through: :race
@@ -36,7 +37,7 @@ class Candidacy < ApplicationRecord
   scope :with_election_context, -> { includes(race: [ :election, { office: :position } ]) }
 
   def name
-    "#{citizen.full_name} for #{office.position.title}"
+    "#{citizen.display_name} for #{office.position.title}"
   end
 
   # The printed labels, in ballot order, for display.

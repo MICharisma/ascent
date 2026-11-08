@@ -8,7 +8,7 @@ class Views::Citizens::ShowView < Views::ApplicationView
   def view_template
     div(class: "record-page citizen-page", id: dom_id(@citizen, :show)) do
       div(class: "profile-header") do
-        PageHeader(title: @citizen.full_name, trail: trail_for(@citizen), eyebrow: eyebrow, lede: lede, record: @citizen,
+        PageHeader(title: @citizen.display_name, trail: trail_for(@citizen), eyebrow: eyebrow, lede: lede, record: @citizen,
           chips: method(:chips)) do
           PillLink(label: "Latest candidacy", path: candidacy_path(latest), icon: :badge_check) if latest
         end
@@ -21,7 +21,7 @@ class Views::Citizens::ShowView < Views::ApplicationView
           candidacies_section
           latest_stances
         end
-        aside(class: "place-aside", aria: { label: "About #{@citizen.full_name}" }) do
+        aside(class: "place-aside", aria: { label: "About #{@citizen.display_name}" }) do
           facts_card
           OfficialChannels(owners: [ @citizen, *candidacies ])
           admin_card
@@ -56,7 +56,7 @@ class Views::Citizens::ShowView < Views::ApplicationView
 
   def lede
     return @citizen.bio if @citizen.bio.present?
-    return "#{@citizen.full_name} has no candidacies on Ascent yet." unless latest
+    return "#{@citizen.display_name} has no candidacies on Ascent yet." unless latest
 
     "Running for #{latest.race.office.name} in the #{latest.race.election.name}." +
       (candidacies.many? ? " #{pluralize(candidacies.size - 1, "earlier candidacy", plural: "earlier candidacies")} below." : "")
@@ -73,7 +73,7 @@ class Views::Citizens::ShowView < Views::ApplicationView
       if candidacies.any?
         ol(class: "list-rows", data: { controller: "reveal" }) { candidacies.each { candidacy_row(it) } }
       else
-        p(class: "card-text") { "No candidacies are recorded for #{@citizen.full_name}." }
+        p(class: "card-text") { "No candidacies are recorded for #{@citizen.display_name}." }
       end
     end
   end

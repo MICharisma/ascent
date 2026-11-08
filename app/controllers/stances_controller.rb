@@ -4,7 +4,7 @@ class StancesController < ApplicationController
   # GET /stances or /stances.json
   def index
     stances = Stance.includes(:stance_evidences, approach: :issue, candidacy: [ :citizen, { race: { office: :position } } ]).visible_to(current_voter)
-      .joins(candidacy: :citizen).order("citizens.last_name", "citizens.first_name", :id)
+      .joins(candidacy: :citizen).merge(Citizen.by_name).order(:id)
     stances = stances.where(candidacy_id: Candidacy.where(citizen_id: Citizen.named_like(filters["q"]).select(:id)).select(:id)) if filters["q"].present?
     stances = stances.where(priority_level: filters["priority_level"]) if filters["priority_level"].present?
     @pagy, @stances = pagy(stances)

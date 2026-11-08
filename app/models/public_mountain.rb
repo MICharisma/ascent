@@ -8,7 +8,7 @@ class PublicMountain < ApplicationRecord
   def refresh!(mountain)
     candidates = mountain.candidacies.active.includes(:citizen).order(:id).map do |candidacy|
       {
-        "name" => candidacy.citizen.full_name,
+        "name" => candidacy.citizen.display_name,
         "rating" => mountain.saved_ratings[candidacy.id],
         "off_ballot" => candidacy.primary_candidacy_id.present?
       }

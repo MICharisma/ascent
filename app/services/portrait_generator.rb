@@ -40,7 +40,7 @@ class PortraitGenerator
     metadata = { ai_generated: true, portrait_generation: { style: @style, pastime: pastime, prompt: prompt, model: model,
       generated_at: Time.current.iso8601, reference_image_id: @reference_image.id, reference_blob_id: @reference_image.file.blob.id } }
     Image.transaction do
-      image = Image.new(alt_text: "AI-generated #{style.fetch(:label).downcase} of #{citizen.full_name}", credit: "AI-generated with OpenAI")
+      image = Image.new(alt_text: "AI-generated #{style.fetch(:label).downcase} of #{citizen.display_name}", credit: "AI-generated with OpenAI")
       image.file.attach(io: StringIO.new(bytes), filename: "#{citizen.full_name.parameterize}-#{@style}.png", content_type: "image/png", metadata: metadata)
       image.save!
       @subject.image_placements.create!(image: image, position: (@subject.image_placements.maximum(:position) || -1) + 1)

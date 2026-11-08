@@ -122,7 +122,7 @@ class Views::RaceResults::ShowView < Views::ApplicationView
           ranked_by(:approval_shares).each_with_index do |(candidacy_id, share), index|
             tr(class: ("is-leader" if index.zero?)) do
               td(class: "rank") { (index + 1).to_s }
-              td { candidacies.fetch(candidacy_id).citizen.full_name }
+              td { candidacies.fetch(candidacy_id).citizen.display_name }
               td(class: "numeric strong") { percent(share) }
               td(class: "numeric") { percent(@summary[:first_choice_shares].fetch(candidacy_id, 0)) }
             end
@@ -143,7 +143,7 @@ class Views::RaceResults::ShowView < Views::ApplicationView
       grid: { left: 8, right: 64, top: 4, bottom: 4, containLabel: true },
       xAxis: { type: "value", max: 100, show: false },
       yAxis: { type: "category", inverse: true, axisLine: { show: false },
-               data: ranked.map { candidacies.fetch(it.first).citizen.full_name } },
+               data: ranked.map { candidacies.fetch(it.first).citizen.display_name } },
       series: [ { type: "bar", name: "Approved by", barMaxWidth: 26, data: ranked.map(&:last),
                   label: { show: true, position: "right", formatter: "{c}%", fontWeight: 600 } } ]
     }
@@ -161,8 +161,8 @@ class Views::RaceResults::ShowView < Views::ApplicationView
   def methods_text(approval_leader, plurality_leader)
     return "No one has been approved yet." unless approval_leader && plurality_leader
 
-    approval_name = candidacies.fetch(approval_leader).citizen.last_name
-    plurality_name = candidacies.fetch(plurality_leader).citizen.last_name
+    approval_name = candidacies.fetch(approval_leader).citizen.display_family_name
+    plurality_name = candidacies.fetch(plurality_leader).citizen.display_family_name
     if approval_leader == plurality_leader
       "#{approval_name} leads either way: the most approved, and the most often rated highest."
     else
@@ -182,7 +182,7 @@ class Views::RaceResults::ShowView < Views::ApplicationView
         tbody do
           off[:approval_shares].sort_by { -it.last }.each do |candidacy_id, share|
             tr do
-              td { candidacies.fetch(candidacy_id).citizen.full_name }
+              td { candidacies.fetch(candidacy_id).citizen.display_name }
               td(class: "numeric strong") { percent(share) }
             end
           end

@@ -243,14 +243,14 @@ class Views::Elections::ShowView < Views::ApplicationView
     button(type: "button", class: "candidate-name", popovertarget: candidate_popover_id(candidacy)) { CitizenName(citizen: candidacy.citizen) }
     div(id: candidate_popover_id(candidacy), popover: "auto", class: "candidate-popover") do
       turbo_frame_tag(dom_id(candidacy, :card), src: candidacy_card_path(candidacy), loading: "lazy", target: "_top") do
-        p(class: "candidate-card-loading") { "Loading #{candidacy.citizen.full_name}…" }
+        p(class: "candidate-card-loading") { "Loading #{candidacy.citizen.display_name}…" }
       end
     end
   end
 
   # The surname carries the weight; given and middle names stay light.
   def candidate_names(race)
-    names = ballot_candidacies(race).map { it.citizen.full_name }
+    names = ballot_candidacies(race).map { it.citizen.display_name }
     names.any? ? names.join(", ") : "No candidates yet"
   end
 

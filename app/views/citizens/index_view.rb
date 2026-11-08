@@ -28,7 +28,7 @@ class Views::Citizens::IndexView < Views::ApplicationView
 
   def citizen_row(citizen)
     latest = citizen.candidacies.max_by { it.race.election.election_date }
-    ListRow(record: citizen, title: citizen.full_name, meta: latest_meta(latest, citizen), detail: latest&.ballot_labels) do
+    ListRow(record: citizen, title: citizen.display_name, meta: latest_meta(latest, citizen), detail: latest&.ballot_labels) do
       span(class: "row-badge row-badge-mock") { "Invented" } if citizen.fictional
     end
   end

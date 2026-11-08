@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_07_010000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_07_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -608,6 +608,54 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_010000) do
     t.check_constraint "ended_on IS NULL OR ended_on >= started_on", name: "residences_end_after_start"
   end
 
+  create_table "rizz_feed_cursors", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "cursor"
+    t.string "purpose", null: false
+    t.datetime "updated_at", null: false
+    t.index ["purpose"], name: "index_rizz_feed_cursors_on_purpose", unique: true
+  end
+
+  create_table "rizz_names", force: :cascade do |t|
+    t.bigint "citizen_id", null: false
+    t.datetime "created_at", null: false
+    t.string "display_name"
+    t.jsonb "display_parts"
+    t.datetime "fetched_at"
+    t.uuid "form_id"
+    t.text "name_sort", array: true
+    t.string "purpose", null: false
+    t.string "rizz_code"
+    t.uuid "rizz_entity_id"
+    t.uuid "rule_id"
+    t.jsonb "search_forms", default: [], null: false
+    t.string "sort_key"
+    t.string "state", default: "current", null: false
+    t.datetime "updated_at", null: false
+    t.string "view_version"
+    t.index ["citizen_id", "purpose"], name: "index_rizz_names_on_citizen_id_and_purpose", unique: true
+    t.index ["purpose", "rizz_entity_id"], name: "index_rizz_names_on_purpose_and_rizz_entity_id"
+    t.check_constraint "state::text = ANY (ARRAY['current'::character varying, 'invalidated'::character varying]::text[])", name: "rizz_names_state"
+  end
+
+  create_table "rizz_syncs", force: :cascade do |t|
+    t.bigint "citizen_id", null: false
+    t.datetime "created_at", null: false
+    t.string "last_error"
+    t.uuid "review_id"
+    t.string "rizz_code"
+    t.uuid "rizz_entity_id"
+    t.integer "rizz_version"
+    t.string "source_revision"
+    t.string "state", default: "pending", null: false
+    t.datetime "synced_at"
+    t.datetime "updated_at", null: false
+    t.index ["citizen_id"], name: "index_rizz_syncs_on_citizen_id", unique: true
+    t.index ["rizz_entity_id"], name: "index_rizz_syncs_on_rizz_entity_id"
+    t.index ["state"], name: "index_rizz_syncs_on_state"
+    t.check_constraint "state::text = ANY (ARRAY['pending'::character varying, 'synced'::character varying, 'review'::character varying, 'merge_needed'::character varying, 'failed'::character varying, 'skipped'::character varying]::text[])", name: "rizz_syncs_state"
+  end
+
   create_table "rule_conditions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "kind", default: 0, null: false
@@ -875,6 +923,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_07_010000) do
   add_foreign_key "residences", "jurisdictions", column: "state_house_district_id"
   add_foreign_key "residences", "jurisdictions", column: "state_senate_district_id"
   add_foreign_key "residences", "voters"
+  add_foreign_key "rizz_names", "citizens", on_delete: :cascade
+  add_foreign_key "rizz_syncs", "citizens", on_delete: :cascade
   add_foreign_key "rule_conditions", "rule_statements", column: "statement_id"
   add_foreign_key "rule_statements", "rule_topics", column: "topic_id"
   add_foreign_key "stance_evidences", "communications"

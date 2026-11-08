@@ -65,8 +65,7 @@ class Race < ApplicationRecord
 
   scope :matching, ->(query) {
     pattern = "%#{sanitize_sql_like(query.strip)}%"
-    candidates = Candidacy.joins(:citizen)
-      .where("concat_ws(' ', citizens.first_name, citizens.middle_name, citizens.last_name) ILIKE ?", pattern)
+    candidates = Candidacy.where(citizen_id: Citizen.named_like(query).select(:id))
     joins(:election, office: :position).where(
       "positions.title ILIKE :pattern OR elections.name ILIKE :pattern OR races.description ILIKE :pattern OR races.id IN (:candidate_races)",
       pattern: pattern, candidate_races: candidates.select(:race_id)

@@ -13,7 +13,7 @@ class Views::Candidacies::ShowView < Views::ApplicationView
   def view_template
     div(class: "record-page candidacy-page", id: dom_id(@candidacy, :show)) do
       div(class: "profile-header") do
-        PageHeader(title: citizen.full_name, trail: trail_for(@candidacy), eyebrow: eyebrow, lede: lede, record: @candidacy,
+        PageHeader(title: citizen.display_name, trail: trail_for(@candidacy), eyebrow: eyebrow, lede: lede, record: @candidacy,
           chips: method(:chips)) do
           primary_action
           PillLink(label: "Citizen page", path: citizen_path(citizen), icon: :user_round, variant: "outline")
@@ -57,7 +57,7 @@ class Views::Candidacies::ShowView < Views::ApplicationView
   end
 
   def lede
-    @candidacy.platform_summary.presence || "#{citizen.full_name} is running for #{race.office.name} in the #{election.name}."
+    @candidacy.platform_summary.presence || "#{citizen.display_name} is running for #{race.office.name} in the #{election.name}."
   end
 
   def chips
@@ -161,10 +161,10 @@ class Views::Candidacies::ShowView < Views::ApplicationView
   end
 
   def rivals
-    others = race.candidacies.where.not(id: @candidacy.id).includes(:citizen, :ballot_lines).sort_by { it.citizen.last_name.to_s }
+    others = race.candidacies.where.not(id: @candidacy.id).includes(:citizen, :ballot_lines).sort_by { it.citizen.sort_keys }
     RelatedList(heading: "Also running for #{race.office.position.title}", records: others.first(RIVAL_LIMIT), total: others.size,
       see_all: race_path(race, anchor: "race-candidates"), noun: "candidates") do |candidacy|
-      ListRow(record: candidacy, title: candidacy.citizen.full_name, meta: candidacy.ballot_labels)
+      ListRow(record: candidacy, title: candidacy.citizen.display_name, meta: candidacy.ballot_labels)
     end
   end
 

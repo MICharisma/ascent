@@ -10,7 +10,7 @@ class Views::Candidacies::Card < Views::ApplicationView
 
   def view_template
     turbo_frame_tag(dom_id(@candidacy, :card), target: "_top") do
-      article(class: "candidate-card", aria: { label: citizen.full_name }) do
+      article(class: "candidate-card", aria: { label: citizen.display_name }) do
         card_head
         ballot_lines
         endorsements_section

@@ -38,7 +38,7 @@ class Views::Mountains::SaveBar < Views::ApplicationView
 
   def changed_ratings_text
     ids = @mountain.unsaved_changes[:candidacy_ids]
-    "Ratings: #{@mountain.candidacies.where(id: ids).map { it.citizen.full_name }.join(", ")}" if ids.any?
+    "Ratings: #{@mountain.candidacies.where(id: ids).map { it.citizen.display_name }.join(", ")}" if ids.any?
   end
 
   def changed_baseline_text
