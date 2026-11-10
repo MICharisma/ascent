@@ -108,3 +108,5 @@ gem "rgeo-geojson", "~> 2.2"
 gem "ahoy_matey", "~> 5.5"
 
 gem "postshiba", git: "https://github.com/postshiba/postshiba-ruby.git"
+
+gem "rizz-client", git: "https://github.com/MICharisma/rizz.git", ref: "5f64cfea8e3e044a1696f36cc77ac55bbc9dfedd", glob: "clients/rizz-client/*.gemspec"
