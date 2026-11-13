@@ -2,8 +2,8 @@
 # assigns. Seeding never calls Rizz; this runs as its own step
 # (rake rizz:sync_citizens).
 #
-# Each Citizen's snapshot gets a revision from its contents, so an unchanged
-# citizen is skipped and a retry of the same snapshot is idempotent. When Rizz
+# Each change gets a revision containing its content digest and a generation,
+# so unchanged citizens are skipped and retries reuse the same revision. When Rizz
 # places the citizen in an entity, the citizen adopts its MIC-RZZ code and
 # keeps its Ascent code as an alias. When Rizz holds the citizen for an
 # identity review, the sync records the review; syncing again after the
@@ -41,9 +41,10 @@ class RizzCitizenSync
     sync = citizen.rizz_sync || citizen.build_rizz_sync
     record = Rizz::Ascent::CitizenRecord.new(citizen, full_name_parts: name_parts(citizen))
     evidence = evidence_for(citizen)
-    revision = Digest::SHA256.hexdigest(JSON.generate(record.to_h(source_revision: "", identity_evidence: evidence).sort.to_h))
-    return sync if sync.persisted? && sync.state == "synced" && sync.source_revision == revision
+    digest = Digest::SHA256.hexdigest(JSON.generate(record.to_h(source_revision: "", identity_evidence: evidence).sort.to_h))
+    return sync if prepare_revision(sync, digest) == :unchanged
 
+    revision = sync.source_revision
     attempt(sync, citizen, record, evidence, revision)
   rescue NameHeld => error
     sync.update!(state: "held", last_error: error.message.truncate(255))
@@ -59,6 +60,21 @@ class RizzCitizenSync
   private
 
   attr_reader :client
+
+  def prepare_revision(sync, digest)
+    sync.with_lock do
+      stored = sync.source_revision.to_s
+      current = stored == digest || stored.start_with?("#{digest}:")
+      if sync.state == "synced" && current
+        :unchanged
+      else
+        reuse = current && (stored.include?(":") || sync.rizz_entity_id.nil?)
+        sync.source_revision = "#{digest}:#{SecureRandom.uuid}" unless reuse
+        sync.update!(state: "pending")
+        :pending
+      end
+    end
+  end
 
   # Nil when Rizz can read the name columns itself; else the parts Ascent
   # read. A fictional citizen is never sent, whatever its name.
@@ -77,7 +93,9 @@ class RizzCitizenSync
   def attempt(sync, citizen, record, evidence, revision, retried: false)
     expected_version = sync.rizz_version if sync.rizz_entity_id
     payload = record.to_h(source_revision: revision, identity_evidence: evidence, expected_version: expected_version)
-    result = client.import_person(payload, idempotency_key: "citizen-#{citizen.id}-#{revision}")
+    request_key = revision.include?(":") ? Digest::SHA256.hexdigest(JSON.generate(payload)) : revision
+    key = "citizen-#{citizen.id}-#{request_key}"
+    result = client.import_person(payload, idempotency_key: key)
     return hold_for_review(sync, result, revision) if result["status"] == "review_required"
 
     place(sync, citizen, result, revision)

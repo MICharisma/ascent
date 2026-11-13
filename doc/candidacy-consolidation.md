@@ -30,6 +30,8 @@ Run the commands in the intended Rails environment. Back up the database and reh
 
    This scans all real Citizens and skips unchanged synced records. A nonzero exit or a `failed` result requires investigation.
 
+   Each changed snapshot gets a new revision, including a return to an earlier candidacy list. Retries reuse that revision; a version-conflict retry uses a transport key for its updated request body.
+
 The task moves ratings, rating archives, stances, communication features, official results, channels, engagements, and image placements. Existing stance evidence keeps its stance ID. General-election links to a retired primary candidacy move to the survivor. Draft rating keys move to the survivor, including null values that remove saved ratings.
 
 Identical duplicate child rows are combined. Duplicate image placement order follows the survivor, while the original order stays in the audit. Conflicting ratings, draft values, ballot-line kinds or parties, endorsements, results, or other duplicate child data reject the batch. Two stances for the same approach require separate reconciliation even if their text agrees.
