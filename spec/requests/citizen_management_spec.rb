@@ -11,6 +11,14 @@ RSpec.describe "Citizen management", type: :request do
     expect(response).to redirect_to(new_voter_session_path)
   end
 
+  it "redirects a consolidated Citizen's old page to the survivor" do
+    survivor = create(:citizen)
+    CitizenMerge.create!(old_citizen_id: 987654321, citizen: survivor, rizz_entity_id: SecureRandom.uuid, performed_by: "maintainer", snapshot: {})
+    get citizen_path(987654321)
+    expect(response).to have_http_status(:moved_permanently)
+    expect(response).to redirect_to(citizen_path(survivor))
+  end
+
   it "prevents a regular voter from creating a citizen" do
     sign_in create(:voter)
 

@@ -86,6 +86,8 @@ module Seeds
     private
 
     def load_inputs
+      curated = @root.join("manifests/contributions/ascent-identity/citizens.yml")
+      @curated_citizen_codes = curated.file? ? MICharismaSeeders::Reader.new.read(curated.to_s).flat_map { [ it.code, *it.aliases ] }.to_set : Set.new
       paths = Dir.glob(@root.join("races", YEAR.to_s, @state_dir, "{federal,state,local}", "*.yml").to_s).sort
       raise Error, "No ballot rows for #{@state_dir}" if paths.empty?
 
@@ -439,7 +441,7 @@ module Seeds
       attributes["ballot_lines"] = lines if lines.any?
       candidacy = record("Candidacy", "CANDIDACY-#{placed[:race_path]}-#{placed[:contest]}-#{username.upcase}", attributes,
                          "race" => placed[:race_code], "citizen" => citizen["code"])
-      [ citizen, candidacy ]
+      @curated_citizen_codes.include?(citizen["code"]) ? [ candidacy ] : [ citizen, candidacy ]
     end
 
     def ballot_line(row)

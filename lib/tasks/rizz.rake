@@ -1,4 +1,14 @@
 namespace :rizz do
+  desc "Preview confirmed Citizen consolidations as JSON; APPLY=/path/to/plan.json applies that exact plan (PERFORMED_BY required)"
+  task consolidate_citizens: :environment do
+    if ENV["APPLY"].present?
+      result = CitizenConsolidation.apply(JSON.parse(File.read(ENV.fetch("APPLY"))), performed_by: ENV.fetch("PERFORMED_BY"))
+      puts JSON.pretty_generate(result)
+    else
+      puts JSON.pretty_generate(CitizenConsolidation.preview)
+    end
+  end
+
   desc "Send real citizens to Rizz, adopt the codes it assigns, and fetch their names (needs rizz-client, RIZZ_ENDPOINT, RIZZ_API_TOKEN, RIZZ_SCOPE)"
   task sync_citizens: :environment do
     sync = RizzCitizenSync.new

@@ -1,4 +1,5 @@
 class CitizensController < ApplicationController
+  prepend_before_action :redirect_merged_citizen, only: %i[ show edit ]
   before_action :set_citizen, only: %i[ show edit update destroy ]
 
   def index
@@ -47,6 +48,14 @@ class CitizensController < ApplicationController
   end
 
   private
+
+  def redirect_merged_citizen
+    merge = CitizenMerge.find_by(old_citizen_id: params[:id])
+    return unless merge
+
+    authorize! merge.citizen, to: action_policy_rule
+    redirect_to citizen_path(merge.citizen_id), status: :moved_permanently
+  end
 
   def filters
     @filters ||= params.permit(:q, :state_id).to_h
