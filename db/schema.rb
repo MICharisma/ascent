@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_190000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_13_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -136,6 +136,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_190000) do
     t.index ["primary_candidacy_id"], name: "index_candidacies_on_primary_candidacy_id"
     t.index ["race_id", "citizen_id"], name: "index_candidacies_from_primaries_once_per_race_and_citizen", unique: true, where: "(primary_candidacy_id IS NOT NULL)"
     t.index ["race_id"], name: "index_candidacies_on_race_id"
+  end
+
+  create_table "candidacy_merges", force: :cascade do |t|
+    t.bigint "old_candidacy_id", null: false
+    t.bigint "candidacy_id", null: false
+    t.string "performed_by", null: false
+    t.jsonb "snapshot", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["candidacy_id"], name: "index_candidacy_merges_on_candidacy_id"
+    t.index ["old_candidacy_id"], name: "index_candidacy_merges_on_old_candidacy_id", unique: true
   end
 
   create_table "chambers", force: :cascade do |t|
@@ -903,6 +914,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_190000) do
   add_foreign_key "candidacies", "candidacies", column: "primary_candidacy_id"
   add_foreign_key "candidacies", "citizens"
   add_foreign_key "candidacies", "races"
+  add_foreign_key "candidacy_merges", "candidacies", on_delete: :restrict
   add_foreign_key "chambers", "governing_bodies"
   add_foreign_key "channels", "voters", column: "reviewed_by_id"
   add_foreign_key "citizen_merges", "citizens", on_delete: :restrict

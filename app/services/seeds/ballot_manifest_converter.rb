@@ -1,6 +1,7 @@
 require "csv"
 require "digest"
 require Rails.root.join("db", "seeds", "data_paths").to_s
+require Rails.root.join("lib/micharisma_seeders/lib/micharisma_seeders").to_s
 
 module Seeds
   # Converts one state's sourced 2026 ballot rows into micharisma-seeds/v1 manifests for the
@@ -88,6 +89,8 @@ module Seeds
     def load_inputs
       curated = @root.join("manifests/contributions/ascent-identity/citizens.yml")
       @curated_citizen_codes = curated.file? ? MICharismaSeeders::Reader.new.read(curated.to_s).flat_map { [ it.code, *it.aliases ] }.to_set : Set.new
+      candidacies = @root.join("manifests/contributions/ascent-identity/candidacies.yml")
+      @curated_candidacy_codes = candidacies.file? ? MICharismaSeeders::Reader.new.read(candidacies.to_s).flat_map { [ it.code, *it.aliases ] }.to_set : Set.new
       paths = Dir.glob(@root.join("races", YEAR.to_s, @state_dir, "{federal,state,local}", "*.yml").to_s).sort
       raise Error, "No ballot rows for #{@state_dir}" if paths.empty?
 
@@ -441,7 +444,10 @@ module Seeds
       attributes["ballot_lines"] = lines if lines.any?
       candidacy = record("Candidacy", "CANDIDACY-#{placed[:race_path]}-#{placed[:contest]}-#{username.upcase}", attributes,
                          "race" => placed[:race_code], "citizen" => citizen["code"])
-      @curated_citizen_codes.include?(citizen["code"]) ? [ candidacy ] : [ citizen, candidacy ]
+      records = []
+      records << citizen unless @curated_citizen_codes.include?(citizen["code"])
+      records << candidacy unless @curated_candidacy_codes.include?(candidacy["code"])
+      records
     end
 
     def ballot_line(row)

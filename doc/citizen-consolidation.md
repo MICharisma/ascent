@@ -12,7 +12,7 @@ Run the commands in the intended Rails environment. Back up that database before
 
    A nonzero exit means preview failed. The JSON contains `groups`, each with a survivor, duplicate IDs, names, and same-race candidacy IDs. An empty `groups` array means there are no pending consolidations.
 
-2. Review the groups and their candidacies. Different offices and primary and general elections remain distinct. Same-race candidacies also retain their IDs and attached records; the report lists them for separate reconciliation.
+2. Review the groups and their candidacies. Different offices and primary and general elections remain distinct. Same-race candidacies also retain their IDs and attached records; the report lists them for [separate candidacy consolidation](candidacy-consolidation.md).
 
 3. Apply the saved plan with an operator name.
 

@@ -31,6 +31,22 @@ RSpec.describe Seeds::BallotManifestConverter do
     expect(reader.read(root.join("manifests/contributions/ascent-identity/citizens.yml").to_s).first.aliases).to eq([ citizen.code ])
   end
 
+  it "does not regenerate candidacies covered by curated definitions or aliases" do
+    described_class.new(state_dir: "new_york", selection: :all, root: root).call
+    reader = MICharismaSeeders::Reader.new
+    paths = Dir.glob(root.join("manifests/2026/new_york/**/*.yml"))
+    candidacy = paths.flat_map { reader.read(it) }.find { it.type == "Candidacy" }
+    write("manifests/contributions/ascent-identity/candidacies.yml", {
+      "format" => "micharisma-seeds/v1", "namespace" => "MIC", "catalog" => "ASC", "records" => [
+        { "type" => "Candidacy", "code" => "CANDIDACY-CURATED-COUNCIL", "aliases" => [ candidacy.code ],
+          "attributes" => candidacy.attributes, "references" => candidacy.references }
+      ]
+    }.to_yaml)
+    described_class.new(state_dir: "new_york", selection: :all, root: root).call
+    expect(paths.flat_map { reader.read(it) }.none? { it.type == "Candidacy" && it.code == candidacy.code }).to be(true)
+    expect(root.join("manifests/contributions/ascent-identity/candidacies.yml")).to exist
+  end
+
   def write(relative, contents)
     path = root.join(relative)
     FileUtils.mkdir_p(path.dirname)

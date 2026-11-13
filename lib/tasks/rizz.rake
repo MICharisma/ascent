@@ -1,4 +1,13 @@
 namespace :rizz do
+  desc "Preview same-race candidacies of consolidated Citizens as JSON; APPLY=/path/to/plan.json applies the plan (PERFORMED_BY required)"
+  task consolidate_candidacies: :environment do
+    if ENV["APPLY"].present?
+      puts JSON.pretty_generate(CandidacyConsolidation.apply(JSON.parse(File.read(ENV.fetch("APPLY"))), performed_by: ENV.fetch("PERFORMED_BY")))
+    else
+      puts JSON.pretty_generate(CandidacyConsolidation.preview)
+    end
+  end
+
   desc "Preview confirmed Citizen consolidations as JSON; APPLY=/path/to/plan.json applies that exact plan (PERFORMED_BY required)"
   task consolidate_citizens: :environment do
     if ENV["APPLY"].present?
