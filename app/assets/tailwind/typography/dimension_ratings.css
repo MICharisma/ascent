@@ -38,7 +38,12 @@
     @apply text-sm;
   }
 
-  .dimension-picker-label {
+  .dimension-suggest {
     @apply font-semibold;
+  }
+
+  .dimension-suggestions-status,
+  .dimension-select-label {
+    @apply text-xs;
   }
 }

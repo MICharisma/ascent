@@ -3,6 +3,11 @@
 module DimensionRated
   extend ActiveSupport::Concern
 
+  # A quality's short name, from the last part of its key: "affects_me" reads "Affects me".
+  def self.quality_name(dimension)
+    dimension.key.split(".").last.humanize
+  end
+
   included do
     has_many :dimension_ratings, as: :rated, dependent: :destroy
   end

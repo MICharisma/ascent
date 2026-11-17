@@ -58,8 +58,12 @@
 
   .dimension-rating-help,
   .dimension-rating-status,
-  .dimension-picker {
+  .dimension-suggestions {
     @apply flex flex-wrap items-center;
+  }
+
+  .dimension-picker {
+    @apply flex flex-col items-start;
   }
 
   .dimension-rating-endpoints span:last-child {

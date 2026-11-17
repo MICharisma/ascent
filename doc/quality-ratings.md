@@ -27,9 +27,10 @@ revisions.
 ## On the page
 
 The citizen and policy pages show a **Your ratings** section. A visitor sees a sign-in prompt and
-no scores or averages. A signed-in voter sees a row for each quality they have rated and opens
-the others from the picker below. Each row shows the voters' average and count, visible to
-signed-in voters only, and individual scores are never shown to anyone else.
+no scores or averages. A signed-in voter sees a row for each quality they have rated, and opens
+the others from the suggestions or the full **Choose a quality** list below. Each row shows the
+voters' average and count, visible to signed-in voters only, and individual scores are never shown
+to anyone else.
 
 Drag the thumb across for coarse steps, then drag down 32 pixels while holding to switch to fine
 steps; moving back within 16 pixels returns to coarse. Release saves once. Escape, a cancelled
@@ -41,11 +42,26 @@ drags, and arrows, Page Up, Page Down, Home and End save as they change. An unra
 `/citizens/:citizen_id/dimension_ratings` and `/policies/:policy_id/dimension_ratings` with a Turbo
 Stream that redraws the row. It only reaches the signed-in voter's own ratings.
 
+## Suggestions
+
+The picker starts with the voter's unrated qualities in catalog order. **Suggest for me** posts to
+`.../dimension_ratings/suggestions`, and `DimensionSuggestions` asks the shared ranker which
+unrated qualities to offer, at most three. The provider receives each candidate's key, short name
+and question, the record's type and public name, and how many times this voter has chosen each of
+those qualities elsewhere in Ascent. Scores, ballots, votes, baselines, account IDs and email
+addresses stay out of the request. The answer is rechecked against the voter's current ratings,
+and unknown or duplicate keys are dropped. A suggestion request writes nothing.
+
+`SharedRatings::LLMProvider.from_env` configures the model from `RATINGS_SUGGESTION_PROVIDER`
+(`openai` or `openrouter`), `RATINGS_SUGGESTION_MODEL`, and `RATINGS_SUGGESTION_API_KEY` or the
+provider's usual key, such as the `OPENAI_API_KEY` Ascent already uses for portraits. Without that
+configuration, or when the model times out, fails or answers badly, the picker shows the curated
+order labelled **Showing default suggestions**. A model's answer is labelled **AI suggestions**.
+Specs supply a fake provider through `Rails.configuration.x.shared_ratings.suggestion_provider`.
+
 ## Checks
 
-`spec/models/dimension_rating_spec.rb`, `spec/requests/dimension_ratings_spec.rb` and
-`spec/system/dimension_ratings_spec.rb` cover the catalog, validation, history, access, averages
-and the browser gesture. The integration workspace's `bin/check` runs all three.
-
-AI dimension suggestions are not wired in yet. When they are, the request should carry only the
-curated catalog and the voter's own dimension choices, never ballots, votes or baselines.
+`spec/models/dimension_rating_spec.rb`, `spec/requests/dimension_ratings_spec.rb`,
+`spec/requests/dimension_suggestions_spec.rb` and `spec/system/dimension_ratings_spec.rb` cover the
+catalog, validation, history, access, averages, the suggestion payload and fallbacks, and the
+browser gesture and picker. The integration workspace's `bin/check` runs all four.

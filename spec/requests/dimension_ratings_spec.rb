@@ -105,7 +105,8 @@ RSpec.describe "Dimension ratings", type: :request do
       expect(rows["trustworthiness"].at_css(".dimension-rating-value").text).to eq("-80")
       expect(rows["familiarity"]["hidden"]).not_to be_nil
       expect(rows["familiarity"].at_css(".dimension-rating-summary").text).to eq("Voters average +310 · 2 ratings")
-      expect(page.css(".dimension-picker button").map(&:text)).to eq(%w[Familiarity Competence])
+      expect(page.css(".dimension-suggestions button").map(&:text)).to eq(%w[Familiarity Competence])
+      expect(page.css(".dimension-select option").map(&:text)).to eq([ "Choose a quality", "Familiarity", "Trustworthiness", "Competence" ])
       expect(JSON.parse(rows["competence"]["data-dimension"])).to include("minimum" => -100, "maximum" => 500, "coarse_step" => 10, "fine_step" => 1)
     end
   end
@@ -114,6 +115,6 @@ RSpec.describe "Dimension ratings", type: :request do
     sign_in voter
     get policy_path(policy)
 
-    expect(Nokogiri::HTML(response.body).css(".dimension-picker button").map(&:text)).to eq([ "Effectiveness", "Fairness", "Affects me" ])
+    expect(Nokogiri::HTML(response.body).css(".dimension-suggestions button").map(&:text)).to eq([ "Effectiveness", "Fairness", "Affects me" ])
   end
 end

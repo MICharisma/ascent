@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A citizen's or policy's quality ratings. A signed-in voter sees a row for each quality they have rated,
-# and a button to open each one they haven't; a visitor is asked to sign in.
+# suggested qualities to rate next, and a picker listing every quality; a visitor is asked to sign in.
 #   DimensionRatings(rated: @citizen)
 class Views::Components::DimensionRatings < Views::ApplicationView
   prop :rated, ApplicationRecord
@@ -20,10 +20,11 @@ class Views::Components::DimensionRatings < Views::ApplicationView
   end
 
   def rating_rows
-    div(class: "dimension-rating-rows", data: { controller: "dimension-rating", dimension_rating_url_value: polymorphic_path([ @rated, :dimension_ratings ]) }) do
+    div(class: "dimension-rating-rows", data: { controller: "dimension-rating", dimension_rating_url_value: polymorphic_path([ @rated, :dimension_ratings ]),
+      action: "dimension-suggestions:select->dimension-rating#openDimension" }) do
       precision_control
       dimensions.each { DimensionRatingRow(rated: @rated, dimension: it) }
-      dimension_picker if unrated_dimensions.any?
+      dimension_picker
     end
   end
 
@@ -40,20 +41,27 @@ class Views::Components::DimensionRatings < Views::ApplicationView
   end
 
   def dimension_picker
-    div(class: "dimension-picker", data: { dimension_rating_target: "picker" }) do
-      span(class: "dimension-picker-label") { "Rate" }
-      unrated_dimensions.each do |dimension|
-        button(type: "button", data: { dimension_key: dimension.key, action: "dimension-rating#openDimension" }) { quality_name(dimension) }
+    div(class: "dimension-picker", data: { controller: "dimension-suggestions",
+      dimension_suggestions_url_value: polymorphic_path([ @rated, :dimension_rating_suggestions ]) }) do
+      div(class: "dimension-suggestions", data: { dimension_suggestions_target: "suggestions" }) do
+        DimensionSuggestions.new(voter: current_voter, rated: @rated).defaults.each { suggestion_button it }
       end
+      button(type: "button", class: "dimension-suggest", data: { dimension_suggestions_target: "requestButton", action: "dimension-suggestions#suggest" }) { "Suggest for me" }
+      p(class: "dimension-suggestions-status", role: "status", data: { dimension_suggestions_target: "status" })
+      quality_select
     end
   end
 
-  def unrated_dimensions
-    @unrated_dimensions ||= dimensions.reject { rated_keys.include? it.key }
+  def suggestion_button(dimension)
+    button(type: "button", data: { dimension_key: dimension.key, action: "dimension-suggestions#choose" }) { quality_name(dimension) }
   end
 
-  def rated_keys
-    current_voter.dimension_ratings.where(rated: @rated).pluck(:dimension_key)
+  def quality_select
+    label(for: dom_id(@rated, :quality_picker), class: "dimension-select-label") { "Choose a quality" }
+    select(id: dom_id(@rated, :quality_picker), class: "dimension-select", data: { action: "dimension-suggestions#choose" }) do
+      option(value: "") { "Choose a quality" }
+      dimensions.each { |dimension| option(value: dimension.key) { quality_name(dimension) } }
+    end
   end
 
   def sign_in_prompt

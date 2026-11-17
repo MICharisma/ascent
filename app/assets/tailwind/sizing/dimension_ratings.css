@@ -95,7 +95,20 @@
     @apply gap-2 pt-4;
   }
 
-  .dimension-picker button {
+  .dimension-suggestions {
+    @apply gap-2;
+  }
+
+  .dimension-picker button,
+  .dimension-select {
     @apply min-h-11 px-3 rounded-md border;
+  }
+
+  .dimension-suggestions-status:empty {
+    @apply hidden;
+  }
+
+  .dimension-select {
+    @apply max-w-full;
   }
 }

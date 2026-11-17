@@ -102,9 +102,8 @@ class Views::ApplicationView < Phlex::HTML
     end
   end
 
-  # A rating dimension's short name, from the last part of its key: "affects_me" reads "Affects me".
   def quality_name(dimension)
-    dimension.key.split(".").last.humanize
+    DimensionRated.quality_name(dimension)
   end
 
   def delimited(number)

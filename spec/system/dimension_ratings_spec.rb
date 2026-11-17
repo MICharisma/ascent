@@ -64,8 +64,9 @@ RSpec.describe "Dimension rating controls", type: :system do
     click_button "Trustworthiness"
     row = row_for(:trustworthiness)
     expect(row).to have_css(".dimension-rating-value", text: "Not rated")
-    expect(page).to have_no_button("Trustworthiness")
+    expect(row.find("input")).to match_selector(":focus")
 
+    coarse_distance(row)
     browser.action.move_to(row.find(".dimension-rating-handle").native).click_and_hold.move_by(80, 0).perform
     expect(row).to have_content("Not saved yet")
     browser.action.send_keys(:escape).release.perform
@@ -76,6 +77,30 @@ RSpec.describe "Dimension rating controls", type: :system do
     within(row) { click_button "Rate neutral" }
     expect_saved row, "0"
     expect(voter.dimension_ratings.sole).to have_attributes(dimension_key: "ascent.citizen.trustworthiness", value: 0)
+  end
+
+  it "suggests qualities on request and opens any quality from the full picker" do
+    create(:dimension_rating, :capable_candidate, voter: voter, rated: citizen, value: 300)
+    previous = Rails.configuration.x.shared_ratings.suggestion_provider
+    Rails.configuration.x.shared_ratings.suggestion_provider = ->(**) { %w[ascent.citizen.trustworthiness] }
+    visit citizen_path(citizen)
+
+    within(".dimension-picker") do
+      expect(page).to have_css(".dimension-suggestions button", count: 2)
+      click_button "Suggest for me"
+      expect(page).to have_css(".dimension-suggestions-status", text: "AI suggestions")
+      expect(all(".dimension-suggestions button").map(&:text)).to eq(%w[Trustworthiness Familiarity])
+      click_button "Trustworthiness"
+    end
+    expect(row_for(:trustworthiness)).to have_css(".dimension-rating-value", text: "Not rated")
+    expect(row_for(:trustworthiness).find("input")).to match_selector(":focus")
+
+    select "Competence", from: "Choose a quality"
+    expect(row_for(:competence).find("input")).to match_selector(":focus")
+    expect(find_field("Choose a quality").value).to eq("")
+    expect(DimensionRating.count).to eq(1)
+  ensure
+    Rails.configuration.x.shared_ratings.suggestion_provider = previous
   end
 
   it "adjusts by keyboard in fine steps and clears back to unrated" do

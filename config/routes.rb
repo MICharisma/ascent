@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   concern :dimension_rated do
     resources :dimension_ratings, only: :create
     delete "dimension_ratings", to: "dimension_ratings#destroy"
+    post "dimension_ratings/suggestions", to: "dimension_ratings#suggest", as: :dimension_rating_suggestions
   end
   resources :official_codes
   resources :policies, concerns: :dimension_rated do

@@ -12,12 +12,14 @@
     @apply cursor-grab;
   }
 
-  .dimension-rating-input:disabled {
+  .dimension-rating-input:disabled,
+  .dimension-suggest:disabled {
     @apply cursor-default;
   }
 
   .precision-control button:focus-visible,
   .dimension-picker button:focus-visible,
+  .dimension-select:focus-visible,
   .dimension-rating-neutral:focus-visible,
   .dimension-rating-clear:focus-visible,
   .dimension-rating-retry:focus-visible,

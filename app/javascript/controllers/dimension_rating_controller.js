@@ -7,7 +7,7 @@ import { HorizontalDrag } from "shared-ratings/horizontal-drag"
 // dragging down while still holding switches to fine steps. Release saves once, and Escape or a lost
 // pointer puts the row back. The server answers each save or clear with the redrawn row.
 export default class extends Controller {
-  static targets = ["row", "slider", "precisionButton", "picker"]
+  static targets = ["row", "slider", "precisionButton"]
   static values = {
     url: String,
     precision: { type: String, default: "coarse" },
@@ -36,18 +36,13 @@ export default class extends Controller {
     this.precisionValue = event.currentTarget.dataset.precision
   }
 
+  // A suggestion or the picker chose a quality: show its row, closed or not, and put the voter on it.
   openDimension(event) {
-    const button = event.currentTarget
-    const row = this.rowTargets.find(row => row.dataset.key === button.dataset.dimensionKey)
+    const row = this.rowTargets.find(row => row.dataset.key === event.detail.key)
     row.hidden = false
-    button.hidden = true
-    if (this.pickerIsEmpty()) this.pickerTarget.hidden = true
-    row.querySelector("input").focus()
+    row.scrollIntoView({ block: "center" })
+    row.querySelector("input").focus({ preventScroll: true })
     this.debug("Opened", row.dataset.key)
-  }
-
-  pickerIsEmpty() {
-    return [...this.pickerTarget.querySelectorAll("button")].every(button => button.hidden)
   }
 
   startDrag(event) {

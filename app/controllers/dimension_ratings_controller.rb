@@ -1,4 +1,5 @@
-# Saves and clears the signed-in voter's own rating of one quality, answering with the redrawn row.
+# Saves and clears the signed-in voter's own rating of one quality, answering with the redrawn row,
+# and suggests which unrated qualities to rate next without writing anything.
 class DimensionRatingsController < ApplicationController
   def create
     rating = current_voter.dimension_ratings.find_or_initialize_by rated: rated, dimension_key: rating_params[:dimension_key]
@@ -12,6 +13,10 @@ class DimensionRatingsController < ApplicationController
     rating = current_voter.dimension_ratings.find_by! rated: rated, dimension_key: rating_params[:dimension_key]
     rating.destroy!
     respond_with_row rating.dimension
+  end
+
+  def suggest
+    render json: DimensionSuggestions.new(voter: current_voter, rated: rated).call
   end
 
   private
