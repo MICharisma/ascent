@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_08_220000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -254,6 +254,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_220000) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.index ["entity_code"], name: "index_countries_on_entity_code", unique: true
+  end
+
+  create_table "dimension_rating_revisions", force: :cascade do |t|
+    t.bigint "voter_id", null: false
+    t.string "rated_type", null: false
+    t.bigint "rated_id", null: false
+    t.string "dimension_key", null: false
+    t.string "event", null: false
+    t.integer "value"
+    t.jsonb "definition", null: false
+    t.datetime "created_at", null: false
+    t.index ["rated_type", "rated_id"], name: "index_dimension_rating_revisions_on_rated_type_and_rated_id"
+    t.index ["voter_id"], name: "index_dimension_rating_revisions_on_voter_id"
+    t.check_constraint "event::text = ANY (ARRAY['rate'::character varying, 'change'::character varying, 'clear'::character varying]::text[])", name: "dimension_rating_revisions_event"
+  end
+
+  create_table "dimension_ratings", force: :cascade do |t|
+    t.bigint "voter_id", null: false
+    t.string "rated_type", null: false
+    t.bigint "rated_id", null: false
+    t.string "dimension_key", null: false
+    t.integer "dimension_version", null: false
+    t.integer "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["rated_type", "rated_id"], name: "index_dimension_ratings_on_rated"
+    t.index ["voter_id", "rated_type", "rated_id", "dimension_key"], name: "index_dimension_ratings_once_per_voter", unique: true
+    t.index ["voter_id"], name: "index_dimension_ratings_on_voter_id"
+    t.check_constraint "value >= '-100'::integer AND value <= 500", name: "dimension_ratings_value_on_standard_scale"
   end
 
   create_table "districts", force: :cascade do |t|
@@ -898,6 +927,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_08_220000) do
   add_foreign_key "communication_features", "communications"
   add_foreign_key "communications", "channels"
   add_foreign_key "counties", "states"
+  add_foreign_key "dimension_rating_revisions", "voters"
+  add_foreign_key "dimension_ratings", "voters"
   add_foreign_key "elections", "jurisdictions"
   add_foreign_key "elections", "voters", column: "creator_id", on_delete: :nullify
   add_foreign_key "elections", "years"

@@ -14,6 +14,7 @@ class Views::Policies::ShowView < Views::ApplicationView
         div(class: "place-main") do
           codes_section
           stances_section
+          DimensionRatings(rated: @policy)
         end
         aside(class: "place-aside", aria: { label: "About this law" }) do
           facts_card

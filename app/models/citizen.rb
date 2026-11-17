@@ -1,6 +1,11 @@
 class Citizen < ApplicationRecord
   include Engageable
   include Illustrated
+  include DimensionRated
+
+  rating_dimension :familiarity, question: "How well do you know this person?", low_label: "Unfamiliar", high_label: "Very familiar"
+  rating_dimension :trustworthiness, question: "How much do you trust this person?", low_label: "Distrust", high_label: "Fully trust"
+  rating_dimension :competence, question: "How capable is this person at public service?", low_label: "Incapable", high_label: "Highly capable"
 
   RIZZ_NAMESPACE = "MIC".freeze
   RIZZ_CATALOG = "RZZ".freeze

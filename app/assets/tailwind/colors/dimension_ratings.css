@@ -1,0 +1,58 @@
+.dimension-ratings {
+  .precision-control,
+  .dimension-picker button {
+    border-color: var(--rating-control-border);
+  }
+
+  .precision-control button[aria-pressed="true"] {
+    background-color: var(--rating-pressed-bg);
+    color: var(--rating-pressed-text);
+  }
+
+  .dimension-rating-row {
+    border-color: var(--rating-row-divider);
+  }
+
+  .dimension-rating-question,
+  .dimension-rating-help,
+  .dimension-rating-endpoints,
+  .dimension-rating-status,
+  .dimension-rating-row[data-rated="false"] .dimension-rating-value {
+    color: var(--rating-muted-text);
+  }
+
+  .dimension-rating-input::-webkit-slider-runnable-track {
+    background: var(--rating-track);
+  }
+
+  .dimension-rating-input::-moz-range-track {
+    background: var(--rating-track);
+  }
+
+  .dimension-rating-input::-webkit-slider-thumb {
+    appearance: none;
+    border-style: solid;
+    border-color: var(--rating-thumb-edge);
+    background: var(--rating-thumb);
+  }
+
+  .dimension-rating-input::-moz-range-thumb {
+    border-style: solid;
+    border-color: var(--rating-thumb-edge);
+    background: var(--rating-thumb);
+  }
+
+  .dimension-rating-row[data-rated="false"] .dimension-rating-input::-webkit-slider-thumb {
+    background: var(--rating-thumb-unrated);
+  }
+
+  .dimension-rating-row[data-rated="false"] .dimension-rating-input::-moz-range-thumb {
+    background: var(--rating-thumb-unrated);
+  }
+
+  .dimension-rating-average-marker {
+    border-style: solid;
+    border-color: var(--rating-average-mark);
+    background: var(--rating-thumb-unrated);
+  }
+}

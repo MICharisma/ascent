@@ -88,6 +88,20 @@
   --card-bg: var(--brand-snow);
   --card-border: var(--brand-mist);
 
+  /* Quality rating colors */
+  --rating-row-divider: var(--brand-contour);
+  --rating-track: var(--brand-scree);
+  --rating-thumb: var(--brand-summit);
+  --rating-thumb-unrated: var(--brand-snow);
+  --rating-thumb-edge: var(--brand-basalt);
+  --rating-average-mark: var(--brand-slate);
+  --rating-muted-text: var(--brand-moss);
+  --rating-pressed-bg: var(--brand-basalt);
+  --rating-pressed-text: var(--brand-snow);
+  --rating-control-border: var(--brand-mist);
+  --rating-focus-ring: var(--brand-rope);
+  --rating-error-text: var(--brand-rope-deep);
+
   /* Expandable section colors */
   --expandable-header-bg: var(--brand-lichen);
   --expandable-content-bg: var(--brand-snow);

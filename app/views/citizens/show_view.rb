@@ -20,6 +20,7 @@ class Views::Citizens::ShowView < Views::ApplicationView
           CommunicationGallery(communications: communications)
           candidacies_section
           latest_stances
+          DimensionRatings(rated: @citizen)
         end
         aside(class: "place-aside", aria: { label: "About #{@citizen.display_name}" }) do
           facts_card
