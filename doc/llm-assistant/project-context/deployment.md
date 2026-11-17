@@ -25,6 +25,14 @@ variables or a Doppler integration. The Rails environment file reads environment
 variables and does not fetch secrets from Doppler. Register the staging origin
 followed by `/voters/auth/google_oauth2/callback` with Google.
 
+The build installs the `shared-ratings` gem from the private `MICharisma/rizz-integration`
+repository at the commit pinned in `Gemfile.lock`. Store `BUNDLE_GITHUB__COM` as
+`x-access-token:<token>` in Doppler `ascent/stg` (and `ascent/prd` for production) and supply
+it to the Railway service the same way. Use a fine-grained token owned by MICharisma with
+Contents read-only on that one repository. Railway passes the service variable to the
+Dockerfile's `BUNDLE_GITHUB__COM` build argument, which only the throwaway build stage uses.
+Without it, `bundle install` fails while fetching `shared-ratings`.
+
 Use the root Dockerfile, `/up` as the health check, and
 `./bin/rails db:prepare` as the pre-deploy command with a 3600-second timeout.
 The Docker entrypoint also runs `db:prepare` before the default server command.
@@ -36,8 +44,8 @@ GitHub auto-deploy.
 Railway's native GitHub auto-deploy builds pushes to `staging`. The root Dockerfile
 fetches both public submodule repositories over HTTPS using full commit hashes.
 The build excludes local submodule directories and copies the fetched contents into
-the application before precompilation. No submodule credentials or GitHub Actions
-deployment token are required.
+the application before precompilation. The submodules need no credentials or GitHub
+Actions deployment token; only the `shared-ratings` gem above needs `BUNDLE_GITHUB__COM`.
 
 When changing a submodule's recorded commit, update the matching `ADD` source in
 `Dockerfile`. When adding a submodule, add its pinned `ADD` source and exclude its
