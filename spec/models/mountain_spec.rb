@@ -83,7 +83,7 @@ RSpec.describe Mountain do
     expect(MountainDraft.count).to eq(0)
   end
 
-  it "removes a saved rating the draft blanks, and archives the one it changes" do
+  it "archives saved ratings the draft blanks or changes" do
     mountain.publish!(ratings: { ventura_quinn.id => 410, lindqvist.id => 120 }, baseline: 280)
 
     mountain.revise_draft!(ratings: { ventura_quinn.id => 350, lindqvist.id => "" })
@@ -91,6 +91,7 @@ RSpec.describe Mountain do
 
     expect(Rating.where(voter: voter).pluck(:candidacy_id, :rating)).to eq([ [ ventura_quinn.id, 350 ] ])
     expect(RatingArchive.where(voter: voter, candidacy: ventura_quinn).pluck(:rating)).to eq([ 410 ])
+    expect(RatingArchive.find_by!(voter: voter, candidacy: lindqvist)).to have_attributes rating: 120, reason: "Removed rating"
   end
 
   it "discards unsaved edits without touching the saved mountain" do
