@@ -295,7 +295,9 @@ module Seeds
 
       target = targets.first || natural_target(model, desired)
       canonical_code = target&.entity_code.presence || bindings.first&.canonical_code || record.code
-      codes |= [ canonical_code ]
+      # A preferred code from another catalog (a place's MIC-RZZ code) is bound there; Ascent's catalog
+      # keeps only the record's own codes as aliases.
+      codes |= [ canonical_code ] unless foreign_code?(canonical_code)
       if target.nil?
         refuse_second_uri!(model, desired, record)
         target = model.create!(desired.merge(entity_code: canonical_code))
@@ -535,6 +537,10 @@ module Seeds
       return unless value
 
       association.polymorphic? ? [ value.class.name, value.id ] : value.id
+    end
+
+    def foreign_code?(code)
+      code.to_s.start_with?("#{@namespace}-") && !code.to_s.start_with?("#{@namespace}-#{@catalog}-")
     end
 
     def local_code(code)

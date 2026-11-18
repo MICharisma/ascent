@@ -1,5 +1,6 @@
 class State < ApplicationRecord
   include JurisdictionOwner
+  include AdoptsRizzCode
 
   belongs_to :country
   has_many :counties, dependent: :destroy
