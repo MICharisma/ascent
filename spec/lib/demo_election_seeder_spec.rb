@@ -13,7 +13,7 @@ RSpec.describe DemoElectionSeeder do
       end
     end
   end
-  let!(:real_voter) { create(:voter, email: "real.person@example.com") }
+  let!(:real_voter) { create(:voter, email: "real.citizen@example.com") }
 
   it "builds resident and visitor mountains, leaving the last race with a small sample" do
     summary = described_class.new(election).seed!

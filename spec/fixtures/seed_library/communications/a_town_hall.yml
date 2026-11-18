@@ -1,4 +1,4 @@
-# A fictional candidate, used to test communications and stance evidence without quoting a real person.
+# A fictional candidate, used to test communications and stance evidence without quoting a real citizen.
 format: micharisma-seeds/v1
 namespace: MIC
 catalog: ASC
@@ -35,8 +35,8 @@ groups:
       - type: District
         code: DISTRICT-USA-NY-EXAMPLE-ED_1
         attributes: {name: New York Example District 1, kind: example district}
-      - type: Person
-        code: PERSON-EXAMPLE_AV_7K
+      - type: Citizen
+        code: CITIZEN-EXAMPLE_AV_7K
         attributes: {username: example_av_7k, username_status: provisional, first_name: Avery, last_name: Example}
       - type: Office
         code: OFFICE-USA-NY-EXAMPLE-ED_1
@@ -53,11 +53,11 @@ groups:
       - type: Candidacy
         code: CANDIDACY-USA-NY-EXAMPLE-ED_1-2026_GENERAL-EXAMPLE_AV_7K
         attributes: {status: active, participation: active}
-        references: {race: RACE-USA-NY-EXAMPLE-ED_1-2026_GENERAL, person: PERSON-EXAMPLE_AV_7K}
+        references: {race: RACE-USA-NY-EXAMPLE-ED_1-2026_GENERAL, citizen: CITIZEN-EXAMPLE_AV_7K}
       - type: Channel
         code: CHANNEL-WEB-AVERYEXAMPLE_EXAMPLE_COM
         attributes: {platform: website, handle: averyexample.example.com, url: https://example.com/avery-example, official: true}
-        references: {owner: PERSON-EXAMPLE_AV_7K}
+        references: {owner: CITIZEN-EXAMPLE_AV_7K}
       - type: Communication
         code: COMMUNICATION-WEB-AVERYEXAMPLE_EXAMPLE_COM-2026_09_14-TOWN_HALL
         attributes:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_17_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -125,16 +125,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
     t.datetime "created_at", null: false
     t.string "entity_code"
     t.string "participation", default: "active", null: false
-    t.bigint "person_id", null: false
+    t.bigint "citizen_id", null: false
     t.text "platform_summary"
     t.bigint "race_id", null: false
     t.string "status"
     t.datetime "updated_at", null: false
     t.bigint "primary_candidacy_id"
+    t.index ["citizen_id"], name: "index_candidacies_on_citizen_id"
     t.index ["entity_code"], name: "index_candidacies_on_entity_code", unique: true
-    t.index ["person_id"], name: "index_candidacies_on_person_id"
     t.index ["primary_candidacy_id"], name: "index_candidacies_on_primary_candidacy_id"
-    t.index ["race_id", "person_id"], name: "index_candidacies_from_primaries_once_per_race_and_person", unique: true, where: "(primary_candidacy_id IS NOT NULL)"
+    t.index ["race_id", "citizen_id"], name: "index_candidacies_from_primaries_once_per_race_and_citizen", unique: true, where: "(primary_candidacy_id IS NOT NULL)"
     t.index ["race_id"], name: "index_candidacies_on_race_id"
   end
 
@@ -166,6 +166,43 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
     t.index ["platform", "handle"], name: "index_channels_on_platform_and_handle", unique: true
     t.index ["review_status"], name: "index_channels_on_review_status"
     t.index ["reviewed_by_id"], name: "index_channels_on_reviewed_by_id"
+  end
+
+  create_table "citizen_name_readings", force: :cascade do |t|
+    t.jsonb "candidates", default: [], null: false
+    t.bigint "citizen_id", null: false
+    t.datetime "created_at", null: false
+    t.string "model", null: false
+    t.string "name_text", null: false
+    t.string "outcome", null: false
+    t.jsonb "parts"
+    t.string "pick"
+    t.float "probability"
+    t.datetime "queued_at"
+    t.string "reviewed_by"
+    t.string "shape", null: false
+    t.datetime "updated_at", null: false
+    t.index ["citizen_id"], name: "index_citizen_name_readings_on_citizen_id", unique: true
+    t.index ["outcome"], name: "index_citizen_name_readings_on_outcome"
+    t.check_constraint "(outcome::text <> ALL (ARRAY['jev'::character varying, 'settled'::character varying]::text[])) OR parts IS NOT NULL", name: "citizen_name_readings_parts"
+    t.check_constraint "outcome::text = ANY (ARRAY['jev'::character varying, 'overflow'::character varying, 'settled'::character varying, 'rejected'::character varying]::text[])", name: "citizen_name_readings_outcome"
+  end
+
+  create_table "citizens", force: :cascade do |t|
+    t.text "bio"
+    t.date "birth_date"
+    t.datetime "created_at", null: false
+    t.string "email"
+    t.string "entity_code"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "middle_name"
+    t.datetime "updated_at", null: false
+    t.string "username"
+    t.string "username_status"
+    t.boolean "fictional", default: false, null: false
+    t.index ["entity_code"], name: "index_citizens_on_entity_code", unique: true
+    t.index ["username"], name: "index_citizens_on_username", unique: true
   end
 
   create_table "communication_features", force: :cascade do |t|
@@ -217,6 +254,35 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.index ["entity_code"], name: "index_countries_on_entity_code", unique: true
+  end
+
+  create_table "dimension_rating_revisions", force: :cascade do |t|
+    t.bigint "voter_id", null: false
+    t.string "rated_type", null: false
+    t.bigint "rated_id", null: false
+    t.string "dimension_key", null: false
+    t.string "event", null: false
+    t.integer "value"
+    t.jsonb "definition", null: false
+    t.datetime "created_at", null: false
+    t.index ["rated_type", "rated_id"], name: "index_dimension_rating_revisions_on_rated_type_and_rated_id"
+    t.index ["voter_id"], name: "index_dimension_rating_revisions_on_voter_id"
+    t.check_constraint "event::text = ANY (ARRAY['rate'::character varying, 'change'::character varying, 'clear'::character varying]::text[])", name: "dimension_rating_revisions_event"
+  end
+
+  create_table "dimension_ratings", force: :cascade do |t|
+    t.bigint "voter_id", null: false
+    t.string "rated_type", null: false
+    t.bigint "rated_id", null: false
+    t.string "dimension_key", null: false
+    t.integer "dimension_version", null: false
+    t.integer "value", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["rated_type", "rated_id"], name: "index_dimension_ratings_on_rated"
+    t.index ["voter_id", "rated_type", "rated_id", "dimension_key"], name: "index_dimension_ratings_once_per_voter", unique: true
+    t.index ["voter_id"], name: "index_dimension_ratings_on_voter_id"
+    t.check_constraint "value >= '-100'::integer AND value <= 500", name: "dimension_ratings_value_on_standard_scale"
   end
 
   create_table "districts", force: :cascade do |t|
@@ -492,23 +558,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
     t.check_constraint "type::text <> 'Party'::text OR state_id IS NOT NULL", name: "parties_have_a_state"
   end
 
-  create_table "people", force: :cascade do |t|
-    t.text "bio"
-    t.date "birth_date"
-    t.datetime "created_at", null: false
-    t.string "email"
-    t.string "entity_code"
-    t.string "first_name"
-    t.string "last_name"
-    t.string "middle_name"
-    t.datetime "updated_at", null: false
-    t.string "username"
-    t.string "username_status"
-    t.boolean "fictional", default: false, null: false
-    t.index ["entity_code"], name: "index_people_on_entity_code", unique: true
-    t.index ["username"], name: "index_people_on_username", unique: true
-  end
-
   create_table "policies", force: :cascade do |t|
     t.bigint "approach_id", null: false
     t.bigint "area_of_concern_id", null: false
@@ -606,6 +655,54 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
     t.index ["state_senate_district_id"], name: "index_residences_on_state_senate_district_id"
     t.index ["voter_id"], name: "index_residences_on_voter_id"
     t.check_constraint "ended_on IS NULL OR ended_on >= started_on", name: "residences_end_after_start"
+  end
+
+  create_table "rizz_feed_cursors", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "cursor"
+    t.string "purpose", null: false
+    t.datetime "updated_at", null: false
+    t.index ["purpose"], name: "index_rizz_feed_cursors_on_purpose", unique: true
+  end
+
+  create_table "rizz_names", force: :cascade do |t|
+    t.bigint "citizen_id", null: false
+    t.datetime "created_at", null: false
+    t.string "display_name"
+    t.jsonb "display_parts"
+    t.datetime "fetched_at"
+    t.uuid "form_id"
+    t.text "name_sort", array: true
+    t.string "purpose", null: false
+    t.string "rizz_code"
+    t.uuid "rizz_entity_id"
+    t.uuid "rule_id"
+    t.jsonb "search_forms", default: [], null: false
+    t.string "sort_key"
+    t.string "state", default: "current", null: false
+    t.datetime "updated_at", null: false
+    t.string "view_version"
+    t.index ["citizen_id", "purpose"], name: "index_rizz_names_on_citizen_id_and_purpose", unique: true
+    t.index ["purpose", "rizz_entity_id"], name: "index_rizz_names_on_purpose_and_rizz_entity_id"
+    t.check_constraint "state::text = ANY (ARRAY['current'::character varying, 'invalidated'::character varying]::text[])", name: "rizz_names_state"
+  end
+
+  create_table "rizz_syncs", force: :cascade do |t|
+    t.bigint "citizen_id", null: false
+    t.datetime "created_at", null: false
+    t.string "last_error"
+    t.uuid "review_id"
+    t.string "rizz_code"
+    t.uuid "rizz_entity_id"
+    t.integer "rizz_version"
+    t.string "source_revision"
+    t.string "state", default: "pending", null: false
+    t.datetime "synced_at"
+    t.datetime "updated_at", null: false
+    t.index ["citizen_id"], name: "index_rizz_syncs_on_citizen_id", unique: true
+    t.index ["rizz_entity_id"], name: "index_rizz_syncs_on_rizz_entity_id"
+    t.index ["state"], name: "index_rizz_syncs_on_state"
+    t.check_constraint "state::text = ANY (ARRAY['pending'::character varying, 'synced'::character varying, 'review'::character varying, 'merge_needed'::character varying, 'failed'::character varying, 'skipped'::character varying, 'held'::character varying]::text[])", name: "rizz_syncs_state"
   end
 
   create_table "rule_conditions", force: :cascade do |t|
@@ -821,14 +918,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
   add_foreign_key "ballot_lines", "candidacies"
   add_foreign_key "ballot_lines", "organizations", column: "party_id"
   add_foreign_key "candidacies", "candidacies", column: "primary_candidacy_id"
-  add_foreign_key "candidacies", "people"
+  add_foreign_key "candidacies", "citizens"
   add_foreign_key "candidacies", "races"
   add_foreign_key "chambers", "governing_bodies"
   add_foreign_key "channels", "voters", column: "reviewed_by_id"
+  add_foreign_key "citizen_name_readings", "citizens", on_delete: :cascade
   add_foreign_key "communication_features", "candidacies"
   add_foreign_key "communication_features", "communications"
   add_foreign_key "communications", "channels"
   add_foreign_key "counties", "states"
+  add_foreign_key "dimension_rating_revisions", "voters"
+  add_foreign_key "dimension_ratings", "voters"
   add_foreign_key "elections", "jurisdictions"
   add_foreign_key "elections", "voters", column: "creator_id", on_delete: :nullify
   add_foreign_key "elections", "years"
@@ -875,6 +975,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_150000) do
   add_foreign_key "residences", "jurisdictions", column: "state_house_district_id"
   add_foreign_key "residences", "jurisdictions", column: "state_senate_district_id"
   add_foreign_key "residences", "voters"
+  add_foreign_key "rizz_names", "citizens", on_delete: :cascade
+  add_foreign_key "rizz_syncs", "citizens", on_delete: :cascade
   add_foreign_key "rule_conditions", "rule_statements", column: "statement_id"
   add_foreign_key "rule_statements", "rule_topics", column: "topic_id"
   add_foreign_key "stance_evidences", "communications"

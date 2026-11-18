@@ -1,6 +1,6 @@
 class CandidacySeeder
   def self.seed
-    # Never attach fictional people to a source-backed election.
+    # Never attach fictional citizens to a source-backed election.
     create_mock_election_candidacies
     create_mock_local_candidacies
 
@@ -16,18 +16,18 @@ class CandidacySeeder
     mock_races.each do |race|
       # Create several candidacies for educational purposes
       mock_candidates = [
-        { person_email: "jennifer.kim@example.com", party: "Progressive", platform: "Technology-forward governance with focus on digital equity and innovation." },
-        { person_email: "robert.johnson@example.com", party: "Conservative", platform: "Fiscal responsibility, strong defense, and traditional values." },
-        { person_email: "maria.garcia@example.com", party: "Social Democratic", platform: "Social justice, community empowerment, and inclusive economic policy." },
-        { person_email: "james.anderson@example.com", party: "Labor", platform: "Workers' rights, union protection, and manufacturing job creation." }
+        { citizen_email: "jennifer.kim@example.com", party: "Progressive", platform: "Technology-forward governance with focus on digital equity and innovation." },
+        { citizen_email: "robert.johnson@example.com", party: "Conservative", platform: "Fiscal responsibility, strong defense, and traditional values." },
+        { citizen_email: "maria.garcia@example.com", party: "Social Democratic", platform: "Social justice, community empowerment, and inclusive economic policy." },
+        { citizen_email: "james.anderson@example.com", party: "Labor", platform: "Workers' rights, union protection, and manufacturing job creation." }
       ]
 
       mock_candidates.each do |candidate_data|
-        person = Person.find_by(email: candidate_data[:person_email])
-        next unless person
+        citizen = Citizen.find_by(email: candidate_data[:citizen_email])
+        next unless citizen
 
         candidacy = Candidacy.find_or_create_by(
-          person: person,
+          citizen: citizen,
           race: race
         ) do |candidacy|
           candidacy.status = "active"
@@ -58,13 +58,13 @@ class CandidacySeeder
   def self.create_mock_local_candidacies
     MOCK_LOCAL_CANDIDATES.each do |position_title, email|
       race = Race.mock.joins(office: :position).find_by(positions: { title: position_title })
-      person = Person.find_by(email: email)
-      next unless race && person
+      citizen = Citizen.find_by(email: email)
+      next unless race && citizen
 
-      Candidacy.find_or_create_by(person: person, race: race) do |candidacy|
+      Candidacy.find_or_create_by(citizen: citizen, race: race) do |candidacy|
         candidacy.status = "active"
         candidacy.announcement_date = Date.new(2024, 3, 4)
-        candidacy.platform_summary = person.bio
+        candidacy.platform_summary = citizen.bio
       end
     end
   end

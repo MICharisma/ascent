@@ -22,13 +22,13 @@ FactoryBot.define do
       ]
 
       candidacies = Array.new(candidate_count) do |index|
-        person = FactoryBot.create(
-          :person,
+        citizen = FactoryBot.create(
+          :citizen,
           first_name: candidate_names.fetch(index),
           last_name: Faker::Name.last_name
         )
 
-        FactoryBot.create(:candidacy, race: race, person: person)
+        FactoryBot.create(:candidacy, race: race, citizen: citizen)
       end
 
       voter_baseline = FactoryBot.create(

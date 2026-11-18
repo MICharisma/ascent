@@ -8,7 +8,7 @@ RSpec.describe "Resource forms", type: :request do
 
   FORMED_RESOURCES = %i[
     approach area_of_concern candidacy county country district election governance_type governing_body
-    issue municipality office official_code person policy position race rating residence stance state
+    issue municipality office official_code citizen policy position race rating residence stance state
     topic voter_race_baseline voter year
   ].freeze
 

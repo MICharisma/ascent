@@ -1,0 +1,114 @@
+.dimension-ratings {
+  .precision-control {
+    @apply p-1 rounded-lg border;
+  }
+
+  .precision-control button {
+    @apply min-h-11 px-3 rounded-md;
+  }
+
+  .dimension-rating-row {
+    @apply py-4 border-b;
+  }
+
+  .dimension-rating-header {
+    @apply gap-3;
+  }
+
+  .dimension-rating-question {
+    @apply mt-0.5;
+  }
+
+  .dimension-rating-track,
+  .dimension-rating-input {
+    @apply h-11 mt-1;
+  }
+
+  .dimension-rating-input {
+    @apply mt-0;
+  }
+
+  .dimension-rating-handle {
+    @apply w-11 h-11;
+  }
+
+  .dimension-rating-input::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 3px;
+  }
+
+  .dimension-rating-input::-moz-range-track {
+    height: 6px;
+    border-radius: 3px;
+  }
+
+  .dimension-rating-input::-webkit-slider-thumb {
+    width: 24px;
+    height: 24px;
+    margin-top: -9px;
+    border-radius: 50%;
+    border-width: 3px;
+  }
+
+  .dimension-rating-input::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border-width: 3px;
+  }
+
+  .dimension-rating-average-marker {
+    width: 9px;
+    height: 9px;
+    margin-left: -4.5px;
+    margin-top: -4.5px;
+    border-width: 2px;
+  }
+
+  .dimension-rating-help {
+    @apply gap-2 mt-1;
+  }
+
+  .dimension-rating-neutral,
+  .dimension-rating-clear,
+  .dimension-rating-retry {
+    @apply min-h-11 px-2;
+  }
+
+  .dimension-rating-endpoints {
+    @apply gap-4;
+  }
+
+  .dimension-rating-endpoints span {
+    @apply max-w-1/2;
+  }
+
+  .dimension-rating-summary {
+    @apply mt-3;
+  }
+
+  .dimension-rating-status {
+    @apply gap-2 min-h-6 mt-1;
+  }
+
+  .dimension-picker {
+    @apply gap-2 pt-4;
+  }
+
+  .dimension-suggestions {
+    @apply gap-2;
+  }
+
+  .dimension-picker button,
+  .dimension-select {
+    @apply min-h-11 px-3 rounded-md border;
+  }
+
+  .dimension-suggestions-status:empty {
+    @apply hidden;
+  }
+
+  .dimension-select {
+    @apply max-w-full;
+  }
+}

@@ -59,7 +59,7 @@ class Views::Issues::ShowView < Views::ApplicationView
   end
 
   def stances_section
-    stances = Stance.where(approach: approaches).includes(:approach, :stance_evidences, candidacy: [ :person, { race: { office: :position } } ]).to_a
+    stances = Stance.where(approach: approaches).includes(:approach, :stance_evidences, candidacy: [ :citizen, { race: { office: :position } } ]).to_a
     RelatedList(heading: "Candidates on this issue", records: stances, total: stances.size) { |stance| StanceRow(stance: stance) }
   end
 

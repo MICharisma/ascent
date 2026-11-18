@@ -8,7 +8,7 @@ RSpec.describe "Races Index", type: :request do
   let!(:governor_office) { create(:office, position: create(:position, :governor), jurisdiction: state.jurisdiction) }
   let!(:mayor_race) { create_race_for(mayor_office, :active) }
   let!(:governor_race) { create_race_for(governor_office, :upcoming) }
-  let!(:candidacy) { create(:candidacy, race: mayor_race, person: create(:person, first_name: "Karen", middle_name: nil, last_name: "Bass")) }
+  let!(:candidacy) { create(:candidacy, race: mayor_race, citizen: create(:citizen, first_name: "Karen", middle_name: nil, last_name: "Bass")) }
 
   describe "GET /races" do
     it "lists races with their offices and candidates" do
@@ -35,7 +35,7 @@ RSpec.describe "Races Index", type: :request do
     end
 
     it "searches candidate names without duplicating their race" do
-      create(:candidacy, race: mayor_race, person: create(:person, first_name: "Karen", middle_name: nil, last_name: "Bishop"))
+      create(:candidacy, race: mayor_race, citizen: create(:citizen, first_name: "Karen", middle_name: nil, last_name: "Bishop"))
 
       get races_path, params: { q: "kArEn" }
 

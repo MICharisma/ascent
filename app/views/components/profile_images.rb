@@ -1,5 +1,5 @@
 class Views::Components::ProfileImages < Views::ApplicationView
-  prop :person, Person
+  prop :citizen, Citizen
   prop :images, Array
 
   include Phlex::Rails::Helpers::URLFor
@@ -12,7 +12,7 @@ class Views::Components::ProfileImages < Views::ApplicationView
       div(class: "profile-image-gallery") do
         @images.drop(1).each do |image|
           div do
-            ProfilePortrait(person: @person, image: image, variant: :thumbnail)
+            ProfilePortrait(citizen: @citizen, image: image, variant: :thumbnail)
             a(href: image.file.attached? ? url_for(image.file.variant(:large)) : image.url,
               class: "text-link", target: "_blank", rel: "noopener noreferrer") { "Open image" }
           end

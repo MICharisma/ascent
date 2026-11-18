@@ -18,7 +18,7 @@ class Election < ApplicationRecord
   has_many :races, dependent: :destroy
   has_many :offices, through: :races
   has_many :candidacies, through: :races
-  has_many :candidates, through: :candidacies, source: :person
+  has_many :candidates, through: :candidacies, source: :citizen
 
   validates :name, :election_date, presence: true
   validates :status, presence: true, inclusion: { in: %w[upcoming active completed cancelled] }
@@ -47,7 +47,7 @@ class Election < ApplicationRecord
   scope :recent, -> { order(election_date: :desc) }
   scope :primaries, -> { where(kind: PRIMARY_KINDS) }
   scope :with_full_details, -> { includes(:jurisdiction, races: [ :office, :candidates, :candidacies ]) }
-  scope :with_candidacy_details, -> { includes(races: { candidacies: [ :person, :ratings ] }) }
+  scope :with_candidacy_details, -> { includes(races: { candidacies: [ :citizen, :ratings ] }) }
 
   # Which kind of election this is, for the mode strip: a real one, a mock one, or a historical replay.
   def mode
@@ -61,10 +61,10 @@ class Election < ApplicationRecord
   def destroy_mock!
     transaction do
       invented_offices = offices.to_a
-      invented_people = candidates.fictional.to_a
+      invented_citizens = candidates.fictional.to_a
       destroy!
       invented_offices.each(&:destroy!)
-      invented_people.each(&:destroy!)
+      invented_citizens.each(&:destroy!)
     end
   end
 
@@ -87,7 +87,7 @@ class Election < ApplicationRecord
   # The races grouped into contests the way a printed ballot reads: federal offices first, then by how
   # many candidates are running. Each contest is [[level, position title], races].
   def contests
-    races.includes(candidacies: :person, office: [ :position, { jurisdiction: :jurisdictionable } ])
+    races.includes(candidacies: :citizen, office: [ :position, { jurisdiction: :jurisdictionable } ])
       .group_by { [ it.office.jurisdiction.ballot_level, it.office.position.title ] }
       .sort_by { |(level, title), contest_races| [ -Jurisdiction::BALLOT_LEVELS.index(level), -contest_races.sum { it.candidacies.size }, title ] }
   end

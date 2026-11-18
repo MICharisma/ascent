@@ -23,13 +23,13 @@ RSpec.describe "Elections Index", type: :request do
       let!(:active_race) { create_race_for(office, :active, year: year, election_date: Date.current) }
       let!(:completed_race) { create_race_for(office, :completed, year: year, election_date: 1.month.ago) }
 
-      let!(:candidate1) { create(:person, :experienced_politician, first_name: "John", last_name: "Smith") }
-      let!(:candidate2) { create(:person, :business_leader, first_name: "Jane", last_name: "Doe") }
-      let!(:candidate3) { create(:person, :young_candidate, first_name: "Alex", last_name: "Johnson") }
+      let!(:candidate1) { create(:citizen, :experienced_politician, first_name: "John", last_name: "Smith") }
+      let!(:candidate2) { create(:citizen, :business_leader, first_name: "Jane", last_name: "Doe") }
+      let!(:candidate3) { create(:citizen, :young_candidate, first_name: "Alex", last_name: "Johnson") }
 
-      let!(:candidacy1) { create(:candidacy, race: active_race, person: candidate1, party_label: "Democratic") }
-      let!(:candidacy2) { create(:candidacy, race: active_race, person: candidate2, party_label: "Republican") }
-      let!(:candidacy3) { create(:candidacy, race: completed_race, person: candidate3, party_label: "Independent") }
+      let!(:candidacy1) { create(:candidacy, race: active_race, citizen: candidate1, party_label: "Democratic") }
+      let!(:candidacy2) { create(:candidacy, race: active_race, citizen: candidate2, party_label: "Republican") }
+      let!(:candidacy3) { create(:candidacy, race: completed_race, citizen: candidate3, party_label: "Independent") }
 
       it "renders successfully with election data" do
         get elections_path

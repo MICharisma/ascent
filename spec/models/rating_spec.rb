@@ -76,6 +76,39 @@ RSpec.describe Rating, type: :model do
   end
 
   describe 'callbacks' do
+    describe 'rating removal' do
+      let!(:rating) { create(:rating, rating: 300) }
+
+      it 'archives the persisted score when a rating is cleared' do
+        rating.rating = 400
+        expect { rating.destroy! }.to change(RatingArchive, :count).by(1)
+        expect(RatingArchive.last).to have_attributes voter: rating.voter, candidacy: rating.candidacy,
+          rating: 300, reason: "Removed rating"
+      end
+
+      it 'rolls back the archive if removal is rolled back' do
+        expect do
+          Rating.transaction do
+            rating.destroy!
+            raise ActiveRecord::Rollback
+          end
+        end.not_to change(RatingArchive, :count)
+        expect(Rating.exists?(rating.id)).to be(true)
+      end
+
+      it 'removes personal history with the voter' do
+        rating.update! rating: 400
+        owner = rating.voter
+        owner.destroy!
+        expect(RatingArchive.where(voter_id: owner.id)).to be_empty
+      end
+
+      it 'does not add archives while removing the candidacy' do
+        expect { rating.candidacy.destroy! }.not_to change(RatingArchive, :count)
+        expect(Rating.exists?(rating.id)).to be(false)
+      end
+    end
+
     describe '#archive_previous_rating (before_update)' do
       let(:rating) { create(:rating, rating: 300) }
 
@@ -117,8 +150,8 @@ RSpec.describe Rating, type: :model do
 
   describe 'instance methods' do
     let(:voter) { create(:voter, first_name: "John", last_name: "Doe") }
-    let(:person) { create(:person, first_name: "Jane", middle_name: nil, last_name: "Smith") }
-    let(:candidacy) { create(:candidacy, person: person) }
+    let(:citizen) { create(:citizen, first_name: "Jane", middle_name: nil, last_name: "Smith") }
+    let(:candidacy) { create(:candidacy, citizen: citizen) }
     let(:rating) { create(:rating, voter: voter, candidacy: candidacy, rating: 350) }
 
     describe '#name' do

@@ -4,11 +4,11 @@ require "rails_helper"
 # mountains give an approval count and a first-choice (plurality) count, from the first saved mountain.
 RSpec.describe RaceResults do
   let(:race) { create(:race, :active) }
-  let(:ventura_quinn) { create(:candidacy, race: race, person: create(:person, first_name: "Marisol", last_name: "Ventura-Quinn")) }
-  let(:okafor) { create(:candidacy, race: race, person: create(:person, first_name: "Dana", last_name: "Okafor")) }
-  let(:lindqvist) { create(:candidacy, race: race, person: create(:person, first_name: "Theo", last_name: "Lindqvist")) }
+  let(:ventura_quinn) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Marisol", last_name: "Ventura-Quinn")) }
+  let(:okafor) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Dana", last_name: "Okafor")) }
+  let(:lindqvist) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Theo", last_name: "Lindqvist")) }
   let(:feld) do
-    create(:candidacy, race: race, person: create(:person, first_name: "Jonah", last_name: "Feld"), participation: "off_ballot", primary_candidacy: create(:candidacy))
+    create(:candidacy, race: race, citizen: create(:citizen, first_name: "Jonah", last_name: "Feld"), participation: "off_ballot", primary_candidacy: create(:candidacy))
   end
 
   # One saved mountain: a baseline of 250 and the given ratings.

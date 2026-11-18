@@ -16,7 +16,7 @@ module SeedLayers
     official_code_seeder
     office_seeder
     election_seeder
-    person_seeder
+    citizen_seeder
     candidacy_seeder
     stance_seeder
     voter_seeder
@@ -57,7 +57,7 @@ module SeedLayers
     OfficialCodeSeeder.seed
     OfficeSeeder.seed
     ElectionSeeder.seed
-    PersonSeeder.seed
+    CitizenSeeder.seed
     CandidacySeeder.seed
     StanceSeeder.seed
     VoterSeeder.seed

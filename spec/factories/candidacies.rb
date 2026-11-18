@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :candidacy do
-    association :person
+    association :citizen
     association :race
     status { "active" }
     announcement_date { Faker::Date.between(from: 1.year.ago, to: 1.month.ago) }

@@ -14,6 +14,7 @@ class Views::Policies::ShowView < Views::ApplicationView
         div(class: "place-main") do
           codes_section
           stances_section
+          DimensionRatings(rated: @policy)
         end
         aside(class: "place-aside", aria: { label: "About this law" }) do
           facts_card
@@ -56,7 +57,7 @@ class Views::Policies::ShowView < Views::ApplicationView
   def stances_section
     return unless @policy.approach
 
-    stances = @policy.approach.stances.includes(:approach, :stance_evidences, candidacy: [ :person, { race: { office: :position } } ]).to_a
+    stances = @policy.approach.stances.includes(:approach, :stance_evidences, candidacy: [ :citizen, { race: { office: :position } } ]).to_a
     RelatedList(heading: "Candidates who take the same approach", records: stances, total: stances.size,
       empty: "No candidate has taken this approach yet.") { |stance| StanceRow(stance: stance) }
   end

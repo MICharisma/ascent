@@ -96,13 +96,15 @@ The simulated people and voters live in `db/seeds/simulated/data`, outside the r
 
 To compare Mountain rating patterns in development, run `bin/rails dev:mountains`. It creates six mock races with saved ratings and baselines, then prints their Mountain URLs. Sign in as an admin to open the generated voters' Mountains. Each run creates new records. The factories in `spec/factories/mountain_scenarios.rb` also work in specs.
 
+[Mountain rating history](doc/rating-history.md) preserves previous scores on updates and the final saved score when it is cleared.
+
 Manifest imports treat upcoming races as active so they appear in the Mountain index. Reference seeding also activates existing upcoming races. Election calendar statuses remain separate. Completed and cancelled race statuses are preserved.
 
 For a focused person and candidacy preview in development, run `bin/rails seed_data:profile_scenario`. It adds the mock New York Civic Forum 2026, with three fictional candidates sharing six approaches but giving different explanations. Marisol Vega has a generated portrait, a locally generated narrated introduction, and an embedded-player example. Her social handle is illustrative. Repeating the command updates the same scenario. It does not run in production or as part of ordinary setup.
 
 Run this after seeding reference data, with the app served at `https://ascent.test`. The scenario uses the New York State jurisdiction and that hostname for its local images, video, and campaign-page links.
 
-Profile images are `Image` records shared through `ImagePlacement` records for people and candidacies. The migration moves existing person portraits into that library. For seed files, replace the former Person portrait attributes with Image attributes and explicit ImagePlacement references; see the data repository's `CONTRIBUTING.md` and `examples/profile_images.yml`. Admin profile forms can add images or reuse existing ones. Image details are shared; display order and removal belong to each placement.
+Profile images are `Image` records shared through `ImagePlacement` records for citizens and candidacies. The migration moves existing person portraits into that library. For seed files, replace the former Citizen portrait attributes with Image attributes and explicit ImagePlacement references; see the data repository's `CONTRIBUTING.md` and `examples/profile_images.yml`. Admin profile forms can add images or reuse existing ones. Image details are shared; display order and removal belong to each placement.
 
 Image files use Active Storage. Admin forms accept JPEG, PNG, and WebP uploads up to 10 MB. Uploaded files use the configured storage service, and the development scenario attaches its existing generated portrait. Source URLs from seed files remain valid external image links; importing a URL does not download it. Upload or attach the file to use stored variants. The named variants use libvips through `image_processing`: `avatar` crops to 96×96, `thumbnail` fits within 320×320, `portrait` crops to 800×1000, and `large` fits within 1600×1600. The header uses `portrait`; additional photos use `thumbnail` and link to `large`. The Docker image already includes libvips; local development needs it too.
 
@@ -122,3 +124,7 @@ To copy the current legacy YAML into the submodule working tree, run:
 ```bash
 bin/rails seed_data:copy_legacy_to_submodule
 ```
+
+## Citizen identity rename
+
+The public identity model is `Citizen`, with profiles at `/citizens`. `Voter` remains the account model. See [the migration notes](doc/citizen-migration.md) for database compatibility, seed regeneration, and verification.

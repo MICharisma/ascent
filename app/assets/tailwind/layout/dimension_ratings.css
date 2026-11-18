@@ -1,0 +1,72 @@
+.dimension-ratings {
+  @apply flex flex-col;
+
+  .dimension-rating-rows {
+    @apply flex flex-col;
+  }
+
+  .precision-control {
+    @apply inline-flex self-start;
+  }
+
+  .dimension-rating-row[hidden] {
+    @apply hidden;
+  }
+
+  .dimension-rating-header,
+  .dimension-rating-endpoints {
+    @apply flex justify-between items-center;
+  }
+
+  .dimension-rating-track {
+    @apply relative;
+  }
+
+  .dimension-rating-input {
+    @apply absolute inset-0 w-full appearance-none bg-transparent;
+    touch-action: pan-y;
+  }
+
+  /* Native range thumbs travel between their centers, inset by half their width. */
+  .dimension-rating-handle-track,
+  .dimension-rating-average-track {
+    @apply absolute inset-x-3 pointer-events-none;
+  }
+
+  .dimension-rating-handle-track {
+    @apply inset-y-0;
+  }
+
+  .dimension-rating-handle {
+    @apply absolute top-0 -translate-x-1/2 pointer-events-auto;
+    left: var(--rating-position);
+    touch-action: none;
+  }
+
+  .dimension-rating-row[aria-busy="true"] .dimension-rating-handle {
+    @apply pointer-events-none;
+  }
+
+  .dimension-rating-average-track {
+    @apply z-1;
+    top: 22px;
+  }
+
+  .dimension-rating-average-marker {
+    @apply absolute rotate-45;
+  }
+
+  .dimension-rating-help,
+  .dimension-rating-status,
+  .dimension-suggestions {
+    @apply flex flex-wrap items-center;
+  }
+
+  .dimension-picker {
+    @apply flex flex-col items-start;
+  }
+
+  .dimension-rating-endpoints span:last-child {
+    @apply text-right;
+  }
+}

@@ -32,7 +32,7 @@ RSpec.describe MountainsController, type: :controller do
       expect {
         post :simulate, params: { id: race.id }
       }.to change(Candidacy, :count).by_at_least(3) # More realistic expectation
-       .and change(Person, :count).by_at_least(1) # Some reuse expected
+       .and change(Citizen, :count).by_at_least(1) # Some reuse expected
        .and change(Rating, :count).by_at_least(3) # At least one rating per candidacy
     end
 

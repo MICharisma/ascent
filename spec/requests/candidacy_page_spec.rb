@@ -1,17 +1,17 @@
 require "rails_helper"
 
-# A candidacy's page presents a candidate as a person running for one seat: their stances by topic,
+# A candidacy's page presents a candidate as a citizen running for one seat: their stances by topic,
 # endorsements, and the others in the race, with the way to rate them that fits the visitor.
 RSpec.describe "Candidacy page", type: :request do
   include_context "Port Merritt ballot"
 
   let(:race) { create_race_for(office_in(ward_4, "City Council"), :active, name: "Port Merritt Municipal Election") }
-  let(:okafor) { create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor") }
+  let(:okafor) { create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor") }
   let!(:candidacy) do
-    create(:candidacy, race: race, person: okafor, status: "active", party_label: "Harbor Party",
+    create(:candidacy, race: race, citizen: okafor, status: "active", party_label: "Harbor Party",
       platform_summary: "Rebuild the ferry pier and keep the library open on Sundays.")
   end
-  let!(:rival) { create(:candidacy, race: race, status: "active", person: create(:person, first_name: "Theo", middle_name: nil, last_name: "Lindqvist")) }
+  let!(:rival) { create(:candidacy, race: race, status: "active", citizen: create(:citizen, first_name: "Theo", middle_name: nil, last_name: "Lindqvist")) }
 
   it "places the candidacy under its race and leads with the candidate" do
     get candidacy_path(candidacy)

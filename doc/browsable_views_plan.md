@@ -18,7 +18,7 @@ Still on the generic shell (`ResourceIndex` / `ResourceShow`, "Showing race", co
 | Area | Records | Index | Show |
 | --- | --- | --- | --- |
 | Races | 4,743 | shell + filter form | shell |
-| Candidacies / people | 6,835 each | shell | shell |
+| Candidacies / citizens | 6,835 each | shell | shell |
 | Offices / positions | 4,891 / 1,311 | shell | shell |
 | Municipalities | 35,640 | shell + state filter | **done** |
 | Counties / districts / states / countries | 3,144 / 7,335 / 61 / few | shell | shell + `HierarchicalNavigation` |
@@ -36,7 +36,7 @@ Problems the shared pieces carry today:
 
 ## Approach
 
-Build a small kit first, then move pages onto it in order of importance (`doc/design/02-screens.md`), then upgrade the generic shell itself so the reference tables improve without bespoke pages. Each page gets its own CSS file per layer (`race`, `person`, `place`, `policy`, …), which keeps the phases from colliding.
+Build a small kit first, then move pages onto it in order of importance (`doc/design/02-screens.md`), then upgrade the generic shell itself so the reference tables improve without bespoke pages. Each page gets its own CSS file per layer (`race`, `citizen`, `place`, `policy`, …), which keeps the phases from colliding.
 
 ### Phase 0: the kit (everything else depends on it)
 
@@ -44,7 +44,7 @@ Build a small kit first, then move pages onto it in order of importance (`doc/de
 2. **Breadcrumbs everywhere**: a `breadcrumb_for(record)` helper that builds the trail from `Hierarchicable#build_hierarchy_chain` for places, and from the record's parents elsewhere (race → election, candidacy → race → election, approach → issue → topic). Index pages get a one-step trail to their section. `HierarchicalNavigation`, `QuickStats`, `GeographicSummary` and `ChildrenPreview` retire once places stop using them.
 3. **`RelatedList`** replaces `ItemPreview` + `ExpandableSection` on show pages: a section heading with a count, the first N records as compact rows, and a "See all N" link to the filtered index. The parent key comes from `model_name.param_key`, which fixes the multi-word bug. Empty lists render nothing, or one quiet line when the absence is itself information ("No candidates have filed yet").
 4. **`ListRow`**: the one row shape for indexes and related lists: entity icon, title link, a meta line, status chips, and a trailing chevron. The whole row is the link target; secondary links inside stay separately focusable.
-5. **Entity icons**: one `entity_icon(record_or_model)` map onto Lucide, used in rows, headers, breadcrumbs and the navigation: race `vote`, election `calendar`, candidacy `badge-check`, person `user-round`, office `landmark`, position `briefcase`, state `map`, county `map-pinned`, municipality `building-2`, district `layout-grid`, country `globe`, topic `tag`, issue `circle-help`, approach `route`, stance `quote`, governing body `columns-3`, policy `scroll-text`.
+5. **Entity icons**: one `entity_icon(record_or_model)` map onto Lucide, used in rows, headers, breadcrumbs and the navigation: race `vote`, election `calendar`, candidacy `badge-check`, citizen `user-round`, office `landmark`, position `briefcase`, state `map`, county `map-pinned`, municipality `building-2`, district `layout-grid`, country `globe`, topic `tag`, issue `circle-help`, approach `route`, stance `quote`, governing body `columns-3`, policy `scroll-text`.
 6. **Pagination, rebuilt** as a Phlex component over the pagy object, not its HTML:
    - "Showing 26–50 of 4,743 races" on the left; prev and next pills with chevrons, a window of page numbers with gaps, and the current page marked, on the right. On a phone: prev, "Page 2 of 190", next.
    - The list and the pager sit in a Turbo frame that advances the URL, so a page change swaps only the list, keeps the filters, and scrolls to the top of the list rather than the page.
@@ -65,8 +65,8 @@ These are the pages a voter reaches from a ballot or a mountain.
 
 - **Race** (`races/show_view.rb`, new view replacing `ResourceShow`): breadcrumb (state / election / race), eyebrow "Office · Place · date", status chips, and the call to action that fits (Build your mountain, Pretend vote, See results). Then candidates first, with ballot labels and party, each opening the candidate card popover the ballot already uses; off-ballot primary candidates as their own group, same weight. Completed races show the approval results inline (reusing the results bars) with a link to the full results. Aside: the office (current holder, link), the election (date, countdown, how many other races), the place.
 - **Races list**: the elections list's shape. Tabs for open, upcoming, completed with counts; place first in the filters (the voter's own places as chips when signed in, then state, then year and kind); search kept. Compact `ListRow`s showing office, place, date, candidate count, and the voter's progress chip. New pager.
-- **Candidacy**: a candidate as a person: name, ballot labels, status, the race and election in the header; stances grouped by topic, each linking along topic → issue → approach, with evidence; endorsements; official channels and featured communications; rating totals only (never who rated or how); other candidates in the race. Room left for multi-dimensional evaluation (ASC-59).
-- **Person** and **people list**: their candidacies as a timeline (office, date, party, status, result), the latest candidacy's stances, and links to each race. The list gets search, a state filter, and rows with the current or latest office.
+- **Candidacy**: a candidate as a citizen: name, ballot labels, status, the race and election in the header; stances grouped by topic, each linking along topic → issue → approach, with evidence; endorsements; official channels and featured communications; rating totals only (never who rated or how); other candidates in the race. Room left for multi-dimensional evaluation (ASC-59).
+- **Citizen** and **citizens list**: their candidacies as a timeline (office, date, party, status, result), the latest candidacy's stances, and links to each race. The list gets search, a state filter, and rows with the current or latest office.
 - **Office** and **offices list**: current holder card, next election with a countdown, a race history timeline with winners, then jurisdiction, governing body, chamber and position as links. The list filters by place and position.
 
 ### Phase 2: places
@@ -103,7 +103,7 @@ Before starting: the uncommitted mountain CSS and `candidate_column.rb` changes 
 All five phases are done, one commit each on `voting-flow`.
 
 - **Phase 0**: the kit (`PageHeader`, `ListRow`, `RelatedList`, `IndexPage`, `Pagination`, icons, motion), the races list and the race page.
-- **Phase 1**: candidacy, person and office pages and their lists, with `FilterForm`, `StanceList` and `OfficialChannels`.
+- **Phase 1**: candidacy, citizen and office pages and their lists, with `FilterForm`, `StanceList` and `OfficialChannels`.
 - **Phase 2**: state, county, district and country pages through `Views::PlaceSections`, which the municipality page shares, and their lists.
 - **Phase 3**: the policy path (`PolicyPath`, `StanceRow`), and governing body, policy and official code pages.
 - **Phase 4**: `ResourceIndex` and `ResourceShow` rebuilt on the kit for the remaining reference data, the hierarchy and preview components and their CSS removed, status and entity colors on brand tokens, the election header on `PageHeader`, and stat tiles that count up.

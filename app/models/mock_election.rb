@@ -42,12 +42,12 @@ class MockElection
   def create_race!(title:, candidates:)
     office = Office.create!(position: Position.find_or_create_by!(title: title), jurisdiction: jurisdiction, is_active: false)
     race = election.races.create!(office: office, status: "upcoming")
-    candidates.compact_blank.each { race.candidacies.create!(person: fictional_person(it), status: "active") }
+    candidates.compact_blank.each { race.candidacies.create!(citizen: fictional_citizen(it), status: "active") }
   end
 
-  def fictional_person(full_name)
+  def fictional_citizen(full_name)
     *given, last = full_name.split
-    Person.create!(first_name: given.join(" ").presence, last_name: last, fictional: true)
+    Citizen.create!(first_name: given.join(" ").presence, last_name: last, fictional: true)
   end
 
   def races_have_titles_and_candidates

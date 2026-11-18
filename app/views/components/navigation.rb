@@ -93,7 +93,7 @@ class Views::Components::Navigation < Views::ApplicationView
       section.link("Years", years_path, ENTITY_ICONS[:year])
       section.link("Elections", elections_path, ENTITY_ICONS[:election])
       section.link("Races", races_path, ENTITY_ICONS[:race])
-      section.link("People", people_path, ENTITY_ICONS[:person])
+      section.link("Citizens", citizens_path, ENTITY_ICONS[:citizen])
       section.link("Candidacies", candidacies_path, ENTITY_ICONS[:candidacy])
       section.link("Organizations", organizations_path, ENTITY_ICONS[:organization])
       section.link("Parties", parties_path, ENTITY_ICONS[:party])

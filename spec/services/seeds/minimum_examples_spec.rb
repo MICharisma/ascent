@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe "Minimum contributor seed examples" do
   let(:root) { Rails.root.join("db/seeds/ascent_seed_data/examples") }
-  let(:models) { [ Country, State, District, Position, Office, Election, Race, Person, Candidacy, Channel, Jurisdiction, EntityCode ] }
+  let(:models) { [ Country, State, District, Position, Office, Election, Race, Citizen, Candidacy, Channel, Jurisdiction, EntityCode ] }
 
   %w[yml json].each do |format|
     it "imports the #{format} election graph with only its documented Year prerequisite" do
@@ -14,7 +14,7 @@ RSpec.describe "Minimum contributor seed examples" do
       expect(importer.report[:created].size).to eq(10)
       expect(importer.report[:conflicts]).to be_empty
       candidacy = Candidacy.sole
-      expect(candidacy.person.full_name).to eq("Marisol Vega")
+      expect(candidacy.citizen.full_name).to eq("Marisol Vega")
       expect(candidacy.race.election.year).to eq(year)
       expect(candidacy.race.election).to be_is_mock
       expect(candidacy.office.branch).to eq("legislative")
@@ -24,7 +24,7 @@ RSpec.describe "Minimum contributor seed examples" do
       expect(state.jurisdiction.parent).to eq(Country.sole.jurisdiction)
       expect(candidacy.office.jurisdiction).to eq(district.jurisdiction)
       expect(candidacy.election.jurisdiction).to eq(state.jurisdiction)
-      expect(Channel.sole).to have_attributes(owner: candidacy.person, platform: "website", official: true)
+      expect(Channel.sole).to have_attributes(owner: candidacy.citizen, platform: "website", official: true)
 
       counts = -> { models.map(&:count) }
       expect { importer.call([ root.join("minimum_election.yml").to_s, root.join("minimum_election.json").to_s ]) }.not_to change(&counts)

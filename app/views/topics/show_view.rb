@@ -69,7 +69,7 @@ class Views::Topics::ShowView < Views::ApplicationView
   end
 
   def stances
-    @stances ||= Stance.where(approach_id: approach_ids).includes(:approach, :stance_evidences, candidacy: [ :person, { race: { office: :position } } ]).to_a
+    @stances ||= Stance.where(approach_id: approach_ids).includes(:approach, :stance_evidences, candidacy: [ :citizen, { race: { office: :position } } ]).to_a
   end
 
   def stances_section

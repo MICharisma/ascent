@@ -1,3 +1,11 @@
+production:
+  rizz_names_poll:
+    class: RizzNamesPollJob
+    schedule: every 5 minutes
+  rizz_names_revalidate:
+    class: RizzNamesRevalidateJob
+    schedule: at 4am every day
+
 # production:
 #   periodic_cleanup:
 #     class: CleanSoftDeletedRecordsJob

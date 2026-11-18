@@ -2,26 +2,26 @@ require "rails_helper"
 
 RSpec.describe "Importing shared profile images" do
   let(:example) { Rails.root.join("db/seeds/ascent_seed_data/examples/profile_images.yml") }
-  let!(:person) { create(:person, entity_code: "PERSON-EXAMPLE_AV_7K") }
-  let!(:other) { create(:person, entity_code: "PERSON-SAMPLE_JN_8P") }
-  let!(:candidacy) { create(:candidacy, person: person, entity_code: "CANDIDACY-USA-NY-GOVERNOR-2026_GENERAL-EXAMPLE_AV_7K") }
+  let!(:citizen) { create(:citizen, entity_code: "CITIZEN-EXAMPLE_AV_7K") }
+  let!(:other) { create(:citizen, entity_code: "CITIZEN-SAMPLE_JN_8P") }
+  let!(:candidacy) { create(:candidacy, citizen: citizen, entity_code: "CANDIDACY-USA-NY-GOVERNOR-2026_GENERAL-EXAMPLE_AV_7K") }
 
   it "imports a reusable image for multiple existing subjects, with ordered placements and repeatable JSON and YAML" do
     importer = Seeds::LibraryImporter.new
     importer.call([ example.to_s ])
     shared = Image.find_by!(entity_code: "IMAGE-EXAMPLE-COMMUNITY_MEETING")
     portrait = Image.find_by!(entity_code: "IMAGE-EXAMPLE-AVERY_PORTRAIT")
-    expect(person.images).to eq([ portrait, shared ])
+    expect(citizen.images).to eq([ portrait, shared ])
     expect(other.images).to eq([ shared ])
     expect(candidacy.images).to eq([ shared ])
-    expect(shared.people).to contain_exactly(person, other)
+    expect(shared.citizens).to contain_exactly(citizen, other)
     expect(ImagePlacement.count).to eq(4)
     expect(importer.report[:conflicts]).to be_empty
 
     Dir.mktmpdir("image-seeds") do |directory|
       path = File.join(directory, "images.json")
       File.write(path, JSON.generate(YAML.safe_load(example.read)))
-      counts = -> { [ Image.count, ImagePlacement.count, Person.count, Candidacy.count, EntityCode.count ] }
+      counts = -> { [ Image.count, ImagePlacement.count, Citizen.count, Candidacy.count, EntityCode.count ] }
       expect { importer.call([ example.to_s, path ]) }.not_to change(&counts)
       expect(importer.report[:conflicts]).to be_empty
     end
@@ -39,7 +39,7 @@ RSpec.describe "Importing shared profile images" do
       document = YAML.safe_load(example.read)
       document.fetch("records")[2]["references"]["subject"] = "RACE-USA-NY-GOVERNOR-2026_GENERAL"
       File.write(path, JSON.generate(document))
-      expect { Seeds::LibraryImporter.new.call([ path ]) }.to raise_error(Seeds::LibraryImporter::Error, /not a Person, Candidacy code/)
+      expect { Seeds::LibraryImporter.new.call([ path ]) }.to raise_error(Seeds::LibraryImporter::Error, /not a Citizen, Candidacy code/)
     end
   end
 end

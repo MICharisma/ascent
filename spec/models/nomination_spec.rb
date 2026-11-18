@@ -28,7 +28,7 @@ RSpec.describe "Nominations", type: :model do
   end
 
   def candidacy(race, given, surname)
-    Candidacy.create!(race: race, person: create(:person, first_name: given, middle_name: nil, last_name: surname), status: "active")
+    Candidacy.create!(race: race, citizen: create(:citizen, first_name: given, middle_name: nil, last_name: surname), status: "active")
   end
 
   it "names the organization and the office it nominates for" do
@@ -42,14 +42,14 @@ RSpec.describe "Nominations", type: :model do
     let!(:okafor) { candidacy(democratic_primary, "Marisol", "Okafor") }
     let!(:pritchett) { candidacy(democratic_primary, "Dwayne", "Pritchett") }
     let!(:voss) { candidacy(republican_primary, "Harlan", "Voss") }
-    let!(:general_okafor) { Candidacy.create!(race: general, person: okafor.person, status: "active") }
+    let!(:general_okafor) { Candidacy.create!(race: general, citizen: okafor.citizen, status: "active") }
 
     it "gives each primary candidate not on the general's ballot an off-ballot candidacy there" do
       added = Race.gather_primary_candidates!
 
       expect(general.nomination_races).to contain_exactly(democratic_primary, republican_primary)
-      expect(added.map { it.person.last_name }).to contain_exactly("Pritchett", "Voss")
-      expect(general.candidacies.reload.map { [ it.person.last_name, it.participation, it.primary_candidacy ] })
+      expect(added.map { it.citizen.last_name }).to contain_exactly("Pritchett", "Voss")
+      expect(general.candidacies.reload.map { [ it.citizen.last_name, it.participation, it.primary_candidacy ] })
         .to contain_exactly([ "Okafor", "active", nil ], [ "Pritchett", "off_ballot", pritchett ], [ "Voss", "off_ballot", voss ])
       expect(Race.gather_primary_candidates!).to be_empty
       expect(general.candidacies.find_by!(primary_candidacy: voss).ballot_summary).to eq("Off the ballot; ran in the Republican Party primary")
@@ -57,7 +57,7 @@ RSpec.describe "Nominations", type: :model do
 
     it "includes a runoff candidate once and leaves out a primary candidate who withdrew" do
       runoff = race_in("primary_runoff", democratic_primary.office, Date.new(2026, 6, 16))
-      candidacy(runoff, "Dwayne", "Pritchett").update!(person: pritchett.person)
+      candidacy(runoff, "Dwayne", "Pritchett").update!(citizen: pritchett.citizen)
       voss.update!(status: "withdrawn")
 
       Race.gather_primary_candidates!

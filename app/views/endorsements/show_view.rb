@@ -5,7 +5,7 @@ class Views::Endorsements::ShowView < Views::ApplicationView
 
   def view_template
     div(class: "record-page", id: dom_id(@endorsement, :show)) do
-      PageHeader(title: "#{@endorsement.endorser.name} supports #{@endorsement.candidacy.person.name}",
+      PageHeader(title: "#{@endorsement.endorser.name} supports #{@endorsement.candidacy.citizen.name}",
         trail: [ [ "Endorsements", endorsements_path ] ], eyebrow: @endorsement.kind_label, record: @endorsement)
       SideCard(heading: "Endorsement details") do
         dl(class: "place-facts-list") do

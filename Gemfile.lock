@@ -1,4 +1,23 @@
 GIT
+  remote: https://github.com/MICharisma/rizz-integration.git
+  revision: 2069a5225f708927b5b05ea032e10be6c71e17ae
+  ref: 2069a5225f708927b5b05ea032e10be6c71e17ae
+  glob: packages/shared-ratings/*.gemspec
+  specs:
+    shared-ratings (0.1.0)
+      ruby_llm (~> 1.16.0)
+
+GIT
+  remote: https://github.com/MICharisma/rizz.git
+  revision: 5f64cfea8e3e044a1696f36cc77ac55bbc9dfedd
+  ref: 5f64cfea8e3e044a1696f36cc77ac55bbc9dfedd
+  glob: clients/rizz-client/*.gemspec
+  specs:
+    rizz-client (0.1.0)
+      json (~> 2.7)
+      net-http (~> 0.4)
+
+GIT
   remote: https://github.com/postshiba/postshiba-ruby.git
   revision: 9c2c5f3585c196f663495b7e2adcd5b9341fdf55
   specs:
@@ -143,6 +162,7 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.2)
       tzinfo
+    event_stream_parser (1.0.1)
     factory_bot (6.6.0)
       activesupport (>= 6.1.0)
     factory_bot_rails (6.5.1)
@@ -154,8 +174,12 @@ GEM
       faraday-net_http (>= 2.0, < 3.6)
       json
       logger
+    faraday-multipart (1.2.0)
+      multipart-post (~> 2.0)
     faraday-net_http (3.5.0)
       net-http (~> 0.5)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     ffi (1.17.4)
     ffi (1.17.4-arm64-darwin)
     fugit (1.14.0)
@@ -183,7 +207,7 @@ GEM
     jbuilder (2.15.1)
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
-    json (3.1.0)
+    json (2.21.2)
     jwt (3.3.0)
       base64
     kamal (2.12.0)
@@ -223,6 +247,7 @@ GEM
     multi_json (1.21.2)
     multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
+    multipart-post (2.4.1)
     net-http (0.10.0)
       net-protocol (>= 0.3.0)
       uri (>= 0.11.1)
@@ -447,6 +472,17 @@ GEM
     ruby-vips (2.3.0)
       ffi (~> 1.12)
       logger
+    ruby_llm (1.16.0)
+      base64
+      event_stream_parser (~> 1)
+      faraday (>= 1.10.0)
+      faraday-multipart (>= 1)
+      faraday-net_http (>= 1)
+      faraday-retry (>= 1)
+      marcel (~> 1)
+      ruby_llm-schema (~> 0)
+      zeitwerk (~> 2)
+    ruby_llm-schema (0.4.0)
     rubyzip (3.7.0)
     safely_block (1.0.0)
     scenic (1.9.0)
@@ -583,11 +619,13 @@ DEPENDENCIES
   rails (~> 8.1, >= 8.1.2)
   rails-controller-testing
   rgeo-geojson (~> 2.2)
+  rizz-client!
   rspec-rails
   rubocop-rails-omakase
   ruby-lsp (~> 0.26.11)
   scenic (~> 1.9)
   selenium-webdriver
+  shared-ratings!
   shoulda
   simplecov
   simplecov-html

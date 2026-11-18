@@ -14,8 +14,13 @@ Rails.application.routes.draw do
   post "inquiries" => "inquiries#create", as: :inquiries
 
   resources :engagements, only: [ :index, :create, :destroy ], path: "saved"
+  concern :dimension_rated do
+    resources :dimension_ratings, only: :create
+    delete "dimension_ratings", to: "dimension_ratings#destroy"
+    post "dimension_ratings/suggestions", to: "dimension_ratings#suggest", as: :dimension_rating_suggestions
+  end
   resources :official_codes
-  resources :policies do
+  resources :policies, concerns: :dimension_rated do
     resources :official_codes, only: [ :index ]
   end
   resources :stances
@@ -53,7 +58,7 @@ Rails.application.routes.draw do
   resources :channels, only: %i[index update]
   resources :residences
   resources :candidacies
-  resources :people
+  resources :citizens, concerns: :dimension_rated
   resources :organizations, only: %i[index show]
   resources :parties, only: %i[index show]
   resources :endorsements, only: %i[index show]

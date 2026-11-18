@@ -11,7 +11,7 @@ RSpec.describe "Election page", type: :request do
   def race_for(title, seat_code: nil, candidates: [])
     office = create(:office, position: Position.find_or_create_by!(title: title), jurisdiction: port_merritt, seat_code: seat_code)
     create(:race, election: election, office: office, status: "upcoming").tap do |race|
-      candidates.each { |name| create(:candidacy, race: race, person: create(:person, first_name: name, middle_name: nil, last_name: "Okafor")) }
+      candidates.each { |name| create(:candidacy, race: race, citizen: create(:citizen, first_name: name, middle_name: nil, last_name: "Okafor")) }
     end
   end
 

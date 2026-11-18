@@ -7,7 +7,7 @@ RSpec.describe "Policy pages", type: :request do
   let(:rents) { create(:issue, title: "Rents", topic: housing, description: "Rents rose faster than wages.") }
   let(:rent_cap) { create(:approach, title: "Cap annual rent increases", issue: rents, description: "Limit yearly increases to inflation.") }
   let!(:vouchers) { create(:approach, title: "Expand housing vouchers", issue: rents) }
-  let(:okafor) { create(:candidacy, status: "active", person: create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
+  let(:okafor) { create(:candidacy, status: "active", citizen: create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
   let!(:stance) { create(:stance, candidacy: okafor, approach: rent_cap, priority_level: "high", explanation: "Families cannot plan when rents jump.", evidence_links: nil) }
   let(:council) { create(:governing_body, name: "Port Merritt City Council") }
   let!(:ordinance) { create(:policy, title: "Rent Stabilization Ordinance", approach: rent_cap, governing_body: council, status: "enacted") }

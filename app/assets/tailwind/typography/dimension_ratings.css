@@ -1,0 +1,49 @@
+.dimension-ratings {
+  .precision-control button {
+    @apply text-xs font-mono font-semibold;
+  }
+
+  .dimension-rating-label {
+    @apply text-sm font-semibold;
+  }
+
+  .dimension-rating-value {
+    @apply text-sm font-mono font-bold;
+  }
+
+  .dimension-rating-row[data-rated="false"] .dimension-rating-value {
+    @apply font-normal;
+  }
+
+  .dimension-rating-question,
+  .dimension-rating-help,
+  .dimension-rating-endpoints,
+  .dimension-rating-summary,
+  .dimension-rating-status {
+    @apply text-xs;
+  }
+
+  .drag-precision,
+  .dimension-rating-retry {
+    @apply font-semibold;
+  }
+
+  .dimension-rating-neutral,
+  .dimension-rating-clear,
+  .dimension-rating-retry {
+    @apply underline;
+  }
+
+  .dimension-picker {
+    @apply text-sm;
+  }
+
+  .dimension-suggest {
+    @apply font-semibold;
+  }
+
+  .dimension-suggestions-status,
+  .dimension-select-label {
+    @apply text-xs;
+  }
+}

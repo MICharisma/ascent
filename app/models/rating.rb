@@ -6,6 +6,7 @@ class Rating < ApplicationRecord
   validates :voter_id, uniqueness: { scope: :candidacy_id, message: "can only rate each candidacy once" }
 
   before_update :archive_previous_rating
+  before_destroy :archive_removed_rating, unless: :destroyed_by_association
 
   scope :above_baseline, ->(baseline) { where("rating > ?", baseline) }
   scope :below_baseline, ->(baseline) { where("rating <= ?", baseline) }
@@ -25,7 +26,7 @@ class Rating < ApplicationRecord
   end
 
   def name
-    "#{voter.name} rating for #{candidacy.person.name}"
+    "#{voter.name} rating for #{candidacy.citizen.name}"
   end
 
   def rating_percentage
@@ -37,6 +38,12 @@ class Rating < ApplicationRecord
   end
 
   private
+
+  def archive_removed_rating
+    reload
+    RatingArchive.create! voter: voter, candidacy: candidacy, rating: rating,
+      archived_at: Time.current, reason: "Removed rating"
+  end
 
   def archive_previous_rating
     if rating_changed?

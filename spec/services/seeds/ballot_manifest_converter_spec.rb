@@ -52,7 +52,7 @@ RSpec.describe Seeds::BallotManifestConverter do
     ].to_yaml)
     write("races/2026/new_york/conflicts.csv", <<~CSV)
       state,office,district,candidate_name,field,value_a,source_a,value_b,source_b,note
-      NY,Governor,,Paul Mailhot,presence,not listed,https://elections.ny.gov,listed; balloted=Write-in,https://www.thegreenpapers.com,Green Papers lists this person
+      NY,Governor,,Paul Mailhot,presence,not listed,https://elections.ny.gov,listed; balloted=Write-in,https://www.thegreenpapers.com,Green Papers lists this citizen
       NY,Representative in Congress,15,Ritchie J. Torres,candidate_name,Ritchie J. Torres,https://elections.ny.gov,"TORRES, RITCHIE",https://www.fec.gov,name form differs
     CSV
     write("conversion/2026/new_york/rules.yml", {
@@ -87,20 +87,20 @@ RSpec.describe Seeds::BallotManifestConverter do
     governor = Race.find_by!(entity_code: "RACE-USA-NY-GOVERNOR-2026_GENERAL")
     expect(governor.election).to have_attributes(entity_code: "ELECTION-USA-NY-2026_GENERAL", name: "New York General Election 2026")
     expect(governor.certification_status).to eq("certified")
-    hochul = governor.candidacies.joins(:person).find_by!(people: { last_name: "Hochul" })
-    expect(hochul.person.username).to match(username_like("hochul_kt"))
-    expect(hochul.person.entity_code).to eq("PERSON-#{hochul.person.username.upcase}")
+    hochul = governor.candidacies.joins(:citizen).find_by!(citizens: { last_name: "Hochul" })
+    expect(hochul.citizen.username).to match(username_like("hochul_kt"))
+    expect(hochul.citizen.entity_code).to eq("CITIZEN-#{hochul.citizen.username.upcase}")
     expect(hochul.ballot_labels).to eq("Democratic; Working Families")
     expect(hochul.endorsements.map { |endorsement| endorsement.endorser.entity_code })
       .to contain_exactly("PARTY-USA-NY-DEMOCRATIC", "PARTY-USA-NY-WORKING_FAMILIES")
 
-    write_in = governor.candidacies.joins(:person).find_by!(people: { last_name: "Mailhot" })
+    write_in = governor.candidacies.joins(:citizen).find_by!(citizens: { last_name: "Mailhot" })
     expect(write_in).to have_attributes(participation: "off_ballot")
     expect(write_in.ballot_lines).to be_empty
 
     house = Race.find_by!(entity_code: "RACE-USA-NY-CONGRESS-CD_15-2026_GENERAL")
     expect(house.office).to have_attributes(seat_code: "CD_15", jurisdiction: District.find_by!(name: "New York Congressional District 15").jurisdiction)
-    vega = house.candidacies.joins(:person).find_by!(people: { last_name: "Vega" })
+    vega = house.candidacies.joins(:citizen).find_by!(citizens: { last_name: "Vega" })
     expect(vega.ballot_lines.sole).to have_attributes(label: "Speak The Truth", kind: "designation", party: nil)
     expect(vega.endorsements).to be_empty
   end
@@ -122,7 +122,7 @@ RSpec.describe Seeds::BallotManifestConverter do
     summary = convert
 
     expect(summary[:usernames_issued]).to eq(0)
-    expect(root.join("manifests/2026/new_york/congress.yml").read).to include("PERSON-TORRES_RT_9Z")
+    expect(root.join("manifests/2026/new_york/congress.yml").read).to include("CITIZEN-TORRES_RT_9Z")
   end
 
   it "places local contests in their town, county, or a district for several places" do
@@ -139,7 +139,7 @@ RSpec.describe Seeds::BallotManifestConverter do
     expect(report[:conflicts]).to be_empty
     sheriff = Race.find_by!(entity_code: "RACE-USA-NY-COUNTY_ERIE-SHERIFF-2026_GENERAL")
     expect(sheriff.office.jurisdiction.jurisdictionable).to eq(County.find_by!(name: "Erie County"))
-    expect(sheriff.candidacies.sole.person.username).to match(username_like("garcia_jh"))
+    expect(sheriff.candidacies.sole.citizen.username).to match(username_like("garcia_jh"))
 
     aurora = Municipality.find_by!(name: "Aurora")
     expect(aurora.county.name).to eq("Erie County")
@@ -298,7 +298,7 @@ RSpec.describe Seeds::BallotManifestConverter do
                                 "RACE-USA-NY-APPEAL-DCA_1-APPELLATE_JUDGE-RETENTION_OF_RACHEL_NORDBY-2026_GENERAL")
   end
 
-  it "gives two people with the same printed name the same name code and different disambiguators" do
+  it "gives two citizens with the same printed name the same name code and different disambiguators" do
     write("races/2026/new_york/state/state_senator.yml", [
       row("State Senator", "1", "John Smith", "Republican"),
       row("State Senator", "2", "John Smith", "Republican")

@@ -14,13 +14,13 @@ RSpec.describe "Candidacies Index", type: :request do
     context "with multiple candidacies" do
       let!(:race) { create(:race, :active) }
 
-      let!(:candidate1) { create(:person, :experienced_politician, first_name: "Sarah", middle_name: nil, last_name: "Johnson") }
-      let!(:candidate2) { create(:person, :business_leader, first_name: "Michael", middle_name: nil, last_name: "Chen") }
-      let!(:candidate3) { create(:person, :young_candidate, first_name: "Jordan", middle_name: nil, last_name: "Taylor") }
+      let!(:candidate1) { create(:citizen, :experienced_politician, first_name: "Sarah", middle_name: nil, last_name: "Johnson") }
+      let!(:candidate2) { create(:citizen, :business_leader, first_name: "Michael", middle_name: nil, last_name: "Chen") }
+      let!(:candidate3) { create(:citizen, :young_candidate, first_name: "Jordan", middle_name: nil, last_name: "Taylor") }
 
-      let!(:candidacy1) { create(:candidacy, race: race, person: candidate1, party_label: "Democratic", status: "active") }
-      let!(:candidacy2) { create(:candidacy, race: race, person: candidate2, party_label: "Republican", status: "active") }
-      let!(:candidacy3) { create(:candidacy, race: race, person: candidate3, party_label: "Independent", status: "announced") }
+      let!(:candidacy1) { create(:candidacy, race: race, citizen: candidate1, party_label: "Democratic", status: "active") }
+      let!(:candidacy2) { create(:candidacy, race: race, citizen: candidate2, party_label: "Republican", status: "active") }
+      let!(:candidacy3) { create(:candidacy, race: race, citizen: candidate3, party_label: "Independent", status: "announced") }
 
       it "renders successfully with candidacy data" do
         get candidacies_path
@@ -67,9 +67,9 @@ RSpec.describe "Candidacies Index", type: :request do
       let!(:race1) { create(:race) }
       let!(:race2) { create(:race, :active) }
 
-      let!(:person) { create(:person, :experienced_politician) }
-      let!(:candidacy1) { create(:candidacy, race: race1, person: person, party_label: "Democratic") }
-      let!(:candidacy2) { create(:candidacy, race: race2, person: person, party_label: "Democratic") }
+      let!(:citizen) { create(:citizen, :experienced_politician) }
+      let!(:candidacy1) { create(:candidacy, race: race1, citizen: citizen, party_label: "Democratic") }
+      let!(:candidacy2) { create(:candidacy, race: race2, citizen: citizen, party_label: "Democratic") }
 
       it "displays candidacies from different elections" do
         get candidacies_path
@@ -88,10 +88,10 @@ RSpec.describe "Candidacies Index", type: :request do
 
     context "with candidacies having platform summaries" do
       let!(:race) { create(:race) }
-      let!(:person) { create(:person, :business_leader) }
+      let!(:citizen) { create(:citizen, :business_leader) }
       let!(:candidacy) { create(:candidacy,
         race: race,
-        person: person,
+        citizen: citizen,
         platform_summary: "Focused on economic development and job creation through small business support and infrastructure investment."
       ) }
 

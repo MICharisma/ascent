@@ -3,8 +3,8 @@ require "rails_helper"
 # Results show totals only, residents and visitors apart, from the first saved mountain.
 RSpec.describe "Race results", type: :request do
   let(:race) { create(:race, :active) }
-  let(:okafor) { create(:candidacy, race: race, person: create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
-  let(:lindqvist) { create(:candidacy, race: race, person: create(:person, first_name: "Theo", middle_name: nil, last_name: "Lindqvist")) }
+  let(:okafor) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
+  let(:lindqvist) { create(:candidacy, race: race, citizen: create(:citizen, first_name: "Theo", middle_name: nil, last_name: "Lindqvist")) }
 
   def mountain!(ratings, counted_as: "resident")
     voter = create(:voter)

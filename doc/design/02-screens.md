@@ -57,15 +57,15 @@ At `/races`. Filters for search text, state, election year, status and election 
 
 Directory dropdown filters apply immediately by default. Text search uses Enter or Apply. Filter submissions use Turbo Drive page navigation, which refreshes dependent dropdown options and result counts.
 
-## 6. Candidacy and person
+## 6. Candidacy and citizen
 
 - **Candidacy** (`/candidacies/:id`): the person's name, status and ballot labels, the race and election, policy positions, and rating totals: how many voters rated the candidate, the average rating, and how many approve. Ratings are private, so this page must never show which voter rated the candidate or how.
-- **Person** (`/people/:id`): their candidacies over time, with office, date, status and party.
+- **Citizen** (`/citizens/:id`): their candidacies over time, with office, date, status and party.
 - They have to present a candidate as a person: stances with their evidence, official channels and communications, endorsements, and room for the multi-dimensional evaluation to come (ASC-59).
-- **Images:** images live in a shared library, linked to people and candidacies through ordered image placements. A candidacy shows its own images first, followed by the person's images, without duplicates. The first image appears in the header and the rest in Photos. Images retain a description, credit, and source link. Admins can create images, reuse existing images, edit their shared details, order placements, or remove a placement on the person and candidacy forms. Removing a placement keeps the image and its other uses. Profiles without an image show initials.
+- **Images:** images live in a shared library, linked to citizens and candidacies through ordered image placements. A candidacy shows its own images first, followed by the person's images, without duplicates. The first image appears in the header and the rest in Photos. Images retain a description, credit, and source link. Admins can create images, reuse existing images, edit their shared details, order placements, or remove a placement on the citizen and candidacy forms. Removing a placement keeps the image and its other uses. Profiles without an image show initials.
 - **Stored image files:** admin forms upload JPEG, PNG, or WebP files up to 10 MB into Active Storage. Named variants are avatar (96×96 crop), thumbnail (within 320×320), portrait (800×1000 crop), and large (within 1600×1600). The header uses portrait and Photos uses thumbnail. Imported external URLs remain usable until a file is attached.
 - **AI portraits:** the style selector and Generate portrait button remain disabled pending legal review. Prepared styles are pen and ink, legislative chamber, voting booth, and a randomized American pastime. The service itself also rejects generation while disabled. Generated files retain their reference and prompt metadata and display an AI-generated illustration label.
-- **Sites and socials:** official channels distinguish personal accounts from campaign accounts. A candidacy shows its own campaign channels; the person page includes their campaigns over time.
+- **Sites and socials:** official channels distinguish personal accounts from campaign accounts. A candidacy shows its own campaign channels; the citizen page includes their campaigns over time.
 - **Videos and statements:** both pages show linked publications with their title, source, date, and summary. YouTube and public Vimeo players load after Play video is clicked. Direct MP4, WebM, and Ogg video links have native playback controls. Unsupported links stay accessible through Open original. Removed publications retain their status and any archive link, with no player.
 
 ## 7. Office and election

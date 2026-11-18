@@ -12,25 +12,25 @@ RSpec.describe "Candidate Management", type: :system do
   let!(:office) { create(:office, position: governor, jurisdiction: california.jurisdiction) }
   let!(:race) { create_race_for(office, :upcoming, year: year) }
 
-  let!(:person) { create(:person, first_name: "Sarah", middle_name: nil, last_name: "Martinez", bio: "Experienced public servant") }
+  let!(:citizen) { create(:citizen, first_name: "Sarah", middle_name: nil, last_name: "Martinez", bio: "Experienced public servant") }
 
-  describe "person registration and candidacy announcement" do
-    it "shows person profiles in the system" do
-      visit people_path
+  describe "citizen registration and candidacy announcement" do
+    it "shows citizen profiles in the system" do
+      visit citizens_path
 
-      expect(page).to have_content("People")
+      expect(page).to have_content("Citizens")
       expect(page).to have_content("Sarah Martinez")
     end
 
-    it "displays person biographical information" do
-      visit person_path(person)
+    it "displays citizen biographical information" do
+      visit citizen_path(citizen)
 
       expect(page).to have_content("Sarah Martinez")
       expect(page).to have_content("Experienced public servant")
     end
 
-    context "when person becomes a candidate" do
-      let!(:candidacy) { create(:candidacy, status: "announced", person: person, race: race, announcement_date: 1.month.ago) }
+    context "when citizen becomes a candidate" do
+      let!(:candidacy) { create(:candidacy, status: "announced", citizen: citizen, race: race, announcement_date: 1.month.ago) }
 
       it "shows candidacy in the candidacies listing" do
         visit candidacies_path
@@ -66,13 +66,13 @@ RSpec.describe "Candidate Management", type: :system do
   end
 
   describe "multiple candidates in a race" do
-    let!(:candidate1) { create(:person, first_name: "Alice", middle_name: nil, last_name: "Johnson") }
-    let!(:candidate2) { create(:person, first_name: "Bob", middle_name: nil, last_name: "Wilson") }
-    let!(:candidate3) { create(:person, first_name: "Carol", middle_name: nil, last_name: "Davis") }
+    let!(:candidate1) { create(:citizen, first_name: "Alice", middle_name: nil, last_name: "Johnson") }
+    let!(:candidate2) { create(:citizen, first_name: "Bob", middle_name: nil, last_name: "Wilson") }
+    let!(:candidate3) { create(:citizen, first_name: "Carol", middle_name: nil, last_name: "Davis") }
 
-    let!(:candidacy1) { create(:candidacy, :active, person: candidate1, race: race) }
-    let!(:candidacy2) { create(:candidacy, :active, person: candidate2, race: race) }
-    let!(:candidacy3) { create(:candidacy, :withdrawn, person: candidate3, race: race) }
+    let!(:candidacy1) { create(:candidacy, :active, citizen: candidate1, race: race) }
+    let!(:candidacy2) { create(:candidacy, :active, citizen: candidate2, race: race) }
+    let!(:candidacy3) { create(:candidacy, :withdrawn, citizen: candidate3, race: race) }
 
     it "shows all candidates for a race" do
       visit race_path(race)
@@ -103,7 +103,7 @@ RSpec.describe "Candidate Management", type: :system do
   end
 
   describe "candidate performance tracking" do
-    let!(:candidacy) { create(:candidacy, :active, person: person, race: race) }
+    let!(:candidacy) { create(:candidacy, :active, citizen: citizen, race: race) }
     let!(:voter1) { create(:voter) }
     let!(:voter2) { create(:voter) }
     let!(:voter3) { create(:voter) }
@@ -141,7 +141,7 @@ RSpec.describe "Candidate Management", type: :system do
   end
 
   describe "office and position context" do
-    let!(:candidacy) { create(:candidacy, person: person, race: race) }
+    let!(:candidacy) { create(:candidacy, citizen: citizen, race: race) }
 
     it "shows office and position information" do
       visit offices_path

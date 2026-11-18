@@ -103,15 +103,15 @@ class MountainsController < ApplicationController
 
     candidate_count.times do
       # Mix of candidate types for realistic diversity with intelligent reuse
-      person_type = candidate_types.sample
+      citizen_type = candidate_types.sample
       candidacy_traits = [ :democrat, :republican, :independent, :green ].sample
 
-      # Use SmartFactory for people (low reuse for diversity)
-      person = SmartFactory.create_for_mountain_simulation(:person, [ person_type ])
+      # Use SmartFactory for citizens (low reuse for diversity)
+      citizen = SmartFactory.create_for_mountain_simulation(:citizen, [ citizen_type ])
 
       # Use SmartFactory for candidacies (very low reuse - each should be unique)
       SmartFactory.create_for_mountain_simulation(:candidacy, [ candidacy_traits ],
-                                                  person: person, race: @race)
+                                                  citizen: citizen, race: @race)
     end
 
     # Create realistic policy stances for each candidate

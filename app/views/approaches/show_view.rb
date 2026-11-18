@@ -26,7 +26,7 @@ class Views::Approaches::ShowView < Views::ApplicationView
   private
 
   def stances
-    @stances ||= @approach.stances.includes(:stance_evidences, candidacy: [ :person, { race: [ :election, { office: :position } ] } ]).to_a
+    @stances ||= @approach.stances.includes(:stance_evidences, candidacy: [ :citizen, { race: [ :election, { office: :position } ] } ]).to_a
   end
 
   def policies

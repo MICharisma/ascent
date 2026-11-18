@@ -17,8 +17,8 @@ class Communication < ApplicationRecord
   validates :archived_url, format: { with: WEB_ADDRESS }, allow_blank: true
   validates :duration_seconds, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
 
-  scope :for_profile, ->(person, candidacies) {
-    where(channel: Channel.where(owner: [ person, *candidacies ]))
+  scope :for_profile, ->(citizen, candidacies) {
+    where(channel: Channel.where(owner: [ citizen, *candidacies ]))
       .or(where(id: CommunicationFeature.where(candidacy: candidacies).select(:communication_id)))
   }
 

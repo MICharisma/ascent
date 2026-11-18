@@ -2,15 +2,15 @@ class CandidaciesController < ApplicationController
   before_action :set_candidacy, only: %i[ show edit update destroy ]
 
   def index
-    candidacies_scope = Candidacy.includes(:person, :ballot_lines, race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ])
+    candidacies_scope = Candidacy.includes(:citizen, :ballot_lines, race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ])
       .visible_to(current_voter).joins(race: :election).order("elections.election_date DESC", :id)
-    candidacies_scope = candidacies_scope.where(person_id: params[:person_id]) if params[:person_id]
+    candidacies_scope = candidacies_scope.where(citizen_id: params[:citizen_id]) if params[:citizen_id]
     candidacies_scope = candidacies_scope.where(race_id: params[:race_id]) if params[:race_id]
-    candidacies_scope = candidacies_scope.where(person_id: Person.named_like(filters["q"]).select(:id)) if filters["q"].present?
+    candidacies_scope = candidacies_scope.where(citizen_id: Citizen.named_like(filters["q"]).select(:id)) if filters["q"].present?
     candidacies_scope = candidacies_scope.where(status: filters["status"]) if filters["status"].present?
     @pagy, @candidacies = pagy(candidacies_scope)
     render Views::Candidacies::IndexView.new(candidacies: @candidacies, pagy: @pagy, filters: filters,
-      scope: params.permit(:person_id, :race_id).to_h, rating_counts: Rating.where(candidacy: @candidacies).group(:candidacy_id).count)
+      scope: params.permit(:citizen_id, :race_id).to_h, rating_counts: Rating.where(candidacy: @candidacies).group(:candidacy_id).count)
   end
 
   def show
@@ -56,11 +56,11 @@ class CandidaciesController < ApplicationController
   end
 
   def set_candidacy
-    @candidacy = Candidacy.includes(:person, :ballot_lines, primary_candidacy: { office: :nominating_organization }, race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ]).find(params[:id])
+    @candidacy = Candidacy.includes(:citizen, :ballot_lines, primary_candidacy: { office: :nominating_organization }, race: [ :election, { office: [ :position, { jurisdiction: :jurisdictionable } ] } ]).find(params[:id])
   end
 
   def candidacy_params
-    params.require(:candidacy).permit(:person_id, :race_id, :status, :announcement_date, :participation, :platform_summary,
+    params.require(:candidacy).permit(:citizen_id, :race_id, :status, :announcement_date, :participation, :platform_summary,
       image_placements_attributes: [ :id, :image_id, :position, :_destroy, image_attributes: %i[id file url alt_text credit source_url] ])
   end
 end

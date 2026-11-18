@@ -1,0 +1,30 @@
+.dimension-ratings {
+  .precision-control button,
+  .dimension-picker button,
+  .dimension-rating-neutral,
+  .dimension-rating-clear,
+  .dimension-rating-retry,
+  .dimension-rating-input {
+    @apply cursor-pointer;
+  }
+
+  .dimension-rating-handle {
+    @apply cursor-grab;
+  }
+
+  .dimension-rating-input:disabled,
+  .dimension-suggest:disabled {
+    @apply cursor-default;
+  }
+
+  .precision-control button:focus-visible,
+  .dimension-picker button:focus-visible,
+  .dimension-select:focus-visible,
+  .dimension-rating-neutral:focus-visible,
+  .dimension-rating-clear:focus-visible,
+  .dimension-rating-retry:focus-visible,
+  .dimension-rating-input:focus-visible {
+    @apply outline-2 outline-offset-2 rounded-md;
+    outline-color: var(--rating-focus-ring);
+  }
+}

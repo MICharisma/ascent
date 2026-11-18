@@ -63,7 +63,7 @@ FactoryBot.define do
     end
     trait :moderate_stance do
       priority_level { "medium" }
-      explanation { "Effective governance requires balanced approaches that bring people together around practical solutions. I support evidence-based policies that address community needs while maintaining fiscal responsibility and broad public support." }
+      explanation { "Effective governance requires balanced approaches that bring citizens together around practical solutions. I support evidence-based policies that address community needs while maintaining fiscal responsibility and broad public support." }
       evidence_links { "https://example.com/bipartisan-support, https://example.com/cost-benefit-analysis, https://example.com/implementation-timeline" }
     end
     trait :conservative_stance do

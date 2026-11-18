@@ -18,6 +18,9 @@ class Voter < ApplicationRecord
   has_many :residences, dependent: :destroy
   has_many :jurisdictions, through: :residences
   has_many :ratings, dependent: :destroy
+  has_many :rating_archives, dependent: :delete_all
+  has_many :dimension_ratings, dependent: :destroy
+  has_many :dimension_rating_revisions, dependent: :delete_all
   has_many :voter_race_baselines, dependent: :destroy
   has_many :voter_race_baseline_archives, dependent: :delete_all
   has_many :engagements, dependent: :destroy

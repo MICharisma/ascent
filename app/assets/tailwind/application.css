@@ -20,6 +20,7 @@
 @import "./layout/record.css";
 @import "./layout/authentication.css";
 @import "./layout/map.css";
+@import "./layout/dimension_ratings.css";
 
 /* Layer 2: Spacing/Size */
 @import "./sizing/scaffold.css";
@@ -36,6 +37,7 @@
 @import "./sizing/record.css";
 @import "./sizing/authentication.css";
 @import "./sizing/map.css";
+@import "./sizing/dimension_ratings.css";
 
 /* Layer 3: Typography & Colors */
 @import "./typography/fonts.css";
@@ -53,6 +55,7 @@
 @import "./typography/record.css";
 @import "./typography/authentication.css";
 @import "./typography/map.css";
+@import "./typography/dimension_ratings.css";
 
 /* Layer 3: Colors */
 @import "./colors/main.css";
@@ -70,6 +73,7 @@
 @import "./colors/record.css";
 @import "./colors/authentication.css";
 @import "./colors/map.css";
+@import "./colors/dimension_ratings.css";
 
 /* Layer 4: State */
 @import "./situation/scaffold.css";
@@ -86,4 +90,5 @@
 @import "./situation/record.css";
 @import "./situation/authentication.css";
 @import "./situation/butterfly.css";
+@import "./situation/dimension_ratings.css";
 

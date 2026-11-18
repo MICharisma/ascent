@@ -8,6 +8,16 @@ gem "propshaft"
 # Use postgresql as the database for Active Record
 gem "pg", "~> 1.1"
 gem "activerecord-postgis-adapter", "~> 11.1"
+if ENV["SHARED_RATINGS_PATH"]
+  gem "shared-ratings", path: ENV.fetch("SHARED_RATINGS_PATH"), require: [ "shared-ratings", "shared_ratings/engine" ]
+else
+  gem "shared-ratings", git: "https://github.com/MICharisma/rizz-integration.git", ref: "2069a5225f708927b5b05ea032e10be6c71e17ae", glob: "packages/shared-ratings/*.gemspec", require: [ "shared-ratings", "shared_ratings/engine" ]
+end
+if ENV["RIZZ_CLIENT_PATH"]
+  gem "rizz-client", path: ENV.fetch("RIZZ_CLIENT_PATH")
+else
+  gem "rizz-client", git: "https://github.com/MICharisma/rizz.git", ref: "5f64cfea8e3e044a1696f36cc77ac55bbc9dfedd", glob: "clients/rizz-client/*.gemspec"
+end
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]

@@ -57,7 +57,7 @@ module Seeds
         candidate = "#{base}_#{DISAMBIGUATORS[(start + offset) % DISAMBIGUATORS.size]}"
         return candidate unless taken.include?(candidate)
       end
-      raise Error, "All #{DISAMBIGUATORS.size} disambiguators are taken for PERSON-#{base.upcase}"
+      raise Error, "All #{DISAMBIGUATORS.size} disambiguators are taken for CITIZEN-#{base.upcase}"
     end
 
     def initialize(state_dir:, selection: :pilot, root: SeedDataPaths.primary_root)
@@ -432,14 +432,14 @@ module Seeds
     def candidate_records(name, rows, key, placed, participation)
       parts = BallotRows.name_parts(name)
       username = username_for(key, parts, placed, name)
-      person = record("Person", "PERSON-#{username.upcase}",
+      citizen = record("Citizen", "CITIZEN-#{username.upcase}",
                       { "username" => username, "username_status" => "provisional" }.merge(parts.transform_keys(&:to_s).compact))
       lines = rows.filter_map { |row| ballot_line(row) }.uniq { |line| line["label"] }
       attributes = { "status" => "active", "participation" => participation }
       attributes["ballot_lines"] = lines if lines.any?
       candidacy = record("Candidacy", "CANDIDACY-#{placed[:race_path]}-#{placed[:contest]}-#{username.upcase}", attributes,
-                         "race" => placed[:race_code], "person" => person["code"])
-      [ person, candidacy ]
+                         "race" => placed[:race_code], "citizen" => citizen["code"])
+      [ citizen, candidacy ]
     end
 
     def ballot_line(row)
@@ -460,7 +460,7 @@ module Seeds
       end
     end
 
-    # Sources disagreeing on whether a person belongs in the contest: include them, off the ballot.
+    # Sources disagreeing on whether a citizen belongs in the contest: include them, off the ballot.
     def off_ballot_names(contest)
       office, district = contest[:key]
       printed = contest[:rows].map { |row| row["candidate_name"] }
@@ -524,12 +524,12 @@ module Seeds
       letters[0] + (letters[1..][/[^aeiou0-9]/] || letters[1].to_s)
     end
 
-    # Every username issued in any state, and any a contribution already uses, so no two people share one.
+    # Every username issued in any state, and any a contribution already uses, so no two citizens share one.
     def taken_usernames
       @taken_usernames ||= begin
         issued = Dir.glob(@root.join("conversion", "*", "*", "usernames.yml").to_s).flat_map { |path| YAML.load_file(path).values }
         contributed = Dir.glob(@root.join("manifests", "contributions", "**", "*.{yml,yaml,json}").to_s).flat_map do |path|
-          File.read(path).scan(/(?:code|"[Cc]ode")\s*:\s*"?PERSON-([A-Z0-9_]+)/).flatten.map(&:downcase)
+          File.read(path).scan(/(?:code|"[Cc]ode")\s*:\s*"?CITIZEN-([A-Z0-9_]+)/).flatten.map(&:downcase)
         end
         (issued + contributed + @usernames.values).to_set
       end
@@ -580,12 +580,12 @@ module Seeds
             "# Issued provisional usernames, keyed by contest and printed name. Reused on every conversion; do not edit an issued username.\n" +
             @usernames.sort.to_h.to_yaml(line_width: -1).delete_prefix("---\n"))
       write(conversion_dir.join("name_spellings.yml"),
-            "# Other spellings of a person's name found in cross-check sources. The ballot spelling is kept on the Person.\n" +
+            "# Other spellings of a citizen's name found in cross-check sources. The ballot spelling is kept on the Citizen.\n" +
             name_spellings(contests).to_yaml(line_width: -1).delete_prefix("---\n"))
       write(conversion_dir.join("judgments.md"), judgments(contests))
     end
 
-    # A conflict names an office and district; it belongs to the converted contest whose rows include its person.
+    # A conflict names an office and district; it belongs to the converted contest whose rows include its citizen.
     def conflict_contest(conflict, contests)
       matches = contests.select do |(office, district), rows|
         office == conflict["office"] && district == conflict["district"].to_s && rows.any? { |row| row["candidate_name"] == conflict["candidate_name"] }
@@ -623,9 +623,9 @@ module Seeds
       end
       lines += [ "", "## Ballot line labels", "", "Rules come from `rules.yml`. Party lines link to Party records and count as the party's endorsement." ]
       @label_tally.sort.each { |kind, labels| lines << "- #{kind}: #{labels.sort.join(", ")}" }
-      lines += [ "", "## People included off the ballot", "" ]
+      lines += [ "", "## Citizens included off the ballot", "" ]
       lines += @off_ballot.any? ? @off_ballot.map { |conflict| "- #{conflict["candidate_name"]} (#{contest_label(conflict)}): #{conflict["note"]}. Included with participation `off_ballot` and no ballot line." } : [ "None." ]
-      lines += [ "", "## Name spellings", "", "#{name_spellings(contests).size} other spellings are recorded in `name_spellings.yml`. Each Person keeps the official ballot spelling." ]
+      lines += [ "", "## Name spellings", "", "#{name_spellings(contests).size} other spellings are recorded in `name_spellings.yml`. Each Citizen keeps the official ballot spelling." ]
       applied = %w[candidate_name]
       placed = @conflicts.select { |conflict| conflict["field"] == "presence" ? @off_ballot.include?(conflict) : applied.include?(conflict["field"]) && in_selection.call(conflict) }
       remaining = @conflicts - placed
@@ -638,7 +638,7 @@ module Seeds
       end
       lines += [ "", "## Fields not stored", "", "The manifests do not store #{UNMAPPED_FIELDS.map { |field| "`#{field}`" }.join(", ")}. They remain in the source rows under `races/#{YEAR}/#{@state_dir}/`." ]
       surname_only = contests.values.flatten.map { |row| row["candidate_name"] }.uniq.select { |name| name.split.one? }
-      lines += [ "", "## Missing evidence", "", surname_only.any? ? "Printed with a surname only: #{surname_only.join(", ")}." : "No person is printed with a surname only." ]
+      lines += [ "", "## Missing evidence", "", surname_only.any? ? "Printed with a surname only: #{surname_only.join(", ")}." : "No citizen is printed with a surname only." ]
       lines.join("\n") + "\n"
     end
 

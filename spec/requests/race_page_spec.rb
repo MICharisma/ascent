@@ -7,16 +7,16 @@ RSpec.describe "Race page", type: :request do
 
   let(:office) { office_in(ward_4, "City Council") }
   let!(:race) { create_race_for(office, :active, name: "Port Merritt Municipal Election") }
-  let!(:okafor) { create(:candidacy, race: race, status: "active", person: create(:person, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
+  let!(:okafor) { create(:candidacy, race: race, status: "active", citizen: create(:citizen, first_name: "Dana", middle_name: nil, last_name: "Okafor")) }
   let(:harbor_party) { Party.create!(name: "Harbor Party", state: state.jurisdictionable) }
   let(:harbor_nomination) do
     Office.create!(position: Position.create!(title: Position::NOMINEE_TITLE, branch: :legislative), jurisdiction: ward_4,
       nominee_for: office, nominating_organization: harbor_party, nominee_count: 1, is_active: true)
   end
   let!(:pritchett) do
-    eliminated = create(:person, first_name: "Dwayne", middle_name: nil, last_name: "Pritchett")
-    primary = create(:candidacy, person: eliminated, race: create_race_for(harbor_nomination, :completed))
-    create(:candidacy, race: race, person: eliminated, status: "active", participation: "off_ballot", primary_candidacy: primary)
+    eliminated = create(:citizen, first_name: "Dwayne", middle_name: nil, last_name: "Pritchett")
+    primary = create(:candidacy, citizen: eliminated, race: create_race_for(harbor_nomination, :completed))
+    create(:candidacy, race: race, citizen: eliminated, status: "active", participation: "off_ballot", primary_candidacy: primary)
   end
 
   it "places the race under its election and invites a signed-out visitor to sign in" do

@@ -1,21 +1,21 @@
 require "rails_helper"
 
 RSpec.describe "Shared profile images" do
-  it "allows many images per person and reuses an image across people and candidacies" do
-    person = create(:person)
-    other = create(:person)
-    candidacy = create(:candidacy, person: person)
+  it "allows many images per citizen and reuses an image across citizens and candidacies" do
+    citizen = create(:citizen)
+    other = create(:citizen)
+    candidacy = create(:candidacy, citizen: citizen)
     shared = create(:image)
     second = create(:image)
-    person.image_placements.create!(image: shared, position: 10)
-    person.image_placements.create!(image: second, position: 0)
+    citizen.image_placements.create!(image: shared, position: 10)
+    citizen.image_placements.create!(image: second, position: 0)
     other.images << shared
     candidacy.images << shared
 
-    expect(person.images).to eq([ second, shared ])
-    expect(shared.people).to contain_exactly(person, other)
+    expect(citizen.images).to eq([ second, shared ])
+    expect(shared.citizens).to contain_exactly(citizen, other)
     expect(shared.candidacies).to eq([ candidacy ])
-    expect(build(:image_placement, image: shared, subject: person)).not_to be_valid
+    expect(build(:image_placement, image: shared, subject: citizen)).not_to be_valid
     expect(build(:image_placement, image: shared, subject: create(:organization))).not_to be_valid
     expect(build(:image_placement, position: -1)).not_to be_valid
     expect(build(:image, url: "javascript:alert(1)")).not_to be_valid
@@ -33,18 +33,18 @@ RSpec.describe "Shared profile images" do
   end
 
   it "ignores blank image form rows while saving new and reused images" do
-    person = create(:person)
+    citizen = create(:citizen)
     shared = create(:image)
-    person.update!(image_placements_attributes: [
+    citizen.update!(image_placements_attributes: [
       { image_id: shared.id, position: 2 },
       { position: 1, image_attributes: { url: "https://images.example.org/portrait.jpg", credit: "City Studio" } },
       { image_id: "", position: "0" },
       { position: "0", image_attributes: { url: "", alt_text: "", credit: "", source_url: "" } }
     ])
 
-    expect(person.images.count).to eq(2)
-    expect(person.images.first.credit).to eq("City Studio")
-    expect(person.images.last).to eq(shared)
+    expect(citizen.images.count).to eq(2)
+    expect(citizen.images.first.credit).to eq("City Studio")
+    expect(citizen.images.last).to eq(shared)
   end
 
   it "stores uploads and produces the named thumbnail sizes" do
