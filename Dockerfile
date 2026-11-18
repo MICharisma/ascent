@@ -11,7 +11,7 @@
 ARG RUBY_VERSION=4.0.9
 
 FROM scratch AS submodules
-ADD https://github.com/MICharisma/ascent_seed_data.git#f4052b93fc5ecb97d204394d58ad61724ab063fc /db/seeds/ascent_seed_data
+ADD https://github.com/MICharisma/ascent_seed_data.git#461f6e8abd53a605a467876b4752fa0c81224985 /db/seeds/ascent_seed_data
 ADD https://github.com/mikeymicrophone/micharisma_seeders.git#8357fe34bbf00cdba83585bf97ef058ca1854f10 /lib/micharisma_seeders
 
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base

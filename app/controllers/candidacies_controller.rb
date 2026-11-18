@@ -1,4 +1,5 @@
 class CandidaciesController < ApplicationController
+  prepend_before_action :redirect_merged_candidacy, only: %i[ show edit ]
   before_action :set_candidacy, only: %i[ show edit update destroy ]
 
   def index
@@ -50,6 +51,14 @@ class CandidaciesController < ApplicationController
   end
 
   private
+
+  def redirect_merged_candidacy
+    merge = CandidacyMerge.find_by(old_candidacy_id: params[:id])
+    return unless merge
+
+    authorize! merge.candidacy, to: action_policy_rule
+    redirect_to candidacy_path(merge.candidacy_id), status: :moved_permanently
+  end
 
   def filters
     @filters ||= params.permit(:q, :status).to_h

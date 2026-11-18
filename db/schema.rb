@@ -138,6 +138,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_130000) do
     t.index ["race_id"], name: "index_candidacies_on_race_id"
   end
 
+  create_table "candidacy_merges", force: :cascade do |t|
+    t.bigint "old_candidacy_id", null: false
+    t.bigint "candidacy_id", null: false
+    t.string "performed_by", null: false
+    t.jsonb "snapshot", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["candidacy_id"], name: "index_candidacy_merges_on_candidacy_id"
+    t.index ["old_candidacy_id"], name: "index_candidacy_merges_on_old_candidacy_id", unique: true
+  end
+
   create_table "chambers", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -166,6 +177,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_130000) do
     t.index ["platform", "handle"], name: "index_channels_on_platform_and_handle", unique: true
     t.index ["review_status"], name: "index_channels_on_review_status"
     t.index ["reviewed_by_id"], name: "index_channels_on_reviewed_by_id"
+  end
+
+  create_table "citizen_merges", force: :cascade do |t|
+    t.bigint "old_citizen_id", null: false
+    t.bigint "citizen_id", null: false
+    t.string "rizz_entity_id", null: false
+    t.string "performed_by", null: false
+    t.jsonb "snapshot", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["citizen_id"], name: "index_citizen_merges_on_citizen_id"
+    t.index ["old_citizen_id"], name: "index_citizen_merges_on_old_citizen_id", unique: true
   end
 
   create_table "citizen_name_readings", force: :cascade do |t|
@@ -920,8 +943,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_17_130000) do
   add_foreign_key "candidacies", "candidacies", column: "primary_candidacy_id"
   add_foreign_key "candidacies", "citizens"
   add_foreign_key "candidacies", "races"
+  add_foreign_key "candidacy_merges", "candidacies", on_delete: :restrict
   add_foreign_key "chambers", "governing_bodies"
   add_foreign_key "channels", "voters", column: "reviewed_by_id"
+  add_foreign_key "citizen_merges", "citizens", on_delete: :restrict
   add_foreign_key "citizen_name_readings", "citizens", on_delete: :cascade
   add_foreign_key "communication_features", "candidacies"
   add_foreign_key "communication_features", "communications"

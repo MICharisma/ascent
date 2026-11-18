@@ -2,6 +2,24 @@ require "rails_helper"
 require Rails.root.join("db", "seeds", "seed_layers")
 
 RSpec.describe SeedLayers do
+  describe "db:seed" do
+    it "leaves reference data untouched when automatic seeding is disabled" do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("SKIP_SEEDS").and_return("1")
+      expect(described_class).not_to receive(:seed_reference!)
+
+      load Rails.root.join("db", "seeds.rb")
+    end
+
+    it "keeps the normal reference seed entrypoint enabled by default" do
+      allow(ENV).to receive(:[]).and_call_original
+      allow(ENV).to receive(:[]).with("SKIP_SEEDS").and_return(nil)
+      expect(described_class).to receive(:seed_reference!)
+
+      load Rails.root.join("db", "seeds.rb")
+    end
+  end
+
   describe ".seed_reference!" do
     before do
       described_class.send(:load_seeders!)

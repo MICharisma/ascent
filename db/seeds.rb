@@ -3,6 +3,7 @@
 #
 # Load the intentionally fictitious demo experience with:
 #   bin/rails seed_data:simulated
-require Rails.root.join("db", "seeds", "seed_layers")
-
-SeedLayers.seed_reference!
+unless ENV["SKIP_SEEDS"] == "1"
+  require Rails.root.join("db", "seeds", "seed_layers")
+  SeedLayers.seed_reference!
+end
