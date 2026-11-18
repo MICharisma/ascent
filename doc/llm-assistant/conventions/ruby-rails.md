@@ -8,14 +8,13 @@
 - When browsing results in an error, this is a hint about something that could become part of the test suite, and it should be noted in testing.md in the test prospectus section.
 
 ## Testing
-- Whenever possible, the tests should be written before the implementation *ignore for today*
 - Use Rspec for testing
 - Use FactoryBot for factories
 - Use Shoulda Matchers for matchers
 - Regarding factories, it would be typical to define them with minimal specification, and to use just one for each required configuration.  This project will, on the contrary, often define multiple options for each factory, and use highly-descriptive data to populate their attributes.  This will serve as a form of documentation for open-source developers and political scientists who are curious about the code.
 
 ## Controllers
-- Use service objects for complex business logic
+- Extract a service object only when the behavior needs one
 - However, most of the methods necessary to implement the logic can be defined on the relevant models
 - Since Phlex templates are being used, the variables set in controller actions do not need to be instance variables.  In fact, local variables are preferred.  In most cases, the named arguments for the Phlex template will match the names of the variables being set - and in that case, the template will be able to infer the objects being passed to it.
 
