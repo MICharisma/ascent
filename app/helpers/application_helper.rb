@@ -24,6 +24,10 @@ module ApplicationHelper
   end
 
   def umami_tracker
-    tag.script(defer: true, src: ENV["UMAMI_SCRIPT_URL"], data: { website_id: ENV["UMAMI_WEBSITE_ID"] }) if ENV["UMAMI_WEBSITE_ID"].present?
+    return unless ENV["UMAMI_SCRIPT_URL"].present? && ENV["UMAMI_WEBSITE_ID"].present?
+
+    tag.script defer: true, src: ENV["UMAMI_SCRIPT_URL"], data: {
+      website_id: ENV["UMAMI_WEBSITE_ID"], domains: ENV["UMAMI_DOMAINS"], exclude_search: true, exclude_hash: true
+    }
   end
 end

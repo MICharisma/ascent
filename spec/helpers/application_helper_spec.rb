@@ -8,6 +8,7 @@ RSpec.describe ApplicationHelper, type: :helper do
       before do
         allow(ENV).to receive(:[]).with("UMAMI_SCRIPT_URL").and_return "https://statsbegin.ascent.ing/script.js"
         allow(ENV).to receive(:[]).with("UMAMI_WEBSITE_ID").and_return "ced54035-17ab-4bf4-ae24-e6991d8c1bc7"
+        allow(ENV).to receive(:[]).with("UMAMI_DOMAINS").and_return "build.ascent.ing"
       end
 
       it "loads the tracker for that website" do
@@ -15,6 +16,9 @@ RSpec.describe ApplicationHelper, type: :helper do
 
         expect(tracker[:src]).to eq "https://statsbegin.ascent.ing/script.js"
         expect(tracker["data-website-id"]).to eq "ced54035-17ab-4bf4-ae24-e6991d8c1bc7"
+        expect(tracker["data-domains"]).to eq "build.ascent.ing"
+        expect(tracker["data-exclude-search"]).to eq "true"
+        expect(tracker["data-exclude-hash"]).to eq "true"
         expect(tracker[:defer]).to be_present
       end
     end
