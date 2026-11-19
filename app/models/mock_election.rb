@@ -11,7 +11,7 @@ class MockElection
   attribute :name, :string
   attribute :description, :string
   attribute :election_date, :date
-  attribute :jurisdiction_id, :integer
+  attribute :jurisdiction_id, :string
   attr_accessor :creator, :races
   attr_reader :election
 

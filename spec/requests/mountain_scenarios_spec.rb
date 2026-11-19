@@ -17,7 +17,7 @@ RSpec.describe "Mountain development scenarios", type: :request do
     ensure
       $stdout = original_stdout
     end
-    links = output.string.scan(%r{/mountains/\d+\?voter_id=\d+})
+    links = output.string.scan(%r{/mountains/[0-9a-f-]+\?voter_id=[0-9a-f-]+})
 
     expect(links.uniq.size).to eq(12)
     sign_in create(:voter, :admin)

@@ -18,6 +18,10 @@ module Ascent
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks generators micharisma_seeders])
 
+    config.generators do |generators|
+      generators.orm :active_record, primary_key_type: :uuid
+    end
+
     # Add app/views to autoload paths for Phlex components
     # config.autoload_paths << Rails.root.join("app/views")
     # config.autoload_paths << Rails.root.join('lib', 'ext')

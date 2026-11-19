@@ -104,7 +104,7 @@ RSpec.describe "Mountains", type: :request do
     end
 
     it "returns not found when the race does not exist" do
-      get mountain_path(999_999)
+      get mountain_path(SecureRandom.uuid_v7)
 
       expect(response).to have_http_status(:not_found)
     end

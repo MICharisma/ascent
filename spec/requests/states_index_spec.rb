@@ -121,7 +121,7 @@ RSpec.describe "States Index", type: :request do
     end
 
     it "handles non-existent country gracefully" do
-      get country_states_path(999999)
+      get country_states_path(SecureRandom.uuid_v7)
 
       expect(response).to have_http_status(:not_found)
     end

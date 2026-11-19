@@ -11,9 +11,9 @@ class MountainDraft < ApplicationRecord
 
   scope :for_voter, ->(voter) { where(voter: voter) }
 
-  # Ratings by integer candidacy id, nil where the draft removes a saved rating.
+  # Ratings by candidacy id, nil where the draft removes a saved rating.
   def ratings_by_candidacy
-    ratings.to_h { |candidacy_id, value| [ candidacy_id.to_i, value ] }
+    ratings.transform_keys(&:to_s)
   end
 
   # Folds further edits into the draft: blank ratings become removals, values clamp to 0..500.

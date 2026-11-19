@@ -14,9 +14,10 @@ RSpec.describe Rating, type: :model do
       let(:rating) { create(:rating) }
 
       it 'validates uniqueness of voter_id scoped to candidacy_id' do
-        expect(rating).to validate_uniqueness_of(:voter_id)
-          .scoped_to(:candidacy_id)
-          .with_message("can only rate each candidacy once")
+        duplicate = build(:rating, voter: rating.voter, candidacy: rating.candidacy)
+
+        expect(duplicate).not_to be_valid
+        expect(duplicate.errors[:voter_id]).to include("can only rate each candidacy once")
       end
     end
   end

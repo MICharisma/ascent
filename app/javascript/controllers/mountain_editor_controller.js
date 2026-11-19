@@ -82,7 +82,7 @@ export default class extends Controller {
   }
 
   analyticsProperties() {
-    return { race_id: Number(this.element.dataset.analyticsRaceId), race_mode: this.element.dataset.analyticsRaceMode, view: this.element.dataset.view }
+    return { race_id: this.element.dataset.analyticsRaceId, race_mode: this.element.dataset.analyticsRaceMode, view: this.element.dataset.view }
   }
 
   trackRatingChange(column, inputMethod) {
@@ -93,7 +93,7 @@ export default class extends Controller {
     this.trackedRatings.set(id, value)
     const ballotColumns = this.candidateColumns().filter(column => !column.classList.contains("off-ballot"))
     track("rating_changed", {
-      ...this.analyticsProperties(), candidacy_id: Number(id), input_method: inputMethod,
+      ...this.analyticsProperties(), candidacy_id: id, input_method: inputMethod,
       rated_count: ballotColumns.filter(column => document.getElementById(column.dataset.ratingInputId).value !== "").length,
       candidate_count: ballotColumns.length, off_ballot: column.classList.contains("off-ballot")
     })

@@ -11,7 +11,7 @@ RSpec.describe RenameCountyCodeToFips do
     migration = described_class.new
 
     migration.down
-    expect(County.connection.select_value("SELECT code FROM counties WHERE id = #{county.id}")).to eq("01001")
+    expect(County.connection.select_value("SELECT code FROM counties WHERE id = #{County.connection.quote(county.id)}")).to eq("01001")
     migration.up
     County.reset_column_information
     expect(county.reload.fips).to eq("01001")

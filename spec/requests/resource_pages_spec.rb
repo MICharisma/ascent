@@ -34,7 +34,7 @@ RSpec.describe "Resource index and show pages", type: :request do
       get positions_path
 
       expect(response.body).to include(%(<nav class="pagination" aria-label="Pagination">), "Showing 1–25 of")
-      expect(response.body.scan(/id="list_item_position_\d+"/).size).to eq(Pagy::OPTIONS[:limit])
+      expect(response.body.scan(/id="list_item_position_[0-9a-f-]+"/).size).to eq(Pagy::OPTIONS[:limit])
     end
   end
 

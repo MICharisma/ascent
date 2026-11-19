@@ -25,7 +25,7 @@ RSpec.describe "Endorsement geography and race levels", type: :request do
   end
 
   def listed_ids
-    page.css("#endorsements-list .list-row").map { it["id"].delete_prefix("list_item_endorsement_").to_i }
+    page.css("#endorsements-list .list-row").map { it["id"].delete_prefix("list_item_endorsement_") }
   end
 
   it "composes named scopes across race geography and national, state and local levels" do

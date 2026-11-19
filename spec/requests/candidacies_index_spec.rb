@@ -217,7 +217,7 @@ RSpec.describe "Candidacies Index", type: :request do
     it "handles invalid filter parameters gracefully" do
       create(:candidacy)
 
-      get candidacies_path, params: { election_id: 999999 }
+      get candidacies_path, params: { election_id: SecureRandom.uuid_v7 }
 
       expect(response).to have_http_status(200)
       expect(response.body).to include("Candidacies")

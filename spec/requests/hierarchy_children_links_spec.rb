@@ -43,7 +43,7 @@ RSpec.describe "Links to a record's children", type: :request do
     end
 
     it "answers not found for a governance type that does not exist" do
-      get governance_type_governing_bodies_path(governance_type_id: 0)
+      get governance_type_governing_bodies_path(governance_type_id: SecureRandom.uuid_v7)
 
       expect(response).to have_http_status(:not_found)
     end

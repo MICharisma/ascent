@@ -51,7 +51,7 @@ RSpec.describe "Election page", type: :request do
     get election_path(election)
 
     expect(response.body).to include("state-chip-saved", 'title="Open mountain"', race_results_path(mayor))
-    expect(response.body.scan(%r{/races/\d+/results}).size).to eq(1)
+    expect(response.body.scan(%r{/races/[0-9a-f-]+/results}).size).to eq(1)
   end
 
   it "shows ten contests and folds the rest" do

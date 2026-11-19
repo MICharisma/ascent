@@ -139,7 +139,7 @@ RSpec.describe "Map explorer", type: :request do
   it "rejects unknown states, non-US states, and unknown layers" do
     canada = create(:country, code: "CA")
     province = create(:state, country: canada)
-    [ { state_id: 0 }, { state_id: province.id }, { layer: "municipalities" } ].each do |parameters|
+    [ { state_id: SecureRandom.uuid_v7 }, { state_id: province.id }, { layer: "municipalities" } ].each do |parameters|
       get map_path, params: parameters
       expect(response).to have_http_status(:not_found)
       get features_map_path, params: parameters

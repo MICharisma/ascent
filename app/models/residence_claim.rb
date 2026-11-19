@@ -18,11 +18,11 @@ class ResidenceClaim
   attribute :address, :string
   attribute :latitude, :float
   attribute :longitude, :float
-  attribute :jurisdiction_id, :integer
-  attribute :county_id, :integer
-  attribute :congressional_district_id, :integer
-  attribute :state_senate_district_id, :integer
-  attribute :state_house_district_id, :integer
+  attribute :jurisdiction_id, :string
+  attribute :county_id, :string
+  attribute :congressional_district_id, :string
+  attribute :state_senate_district_id, :string
+  attribute :state_house_district_id, :string
   attribute :started_on, :date
   attribute :ended_on, :date
   attribute :past, :boolean, default: false

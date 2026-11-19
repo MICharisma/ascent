@@ -122,7 +122,7 @@ RSpec.describe "Municipalities Index", type: :request do
     end
 
     it "handles non-existent state gracefully" do
-      get state_municipalities_path(999999)
+      get state_municipalities_path(SecureRandom.uuid_v7)
 
       expect(response).to have_http_status(:not_found)
     end

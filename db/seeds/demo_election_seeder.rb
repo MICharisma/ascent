@@ -25,8 +25,9 @@ class DemoElectionSeeder
 
   def initialize(election)
     @election = election
-    @random = Random.new(election.id)
-    Faker::Config.random = Random.new(election.id)
+    seed = election.id.to_s.delete("-").to_i(16)
+    @random = Random.new(seed)
+    Faker::Config.random = Random.new(seed)
   end
 
   def seed!
