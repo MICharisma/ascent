@@ -68,7 +68,8 @@ class RizzNames
     end
 
     def put(key, row)
-      record = rows.find_or_initialize_by citizen_id: citizen_id(key)
+      id = citizen_id(key) or return
+      record = rows.find_or_initialize_by citizen_id: id
       record.update!(
         state: row["state"], rizz_entity_id: row["entity_id"], rizz_code: row["code"], display_name: row["display_name"],
         display_parts: row["display_parts"], sort_key: row["sort_key"], name_sort: RizzName.sort_keys(row["display_name"], row["display_parts"], row["sort_key"]), search_forms: row["search_forms"] || [], form_id: row["form_id"], rule_id: row["rule_id"],
@@ -114,10 +115,14 @@ class RizzNames
       Rizz::Projection.key RizzNames.reference(citizen_id)
     end
 
+    # Rizz may still hold bindings made with pre-UUID integer Citizen IDs; they match no Citizen, so skip them.
     def citizen_id(key)
       reference = JSON.parse key
       raise ArgumentError, "not an Ascent Citizen reference: #{key}" unless reference["namespace"] == RizzNames.namespace
-      Integer reference.fetch("external_id")
+      id = reference.fetch("external_id").to_s
+      return id if id.match? ApplicationRecord::UUID_FORMAT
+      Rails.logger.info "Skipping Rizz reference to a pre-UUID Citizen ID: #{key}"
+      nil
     end
 
     def to_row(record)
