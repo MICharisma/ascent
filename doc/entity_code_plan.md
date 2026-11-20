@@ -53,7 +53,7 @@ Decided October 21, 2026. A printed ballot line is an official fact; an endorsem
 ## Phases
 
 1. **Foundation (done October 20, 2026).**
-   - `lib/micharisma_seeders` is a submodule of [micharisma_seeders](https://github.com/mikeymicrophone/micharisma_seeders), pinned to `main`. It is excluded from `autoload_lib`, and `MICharisma` is an inflection acronym. AthleteAce pins a later commit on `codex/published-seed-schemas` that adds schema-export tooling.
+   - `lib/micharisma_seeders` is a submodule of [micharisma_seeders](https://github.com/MICharisma/micharisma_seeders), pinned to `main`. It is excluded from `autoload_lib`, and `MICharisma` is an inflection acronym. AthleteAce pins a later commit on `codex/published-seed-schemas` that adds schema-export tooling.
    - `AddEntityCodes` adds `entity_code` to countries, states, counties, municipalities, districts, positions, offices, elections, races, people, and candidacies; creates `entity_codes`; and adds `people.username`, `people.username_status`, and `offices.seat_code`.
    - `RenamePeopleToCitizens` later renames `people` to `citizens` and `candidacies.person_id` to `citizen_id`.
 2. **Importer (done October 21, 2026).**
