@@ -13,6 +13,12 @@ if ENV["SHARED_RATINGS_PATH"]
 else
   gem "shared-ratings", git: "https://github.com/MICharisma/rizz-integration.git", ref: "2069a5225f708927b5b05ea032e10be6c71e17ae", glob: "packages/shared-ratings/*.gemspec", require: [ "shared-ratings", "shared_ratings/engine" ]
 end
+if ENV["RIZZ_AUTH_PATH"] && !ENV["RIZZ_AUTH_PATH"].empty?
+  gem "rizz-auth", path: ENV.fetch("RIZZ_AUTH_PATH")
+else
+  gem "rizz-auth", git: "https://github.com/MICharisma/rizz-integration.git",
+    ref: "72ce12caf426f699d2f995bb6781eb0fd3c98fcb", glob: "packages/rizz-auth/*.gemspec"
+end
 if ENV["RIZZ_CLIENT_PATH"]
   gem "rizz-client", path: ENV.fetch("RIZZ_CLIENT_PATH")
 else

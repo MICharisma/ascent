@@ -1,0 +1,3 @@
+<% if RizzSignIn.enabled? %>
+  <%= button_to t("authentication.sign_in_with_rizz"), rizz_auth_path, method: :post, class: "auth-submit auth-rizz", form: { data: { turbo: false } } %>
+<% end %>

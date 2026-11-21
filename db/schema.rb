@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -680,6 +680,62 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
     t.check_constraint "ended_on IS NULL OR ended_on >= started_on", name: "residences_end_after_start"
   end
 
+  create_table "rizz_backchannel_logout_events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "jti", null: false
+    t.string "rizz_sub", null: false
+    t.bigint "rizz_epoch", null: false
+    t.datetime "processed_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["jti"], name: "index_rizz_backchannel_logout_events_on_jti", unique: true
+    t.index ["rizz_sub"], name: "index_rizz_backchannel_logout_events_on_rizz_sub"
+  end
+
+  create_table "rizz_claim_handoffs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "handoff_jti", null: false
+    t.string "operation_id", null: false
+    t.string "speaker_label", null: false
+    t.string "callback_uri", null: false
+    t.string "browser_token_digest", null: false
+    t.string "intent", default: "claim", null: false
+    t.string "email"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "display_name"
+    t.string "username"
+    t.string "suggested_username"
+    t.string "encrypted_password"
+    t.string "google_uid"
+    t.uuid "verified_voter_id"
+    t.datetime "verified_at"
+    t.datetime "expires_at", null: false
+    t.datetime "consumed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_rizz_claim_handoffs_on_expires_at"
+    t.index ["handoff_jti"], name: "index_rizz_claim_handoffs_on_handoff_jti", unique: true
+    t.index ["operation_id"], name: "index_rizz_claim_handoffs_on_operation_id"
+    t.index ["verified_voter_id"], name: "index_rizz_claim_handoffs_on_verified_voter_id"
+    t.check_constraint "intent::text = ANY (ARRAY['claim'::character varying, 'create'::character varying]::text[])", name: "rizz_claim_handoffs_intent"
+  end
+
+  create_table "rizz_claim_receipts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "voter_id"
+    t.uuid "rizz_claim_handoff_id"
+    t.string "operation_id", null: false
+    t.string "receipt_digest", null: false
+    t.datetime "expires_at", null: false
+    t.datetime "consumed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_rizz_claim_receipts_on_expires_at"
+    t.index ["operation_id"], name: "index_rizz_claim_receipts_on_operation_id", unique: true
+    t.index ["receipt_digest"], name: "index_rizz_claim_receipts_on_receipt_digest", unique: true
+    t.index ["rizz_claim_handoff_id"], name: "index_rizz_claim_receipts_on_rizz_claim_handoff_id"
+    t.index ["voter_id"], name: "index_rizz_claim_receipts_on_voter_id"
+    t.check_constraint "voter_id IS NOT NULL AND rizz_claim_handoff_id IS NULL OR voter_id IS NULL AND rizz_claim_handoff_id IS NOT NULL", name: "rizz_claim_receipts_subject"
+  end
+
   create_table "rizz_feed_cursors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "purpose", null: false
     t.string "cursor"
@@ -881,6 +937,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
     t.index ["voter_id", "race_id"], name: "index_voter_race_preferences_on_voter_id_and_race_id", unique: true
   end
 
+  create_table "voter_rizz_bindings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "voter_id", null: false
+    t.string "rizz_sub", null: false
+    t.string "operation_id", null: false
+    t.string "status", default: "active", null: false
+    t.bigint "rizz_session_epoch", default: 1, null: false
+    t.datetime "connected_at", null: false
+    t.datetime "disconnected_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["operation_id"], name: "index_voter_rizz_bindings_on_operation_id", unique: true
+    t.index ["rizz_sub"], name: "index_voter_rizz_bindings_on_rizz_sub", unique: true
+    t.index ["voter_id"], name: "index_voter_rizz_bindings_on_voter_id"
+    t.index ["voter_id"], name: "index_voter_rizz_bindings_one_active_per_voter", unique: true, where: "((status)::text = 'active'::text)"
+    t.check_constraint "rizz_session_epoch > 0", name: "voter_rizz_bindings_epoch_positive"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'disconnected'::character varying]::text[])", name: "voter_rizz_bindings_status"
+  end
+
   create_table "voter_statements", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text "body", null: false
     t.boolean "active", default: true, null: false
@@ -1003,6 +1077,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
   add_foreign_key "residences", "jurisdictions", column: "state_house_district_id"
   add_foreign_key "residences", "jurisdictions", column: "state_senate_district_id"
   add_foreign_key "residences", "voters"
+  add_foreign_key "rizz_claim_handoffs", "voters", column: "verified_voter_id", on_delete: :nullify
+  add_foreign_key "rizz_claim_receipts", "rizz_claim_handoffs", on_delete: :cascade
+  add_foreign_key "rizz_claim_receipts", "voters", on_delete: :cascade
   add_foreign_key "rizz_names", "citizens", on_delete: :cascade
   add_foreign_key "rizz_syncs", "citizens", on_delete: :cascade
   add_foreign_key "rule_conditions", "rule_statements", column: "statement_id"
@@ -1019,6 +1096,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
   add_foreign_key "voter_race_baselines", "voters"
   add_foreign_key "voter_race_preferences", "races", on_delete: :cascade
   add_foreign_key "voter_race_preferences", "voters", on_delete: :cascade
+  add_foreign_key "voter_rizz_bindings", "voters", on_delete: :cascade
   add_foreign_key "voter_statements", "voters", on_delete: :cascade
 
   create_view "mountain_ratings", sql_definition: <<-SQL

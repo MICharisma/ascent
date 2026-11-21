@@ -6,5 +6,7 @@
     <%= image_tag "google-g.png", width: 20, height: 20, alt: "", aria: { hidden: true } %>
     <span>Continue with Google</span>
   <% end %>
-  <div class="auth-divider"><span>or use your email</span></div>
+  <% if local_assigns.fetch(:show_divider, true) %>
+    <div class="auth-divider"><span>or use your email</span></div>
+  <% end %>
 <% end %>

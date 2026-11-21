@@ -5,6 +5,9 @@ production: &rizz_names
   rizz_names_revalidate:
     class: RizzNamesRevalidateJob
     schedule: at 4am every day
+  rizz_onboarding_digests:
+    command: "RizzClaimHandoff.purge_spent_drafts!"
+    schedule: every 5 minutes
 
 staging:
   <<: *rizz_names

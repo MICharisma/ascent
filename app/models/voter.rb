@@ -12,6 +12,8 @@ class Voter < ApplicationRecord
   has_many :inviters, through: :received_invites, source: :inviter
   has_many :voter_links, -> { ordered }, dependent: :destroy, inverse_of: :voter
   has_many :voter_statements, -> { ordered }, dependent: :destroy, inverse_of: :voter
+  has_many :rizz_bindings, class_name: "VoterRizzBinding", dependent: :destroy
+  has_one :active_rizz_binding, -> { active }, class_name: "VoterRizzBinding", inverse_of: :voter
 
   has_many :ahoy_visits, class_name: "Ahoy::Visit", foreign_key: :user_id, dependent: :nullify
   has_many :ahoy_events, class_name: "Ahoy::Event", foreign_key: :user_id, dependent: :nullify
@@ -35,8 +37,11 @@ class Voter < ApplicationRecord
 
   enum :role, ROLES.index_with(&:itself), validate: { allow_nil: true }
 
+  attr_accessor :password_digest_supplied
+
   validates :first_name, presence: true
   validates :last_name, presence: true
+  validates :uid, uniqueness: { scope: :provider }, allow_nil: true
 
   normalizes :username, with: ->(value) { value.to_s.strip.downcase.presence }
   normalizes :display_name, with: ->(value) { value.to_s.gsub(/[[:cntrl:]]/, "").strip.presence }
@@ -68,6 +73,18 @@ class Voter < ApplicationRecord
 
   def self.google_sign_in_available?
     Devise.omniauth_configs.key?(:google_oauth2)
+  end
+
+  def self.find_by_google_uid(uid)
+    find_by(provider: "google_oauth2", uid: uid.to_s) if uid.present?
+  end
+
+  def self.build_with_password_digest(digest, **attributes)
+    voter = new(**attributes)
+    voter.encrypted_password = digest
+    voter.password_digest_supplied = true
+    voter.skip_confirmation!
+    voter
   end
 
   # The voter a Google account signs in as: the one already linked to it, else the one with its
@@ -219,5 +236,11 @@ class Voter < ApplicationRecord
 
   def residence_history
     residences.chronological
+  end
+
+  private
+
+  def password_required?
+    !password_digest_supplied && super
   end
 end

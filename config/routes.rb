@@ -52,6 +52,7 @@ Rails.application.routes.draw do
     patch :move, on: :member
   end
   devise_for :voters, controllers: { registrations: "voters/registrations", omniauth_callbacks: "voters/omniauth_callbacks" }
+  draw :rizz_auth
   resources :voters do
     patch :hide_profile, on: :member
   end

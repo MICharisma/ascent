@@ -1,0 +1,26 @@
+en:
+  authentication:
+    continue_with_google: "Continue with Google"
+    sign_in_with_rizz: "Sign in with Rizz"
+  rizz_auth:
+    creations:
+      new:
+        title: "Create your Ascent account"
+        description: "Confirm your name, handle, and display name to finish. A password is optional."
+        signed_in_notice: "This browser is currently signed in as %{account}. Creating a new account here won't change that session."
+        email_hint: "Your email was verified with Google through Rizz."
+        first_name: "First name"
+        last_name: "Last name"
+        handle: "Handle"
+        handle_hint: "3–24 letters, numbers, or underscores."
+        display_name: "Display name"
+        handle_taken: "@%{handle} is already taken on Ascent. Choose another handle."
+        password_summary: "Set a password (optional)"
+        password_hint: "At least %{minimum} characters. Skip it to sign in with Rizz or Google, or reset a password by email later."
+        password_confirmation: "Confirm password"
+        submit: "Create account"
+        google_summary: "Link Google now (optional)"
+        google_hint: "Verify the Google account for %{email} so you can sign in to Ascent with Google directly."
+        google_button: "Link Google account now"
+        google_linked: "Google account verified — will be linked for direct sign-in."
+        cancel: "Cancel"

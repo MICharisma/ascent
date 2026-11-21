@@ -1,5 +1,11 @@
 <%= render layout: "devise/shared/card", locals: { title: "Log in", description: "Pick up where you left off." } do %>
-  <%= render "devise/shared/google" %>
+  <% if Voter.google_sign_in_available? || RizzSignIn.enabled? %>
+    <div class="auth-form">
+      <%= render "devise/shared/google", show_divider: false %>
+      <%= render "devise/shared/rizz" %>
+    </div>
+    <div class="auth-divider"><span>or use your email</span></div>
+  <% end %>
   <%= form_for resource, as: resource_name, url: session_path(resource_name), html: { class: "auth-form" } do |form| %>
     <%= auth_field form, :email, type: :email, autofocus: true, autocomplete: "email", required: true %>
     <%= auth_field form, :password, type: :password, autocomplete: "current-password", required: true %>
