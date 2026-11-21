@@ -9,7 +9,9 @@
 .auth-heading > p:last-child { font-size: .95rem; }
 .auth-field label { font-size: .875rem; font-weight: 650; }
 .auth-page .auth-input { font: inherit; font-size: 1rem; }
-.auth-google { font-family: "Google Sans", Arial, sans-serif; font-size: 14px; line-height: 20px; font-weight: 500; }
+.auth-google { font-family: "Google Sans", Arial, sans-serif; font-size: 16px; line-height: 20px; font-weight: 600; }
+.auth-google-callout-title { font-size: .95rem; font-weight: 700; }
+.auth-cancel { font: inherit; font-size: .9rem; font-weight: 600; }
 .auth-submit { font: inherit; font-weight: 700; }
 .auth-hint, .auth-field-error { font-size: .8rem; line-height: 1.5; }
 .auth-divider, .auth-options, .auth-links, .auth-back { font-size: .875rem; }

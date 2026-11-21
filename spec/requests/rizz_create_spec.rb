@@ -517,17 +517,17 @@ RSpec.describe "Rizz create", type: :request do
       follow_redirect!
     end
 
-    it "offers a collapsed Link Google now button outside the form that reuses the claim Google path, and hides it when Google is off" do
+    it "offers a prominent Link Google now button outside the form that reuses the claim Google path, and hides it when Google is off" do
       start_create
       get rizz_create_path
       page = Nokogiri::HTML(response.body)
-      details = page.css("details").find { it.at_css("summary").text == "Link Google now (optional)" }
-      expect(details["open"]).to be_nil
+      expect(page.css("details form[action='/auth/rizz/claim/google']")).to be_empty
       expect(page.at_css("form[action='#{rizz_create_path}']").at_css("form[action='/auth/rizz/claim/google']")).to be_nil
-      button_form = details.at_css("form[action='/auth/rizz/claim/google']")
+      button_form = page.at_css("form[action='/auth/rizz/claim/google']")
       expect(button_form["method"]).to eq("post")
       expect(button_form["data-turbo"]).to eq("false")
-      expect(button_form.at_css("button, input[type=submit]").then { it["value"] || it.text }).to eq("Link Google account now")
+      expect(button_form.at_css("button.google-sign-in, button.auth-google")).to be_present
+      expect(button_form.at_css("button, input[type=submit]").then { it["value"] || it.text.strip }).to eq("Link Google account now")
 
       allow(Voter).to receive(:google_sign_in_available?).and_return(false)
       get rizz_create_path

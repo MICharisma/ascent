@@ -1,11 +1,12 @@
 .auth-page .auth-input:focus { scale: 1; box-shadow: none; border-color: #8866b4; }
-.auth-input:focus-visible, .auth-google:focus-visible, .auth-submit:focus-visible,
+.auth-input:focus-visible, .auth-google:focus-visible, .auth-submit:focus-visible, .auth-cancel:focus-visible,
 .auth-page a:focus-visible, .auth-remember input:focus-visible {
   outline: 3px solid #8866b4;
   outline-offset: 3px;
 }
 .auth-submit:hover { background: #342347; }
-.auth-google:hover { background: #f8f8f8; }
+.auth-google:hover { background: #f8f8f8; box-shadow: 0 6px 16px rgba(21, 32, 27, 0.2); transform: translateY(-1px); }
+.auth-cancel:hover { background: #f6f3ee; color: var(--auth-night); }
 .auth-back:hover, .auth-family:hover { text-decoration: underline; text-underline-offset: 4px; }
 .auth-links a:hover, .auth-options a:hover { color: #694582; }
 .auth-submit:disabled { opacity: .6; cursor: wait; }

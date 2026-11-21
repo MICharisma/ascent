@@ -1,6 +1,16 @@
 <%= render layout: "devise/shared/card", locals: { title: "Connect to Rizz", description: "#{@handoff.speaker_label} wants to connect to your Ascent account. Confirm it's you first." } do %>
   <% if @signed_in_voter %>
-    <p class="auth-hint" role="status">This browser is signed in as <%= @signed_in_voter.handle || masked_email(@signed_in_voter.email) %>. Confirm with your password to continue.</p>
+    <p class="auth-hint" role="status">This browser is signed in as <%= @signed_in_voter.handle || masked_email(@signed_in_voter.email) %>. Confirm with Google or your password to continue.</p>
+  <% end %>
+  <% if google_proof_enabled? %>
+    <% content_for :head do %>
+      <%= tag.link rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Google+Sans:wght@500;600&display=swap" %>
+    <% end %>
+    <%= button_to "/auth/rizz/claim/google", method: :post, class: "auth-google google-sign-in auth-google--prominent", form: { data: { turbo: false } } do %>
+      <%= image_tag "google-g.png", width: 22, height: 22, alt: "", aria: { hidden: true } %>
+      <span>Confirm with Google</span>
+    <% end %>
+    <div class="auth-divider"><span>or confirm with your password</span></div>
   <% end %>
   <%= form_with url: rizz_claim_verify_password_path, class: "auth-form" do |form| %>
     <div class="auth-field">
@@ -14,9 +24,6 @@
     <%= form.submit "Confirm with password", class: "auth-submit" %>
   <% end %>
   <div class="auth-links">
-    <% if google_proof_enabled? %>
-      <%= button_to "Confirm with Google", "/auth/rizz/claim/google", method: :post, class: "auth-google", form: { data: { turbo: false } } %>
-    <% end %>
-    <%= button_to "Cancel", rizz_claim_cancel_path, method: :post, class: "auth-google" %>
+    <%= button_to "Cancel", rizz_claim_cancel_path, method: :post, class: "auth-cancel" %>
   </div>
 <% end %>

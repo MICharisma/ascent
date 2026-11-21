@@ -3,6 +3,23 @@
   <% if @signed_in_voter %>
     <p class="auth-hint" role="status"><%= t(:signed_in_notice, scope: scope, account: @signed_in_voter.handle || RizzSignIn.mask_email(@signed_in_voter.email)) %></p>
   <% end %>
+  <% if google_proof_enabled? %>
+    <% content_for :head do %>
+      <%= tag.link rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Google+Sans:wght@500;600&display=swap" %>
+    <% end %>
+    <div class="auth-google-callout">
+      <% if @handoff.google_uid.present? %>
+        <p class="auth-hint" role="status"><%= t(:google_linked, scope: scope) %></p>
+      <% else %>
+        <p class="auth-google-callout-title"><%= t(:google_summary, scope: scope) %></p>
+        <p class="auth-hint"><%= t(:google_hint, scope: scope, email: RizzSignIn.mask_email(@handoff.email)) %></p>
+        <%= button_to "/auth/rizz/claim/google", method: :post, class: "auth-google google-sign-in auth-google--prominent", form: { data: { turbo: false } } do %>
+          <%= image_tag "google-g.png", width: 22, height: 22, alt: "", aria: { hidden: true } %>
+          <span><%= t(:google_button, scope: scope) %></span>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
   <%= render "devise/shared/error_messages", resource: @voter %>
   <%= form_with model: @voter, scope: :voter, url: rizz_create_path, class: "auth-form", data: { turbo: false } do |form| %>
     <%= auth_field form, :email, type: :email, value: @handoff.email, readonly: true, hint: t(:email_hint, scope: scope) %>
@@ -23,17 +40,6 @@
     <%= form.submit t(:submit, scope: scope), class: "auth-submit" %>
   <% end %>
   <div class="auth-links">
-    <% if google_proof_enabled? %>
-      <% if @handoff.google_uid.present? %>
-        <p class="auth-hint" role="status"><%= t(:google_linked, scope: scope) %></p>
-      <% else %>
-        <details class="auth-field">
-          <summary><%= t(:google_summary, scope: scope) %></summary>
-          <p class="auth-hint"><%= t(:google_hint, scope: scope, email: RizzSignIn.mask_email(@handoff.email)) %></p>
-          <%= button_to t(:google_button, scope: scope), "/auth/rizz/claim/google", method: :post, class: "auth-google", form: { data: { turbo: false } } %>
-        </details>
-      <% end %>
-    <% end %>
-    <%= button_to t(:cancel, scope: scope), rizz_create_cancel_path, method: :post, class: "auth-google" %>
+    <%= button_to t(:cancel, scope: scope), rizz_create_cancel_path, method: :post, class: "auth-cancel" %>
   </div>
 <% end %>
