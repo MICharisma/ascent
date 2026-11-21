@@ -1,0 +1,22 @@
+<%= render layout: "devise/shared/card", locals: { title: "Connect to Rizz", description: "#{@handoff.speaker_label} wants to connect to your Ascent account. Confirm it's you first." } do %>
+  <% if @signed_in_voter %>
+    <p class="auth-hint" role="status">This browser is signed in as <%= @signed_in_voter.handle || masked_email(@signed_in_voter.email) %>. Confirm with your password to continue.</p>
+  <% end %>
+  <%= form_with url: rizz_claim_verify_password_path, class: "auth-form" do |form| %>
+    <div class="auth-field">
+      <%= form.label :email, "Email" %>
+      <%= form.email_field :email, value: @signed_in_voter&.email, autocomplete: "email", required: true, class: "auth-input" %>
+    </div>
+    <div class="auth-field">
+      <%= form.label :password, "Password" %>
+      <%= form.password_field :password, autocomplete: "current-password", required: true, class: "auth-input" %>
+    </div>
+    <%= form.submit "Confirm with password", class: "auth-submit" %>
+  <% end %>
+  <div class="auth-links">
+    <% if google_proof_enabled? %>
+      <%= button_to "Confirm with Google", "/auth/rizz/claim/google", method: :post, class: "auth-google", form: { data: { turbo: false } } %>
+    <% end %>
+    <%= button_to "Cancel", rizz_claim_cancel_path, method: :post, class: "auth-google" %>
+  </div>
+<% end %>

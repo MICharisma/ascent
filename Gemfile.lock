@@ -8,6 +8,15 @@ GIT
       ruby_llm (~> 1.16.0)
 
 GIT
+  remote: https://github.com/MICharisma/rizz-integration.git
+  revision: 72ce12caf426f699d2f995bb6781eb0fd3c98fcb
+  ref: 72ce12caf426f699d2f995bb6781eb0fd3c98fcb
+  glob: packages/rizz-auth/*.gemspec
+  specs:
+    rizz-auth (0.1.0)
+      jwt (>= 2.9, < 4)
+
+GIT
   remote: https://github.com/MICharisma/rizz.git
   revision: 5f64cfea8e3e044a1696f36cc77ac55bbc9dfedd
   ref: 5f64cfea8e3e044a1696f36cc77ac55bbc9dfedd
@@ -619,6 +628,7 @@ DEPENDENCIES
   rails (~> 8.1, >= 8.1.2)
   rails-controller-testing
   rgeo-geojson (~> 2.2)
+  rizz-auth!
   rizz-client!
   rspec-rails
   rubocop-rails-omakase

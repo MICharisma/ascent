@@ -189,4 +189,31 @@ RSpec.describe Voter, type: :model do
       end
     end
   end
+
+  describe '.build_with_password_digest' do
+    let(:digest) { Devise::Encryptor.digest(Voter, 'hardwood-9') }
+    let(:attributes) { { first_name: 'Marcus', last_name: 'Tate', email: 'marcus.tate@example.test', username: 'marcus_tate' } }
+
+    it 'accepts a non-blank bcrypt digest without requiring plaintext password params' do
+      voter = Voter.build_with_password_digest(digest, **attributes)
+
+      expect(voter).to be_valid
+      expect(voter.valid_password?('hardwood-9')).to be(true)
+    end
+
+    it 'still requires a password when the supplied digest is blank' do
+      voter = Voter.build_with_password_digest('', **attributes)
+
+      expect(voter).not_to be_valid
+      expect(voter.errors[:password]).to include("can't be blank")
+    end
+
+    it 'still runs Devise password validations if a plaintext password is later assigned' do
+      voter = Voter.build_with_password_digest(digest, **attributes)
+      voter.password = 'abc'
+
+      expect(voter).not_to be_valid
+      expect(voter.errors[:password]).to be_present
+    end
+  end
 end
