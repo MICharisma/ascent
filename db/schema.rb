@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_21_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -918,6 +918,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_120000) do
     t.boolean "public_influencer", default: false, null: false
     t.string "role"
     t.boolean "profile_hidden", default: false, null: false
+    t.string "username"
+    t.string "display_name"
+    t.index "lower((username)::text)", name: "index_voters_on_lower_username", unique: true, where: "(username IS NOT NULL)"
     t.index ["email"], name: "index_voters_on_email", unique: true
     t.index ["invite_token"], name: "index_voters_on_invite_token", unique: true
     t.index ["profile_hidden"], name: "index_voters_on_profile_hidden"
