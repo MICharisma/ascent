@@ -31,11 +31,23 @@ class Voter < ApplicationRecord
   has_many :reviewed_channels, class_name: "Channel", foreign_key: :reviewed_by_id, dependent: :nullify
 
   ROLES = %w[admin moderator reviewer].freeze
+  RESERVED_USERNAMES = %w[admin administrator moderator support system staff help rizz micharisma ascent].freeze
 
   enum :role, ROLES.index_with(&:itself), validate: { allow_nil: true }
 
   validates :first_name, presence: true
   validates :last_name, presence: true
+
+  normalizes :username, with: ->(value) { value.to_s.strip.downcase.presence }
+  normalizes :display_name, with: ->(value) { value.to_s.gsub(/[[:cntrl:]]/, "").strip.presence }
+
+  validates :username,
+            length: { in: 3..24 },
+            format: { with: /\A[a-z0-9_]+\z/, message: "can only contain letters, numbers, and underscores" },
+            uniqueness: { case_sensitive: false },
+            exclusion: { in: RESERVED_USERNAMES },
+            allow_nil: true
+  validates :display_name, length: { maximum: 60 }, allow_nil: true
   # validates :is_verified, inclusion: { in: [true, false] }
 
   scope :publicly_visible, -> { where(profile_hidden: false) }
@@ -109,6 +121,10 @@ class Voter < ApplicationRecord
 
   def publicly_visible_to?(viewer)
     !profile_hidden? || viewer == self
+  end
+
+  def handle
+    "@#{username}" if username.present?
   end
 
   def full_name
