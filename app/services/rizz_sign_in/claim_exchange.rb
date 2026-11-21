@@ -25,7 +25,7 @@ module RizzSignIn
     def call
       ApplicationRecord.transaction { bind }
     rescue ActiveRecord::RecordNotUnique
-      replay || Result.new(:conflict)
+      replay
     rescue EmailTaken
       Result.new(:email_taken)
     rescue Conflict
@@ -38,7 +38,7 @@ module RizzSignIn
       return replay if VoterRizzBinding.exists?(operation_id: @operation_id)
 
       receipt = RizzClaimReceipt.find_by_receipt(@receipt)
-      return Result.new(:invalid) unless receipt&.usable? && receipt.operation_id == @operation_id
+      return invalid_or_replay unless receipt&.usable? && receipt.operation_id == @operation_id
 
       voter = receipt.voter || new_voter_for(receipt)
       return Result.new(:invalid) unless voter&.active_for_authentication?
@@ -46,7 +46,7 @@ module RizzSignIn
       by_sub = VoterRizzBinding.lock.find_by(rizz_sub: @rizz_sub)
       held = VoterRizzBinding.lock.active.find_by(voter_id: voter.id) if voter.persisted?
       return Result.new(:conflict) if (held && held.rizz_sub != @rizz_sub) || (by_sub&.active? && by_sub.voter_id != voter.id)
-      return Result.new(:invalid) unless receipt.consume!
+      return invalid_or_replay unless receipt.consume!
 
       create_voter!(voter, receipt) unless voter.persisted?
 
@@ -85,6 +85,10 @@ module RizzSignIn
       return Result.new(:invalid) unless RizzClaimReceipt.find_by_receipt(@receipt)&.operation_id == @operation_id
 
       Result.new(:ok, binding.voter)
+    end
+
+    def invalid_or_replay
+      VoterRizzBinding.exists?(operation_id: @operation_id) ? replay : Result.new(:invalid)
     end
   end
 end

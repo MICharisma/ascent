@@ -241,6 +241,6 @@ class Voter < ApplicationRecord
   private
 
   def password_required?
-    !password_digest_supplied && super
+    !(password_digest_supplied && encrypted_password.present? && password.nil? && password_confirmation.nil?) && super
   end
 end

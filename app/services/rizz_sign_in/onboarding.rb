@@ -20,6 +20,8 @@ module RizzSignIn
     # as a claim), :gone (expired, spent or no longer a create handoff)
     def call
       RizzClaimHandoff.transaction(requires_new: true) { onboard } || Result.new(:gone)
+    rescue ActiveRecord::RecordNotUnique
+      Result.new(:gone)
     end
 
     private

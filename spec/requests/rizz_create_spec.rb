@@ -927,6 +927,16 @@ RSpec.describe "Rizz create", type: :request do
       expect(RizzClaimHandoff.last.encrypted_password).to be_present
     end
 
+    it "returns gone instead of raising if a receipt for the same operation_id already exists" do
+      start_create
+      handoff = RizzClaimHandoff.last
+      RizzClaimReceipt.issue!(voter: create(:voter), operation_id: handoff.operation_id)
+
+      result = RizzSignIn::Onboarding.call(handoff: handoff, attributes: onboarding[:voter].stringify_keys)
+      expect(result.status).to eq(:gone)
+      expect(handoff.reload.consumed_at).to be_nil
+    end
+
     it "purges abandoned digests whenever another handoff starts, and schedules purge in recurring.yml" do
       start_create
       submit

@@ -8,6 +8,10 @@ class RizzAuth::ClaimsController < ApplicationController
 
   COOKIE = "rizz_claim_local"
 
+  def self.dummy_password_digest
+    @dummy_password_digest ||= Devise::Encryptor.digest(Voter, SecureRandom.hex(16))
+  end
+
   skip_before_action :authorize_action_policy_resource!
   skip_verify_authorized
   skip_forgery_protection only: %i[start google_failure] # start is entered from the Speaker; its JWT is the credential
@@ -41,9 +45,10 @@ class RizzAuth::ClaimsController < ApplicationController
   end
 
   def verify_password
-    voter = Voter.find_for_database_authentication(email: params[:email].to_s.strip.downcase) if params[:password].is_a?(String)
-    return prove_failed "That email and password didn't match." unless voter&.valid_password?(params[:password])
-    return prove_failed "That email and password didn't match." unless claimable?(voter)
+    password = params[:password]
+    voter = Voter.find_for_database_authentication(email: params[:email].to_s.strip.downcase) if password.is_a?(String)
+    Devise::Encryptor.compare(Voter, self.class.dummy_password_digest, password) if voter.nil? && password.is_a?(String)
+    return prove_failed "That email and password didn't match." unless voter&.valid_password?(password) && claimable?(voter)
 
     proven = @handoff.with_lock do
       next false unless @handoff.claim_intent? && @handoff.usable?
@@ -105,6 +110,8 @@ class RizzAuth::ClaimsController < ApplicationController
 
     delete_rizz_cookie COOKIE
     redirect_to @handoff.return_url(receipt), allow_other_host: true, status: :see_other
+  rescue ActiveRecord::RecordNotUnique
+    claim_rejected
   end
 
   def cancel

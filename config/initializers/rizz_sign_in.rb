@@ -18,6 +18,7 @@ Rails.application.config.middleware.use OmniAuth::Strategies::RizzClaimGoogle, g
   **RizzAuth::OmniAuth::RizzClaimGoogle.middleware_options(enabled_check: -> { RizzSignIn.enabled? && RizzSignIn.google_proof_enabled? })
 
 Rails.application.config.after_initialize do
+  require "devise/omniauth"
   devise_failure = OmniAuth.config.on_failure
   OmniAuth.config.on_failure = proc do |env|
     if env["PATH_INFO"].to_s.start_with?("/auth/rizz/claim/google")

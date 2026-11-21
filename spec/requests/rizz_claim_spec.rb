@@ -196,6 +196,13 @@ RSpec.describe "Rizz claim", type: :request do
       expect(RizzClaimHandoff.last.verified_voter_id).to be_nil
     end
 
+    it "runs a dummy bcrypt comparison when the email does not match any Voter" do
+      allow(Devise::Encryptor).to receive(:compare).and_call_original
+      post rizz_claim_verify_password_path, params: { email: "nobody@example.com", password: "password123" }
+      expect(response).to redirect_to(rizz_claim_prove_path)
+      expect(Devise::Encryptor).to have_received(:compare).with(Voter, kind_of(String), "password123")
+    end
+
     it "does not let confirmation be reached before proof" do
       get rizz_claim_confirm_path
       expect(response).to redirect_to(rizz_claim_prove_path)
@@ -547,6 +554,48 @@ RSpec.describe "Rizz claim", type: :request do
       receipt = RizzClaimReceipt.issue!(voter: voter, operation_id: "op-1")
       stored = RizzClaimReceipt.find_by_receipt(receipt)
       expect([ stored.consume!, RizzClaimReceipt.find(stored.id).consume! ]).to eq([ true, false ])
+    end
+
+    it "returns a clean rejection instead of raising if a duplicate receipt already exists on connect" do
+      start_claim
+      prove_with_password
+      RizzClaimReceipt.issue!(voter: voter, operation_id: "op-1")
+
+      post rizz_claim_confirm_path
+      expect(response).to redirect_to(new_voter_session_path)
+      expect(RizzClaimHandoff.last.consumed_at).to be_nil
+    end
+
+    it "returns ok when a concurrent exchange completes before usable? or consume! checks" do
+      claim_and_confirm
+      receipt = receipt_from_redirect
+      allow(RizzClaimReceipt).to receive(:find_by_receipt).and_wrap_original do |original, token|
+        record = original.call(token)
+        if record && !record.consumed_at && VoterRizzBinding.where(operation_id: "op-1").none?
+          allow(record).to receive(:consume!) do
+            record.update!(consumed_at: Time.current)
+            VoterRizzBinding.create!(
+              voter: voter, rizz_sub: "pairwise-sub-1", operation_id: "op-1",
+              rizz_session_epoch: 3, connected_at: Time.current
+            )
+            false
+          end
+        end
+        record
+      end
+
+      losing_consume = RizzSignIn::ClaimExchange.call(
+        operation_id: "op-1", receipt: receipt, rizz_sub: "pairwise-sub-1", rizz_session_epoch: 3
+      )
+      expect(losing_consume.status).to eq(:ok)
+      expect(losing_consume.voter).to eq(voter)
+
+      allow(VoterRizzBinding).to receive(:exists?).and_return(false, true)
+      losing_usable = RizzSignIn::ClaimExchange.call(
+        operation_id: "op-1", receipt: receipt, rizz_sub: "pairwise-sub-1", rizz_session_epoch: 3
+      )
+      expect(losing_usable.status).to eq(:ok)
+      expect(losing_usable.voter).to eq(voter)
     end
   end
 
