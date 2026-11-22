@@ -15,6 +15,13 @@ See `doc/llm-assistant/README.md` for complete navigation guide.
 
 ## Common Development Commands
 
+### Ruby through mise
+This app loads Ruby 4.0.9 through mise, pinned in `mise.toml`. A `ruby` already on `PATH` is usually a different version, so check mise before reporting that Ruby is missing.
+
+- `mise install` installs the pinned Ruby if it isn't there yet.
+- Prefix Ruby commands with `mise exec --`: `mise exec -- ruby -S bundle install`, `mise exec -- ruby bin/rails db:migrate`, `mise exec -- ruby -S bundle exec rspec`.
+- Or activate mise once per shell with `eval "$(mise activate bash)"` (or `zsh`) and run the commands bare.
+
 ### Primary Development Cycle
 - The development log is the fastest way to review context
 - You do not need to start the Rails server or Tailwind watcher
