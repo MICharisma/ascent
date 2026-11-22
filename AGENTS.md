@@ -15,6 +15,9 @@ See `doc/llm-assistant/README.md` for complete navigation guide.
 
 ## Common Development Commands
 
+### Ruby
+- Ruby is loaded through mise, which reads the version from `.ruby-version` and `mise.toml`. If the shell's `ruby` is missing or a different version, run commands through mise rather than concluding Ruby is unavailable: `mise exec -- ruby bin/rails …` and `mise exec -- ruby -S bundle exec …`.
+
 ### Primary Development Cycle
 - The development log is the fastest way to review context
 - You do not need to start the Rails server or Tailwind watcher
