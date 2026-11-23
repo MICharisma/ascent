@@ -24,40 +24,57 @@ RSpec.describe "Public mountains", type: :request do
     expect(response.body).not_to include("Make public")
   end
 
-  it "publishes only saved ratings, stores a real PNG, and provides anonymous Open Graph previews" do
-    save_mountain
-    mountain.revise_draft!(ratings: { candidate.id => 111 }, baseline: 450)
-    sign_in voter
-    post share_mountain_path(race)
-    expect(response).to redirect_to(mountain_path(race))
-    publication = PublicMountain.find_by!(voter: voter, race: race)
-    expect(publication.snapshot).to include("voter_name" => "Rosa Delgado", "baseline" => 280)
-    expect(publication.snapshot.fetch("candidates").sole).to include("name" => "Dana Okafor", "rating" => 360)
-    image = Vips::Image.new_from_buffer(publication.preview_png, "")
-    expect([ image.width, image.height ]).to eq([ 1200, 630 ])
+  context "after the owner publishes over an unsaved draft" do
+    let(:publication) { PublicMountain.find_by!(voter: voter, race: race) }
 
-    sign_out voter
-    get public_mountain_path(publication), headers: { "User-Agent" => "facebookexternalhit/1.1" }
-    expect(response).to have_http_status(:ok)
-    page = Nokogiri::HTML(response.body)
-    expect(page.at_css("meta[property='og:title']")["content"]).to eq("Rosa Delgado's mountain")
-    expect(page.at_css("meta[property='og:url']")["content"]).to eq(public_mountain_url(publication))
-    image_url = page.at_css("meta[property='og:image']")["content"]
-    expect(image_url).to start_with(public_mountain_url(publication, format: :png))
-    expect(page.at_css("meta[property='og:image:width']")["content"]).to eq("1200")
-    expect(page.css("main form, input[name='ratings']")).to be_empty
-    expect(page.at_css(".public-mountain-ratings").text).to include("Dana Okafor", "360", "Approved")
-    expect(response.headers["Cache-Control"]).to include("no-store")
+    before do
+      save_mountain
+      mountain.revise_draft!(ratings: { candidate.id => 111 }, baseline: 450)
+      sign_in voter
+      post share_mountain_path(race)
+      sign_out voter
+    end
 
-    get image_url, headers: { "User-Agent" => "Twitterbot/1.0" }
-    expect(response).to have_http_status(:ok)
-    expect(response.media_type).to eq("image/png")
-    expect(response.body.b).to eq(publication.preview_png.b)
-    expect(response.headers["Cache-Control"]).to include("no-store")
+    def preview_page
+      get public_mountain_path(publication), headers: { "User-Agent" => "facebookexternalhit/1.1" }
+      Nokogiri::HTML(response.body)
+    end
 
-    get mountain_path(race, voter_id: voter.id)
-    expect(response).to redirect_to(new_voter_session_path)
-    expect(MountainDraft.find_by!(voter: voter, race: race).baseline).to eq(450)
+    it "publishes the saved ratings, not the draft" do
+      expect(publication.snapshot).to include("voter_name" => "Rosa Delgado", "baseline" => 280)
+      expect(publication.snapshot.fetch("candidates").sole).to include("name" => "Dana Okafor", "rating" => 360)
+      expect(MountainDraft.find_by!(voter: voter, race: race).baseline).to eq(450)
+    end
+
+    it "stores a 1200 by 630 PNG preview" do
+      image = Vips::Image.new_from_buffer(publication.preview_png, "")
+      expect([ image.width, image.height ]).to eq([ 1200, 630 ])
+    end
+
+    it "gives link previewers Open Graph tags and read-only ratings" do
+      page = preview_page
+      expect(response).to have_http_status(:ok)
+      expect(page.at_css("meta[property='og:title']")["content"]).to eq("Rosa Delgado's mountain")
+      expect(page.at_css("meta[property='og:url']")["content"]).to eq(public_mountain_url(publication))
+      expect(page.at_css("meta[property='og:image']")["content"]).to start_with(public_mountain_url(publication, format: :png))
+      expect(page.at_css("meta[property='og:image:width']")["content"]).to eq("1200")
+      expect(page.css("main form, input[name='ratings']")).to be_empty
+      expect(page.at_css(".public-mountain-ratings").text).to include("Dana Okafor", "360", "Approved")
+      expect(response.headers["Cache-Control"]).to include("no-store")
+    end
+
+    it "serves the stored PNG to link previewers" do
+      get preview_page.at_css("meta[property='og:image']")["content"], headers: { "User-Agent" => "Twitterbot/1.0" }
+      expect(response).to have_http_status(:ok)
+      expect(response.media_type).to eq("image/png")
+      expect(response.body.b).to eq(publication.preview_png.b)
+      expect(response.headers["Cache-Control"]).to include("no-store")
+    end
+
+    it "keeps the owner's private mountain page behind sign-in" do
+      get mountain_path(race, voter_id: voter.id)
+      expect(response).to redirect_to(new_voter_session_path)
+    end
   end
 
   it "refuses empty and draft-only mountains" do

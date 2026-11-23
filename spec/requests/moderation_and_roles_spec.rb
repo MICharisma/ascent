@@ -121,46 +121,50 @@ RSpec.describe "Roles, heaven-banning, and channel reviews", type: :request do
       end
     end
 
-    it "hides a heaven-banned voter's influencer profile, links, and statements from others while keeping them visible to the voter themselves" do
-      voter.update!(profile_hidden: true)
+    context "when the voter's profile is hidden" do
+      before { voter.update!(profile_hidden: true) }
 
-      get influencer_path(token: voter.invite_token)
-      expect(response).to have_http_status(:not_found)
+      it "hides their influencer page from visitors and other voters" do
+        get influencer_path(token: voter.invite_token)
+        expect(response).to have_http_status(:not_found)
+        sign_in neighbor
+        get influencer_path(token: voter.invite_token)
+        expect(response).to have_http_status(:not_found)
+      end
 
-      get invites_path
-      expect(response.body).to include("Anonymous influencer")
-      expect(response.body).not_to include("Marisol Vega", voter.invite_token)
+      it "lists them anonymously among influencers" do
+        get invites_path
+        expect(response.body).to include("Anonymous influencer")
+        expect(response.body).not_to include("Marisol Vega", voter.invite_token)
+        sign_in neighbor
+        get invites_path
+        expect(response.body).to include("Anonymous influencer")
+        expect(response.body).not_to include("Marisol Vega", voter.invite_token)
+      end
 
-      sign_in neighbor
-      get influencer_path(token: voter.invite_token)
-      expect(response).to have_http_status(:not_found)
+      it "refuses an invite through their link" do
+        sign_in neighbor
+        expect { post invites_path, params: { token: voter.invite_token } }.not_to change(Invite, :count)
+        expect(response).to have_http_status(:not_found)
+      end
 
-      sign_in neighbor
-      expect do
-        post invites_path, params: { token: voter.invite_token }
-      end.not_to change(Invite, :count)
-      expect(response).to have_http_status(:not_found)
+      it "still shows the voter their own page, links and statements" do
+        sign_in voter
+        get influencer_path(token: voter.invite_token)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include("Marisol Vega", "My Civic Blog", "Local budgets should be transparent.")
+        get invites_path
+        expect(response.body).to include("Marisol Vega", "You")
+        get influencer_profile_path
+        expect(response.body).to include("My Civic Blog", "Local budgets should be transparent.")
+      end
 
-      sign_in neighbor
-      get invites_path
-      expect(response.body).to include("Anonymous influencer")
-      expect(response.body).not_to include("Marisol Vega", voter.invite_token)
-
-      sign_in voter
-      get influencer_path(token: voter.invite_token)
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include("Marisol Vega", "My Civic Blog", "Local budgets should be transparent.")
-
-      get invites_path
-      expect(response.body).to include("Marisol Vega", "You")
-
-      get influencer_profile_path
-      expect(response).to have_http_status(:ok)
-      expect(response.body).to include("My Civic Blog", "Local budgets should be transparent.")
-
-      get voter_path(voter)
-      expect(response).to have_http_status(:ok)
-      expect(response.body).not_to include("Profile visibility", "Hidden", "Unhide profile")
+      it "doesn't tell the voter their profile is hidden" do
+        sign_in voter
+        get voter_path(voter)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include("Profile visibility", "Hidden", "Unhide profile")
+      end
     end
 
     it "continues to tabulate a heaven-banned voter's ratings and baselines in race results" do
@@ -242,36 +246,34 @@ RSpec.describe "Roles, heaven-banning, and channel reviews", type: :request do
       expect(pending_channel.reload.review_status).to eq("pending")
     end
 
-    it "allows a reviewer, moderator, or admin to approve and reject candidate channels" do
+    it "keeps a pending channel off the citizen's page" do
       get citizen_path(citizen)
       expect(response.body).not_to include("elenarostova · Bluesky")
+    end
 
+    it "lists pending channels for a reviewer" do
       sign_in reviewer
       get channels_path
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("elenarostova on Bluesky", "Elena Rostova")
+    end
 
+    it "lets a reviewer approve a channel, which then shows as official" do
+      sign_in reviewer
       patch channel_path(pending_channel), params: { review_status: "approved" }
       expect(response).to redirect_to(channels_path)
-      expect(pending_channel.reload).to have_attributes(
-        official: true,
-        review_status: "approved",
-        reviewed_by: reviewer
-      )
+      expect(pending_channel.reload).to have_attributes(official: true, review_status: "approved", reviewed_by: reviewer)
       expect(pending_channel.reviewed_at).to be_present
-
       get citizen_path(citizen)
       expect(response.body).to include("elenarostova · Bluesky")
+    end
 
+    it "lets a moderator reject an approved channel, which leaves the citizen's page" do
+      pending_channel.update!(official: true, review_status: "approved", reviewed_by: reviewer, reviewed_at: Time.current)
       sign_in moderator
       patch channel_path(pending_channel), params: { review_status: "rejected" }
       expect(response).to redirect_to(channels_path)
-      expect(pending_channel.reload).to have_attributes(
-        official: false,
-        review_status: "rejected",
-        reviewed_by: moderator
-      )
-
+      expect(pending_channel.reload).to have_attributes(official: false, review_status: "rejected", reviewed_by: moderator)
       get citizen_path(citizen)
       expect(response.body).not_to include("elenarostova · Bluesky")
     end

@@ -252,7 +252,20 @@ RSpec.describe "Rizz create", type: :request do
   end
 
   describe "happy path" do
-    it "builds nothing until the Speaker spends the receipt, then creates a confirmed, independently usable Voter with the Rizz binding" do
+    # Submits the form and returns the receipt Rizz is redirected back with.
+    def submit_for_receipt
+      start_create
+      get rizz_create_path
+      submit
+      Rack::Utils.parse_query(URI(response.location).query).fetch("receipt")
+    end
+
+    def spend(receipt)
+      reset!
+      exchange(receipt: receipt)
+    end
+
+    it "stores a receipt and the held details, and builds no Voter until the Speaker spends it" do
       start_create
       get rizz_create_path
       expect { submit }.not_to change(Voter, :count)
@@ -265,16 +278,15 @@ RSpec.describe "Rizz create", type: :request do
       expect(stored).to have_attributes(voter_id: nil, handoff: RizzClaimHandoff.last, operation_id: "op-1", consumed_at: nil)
       expect(stored.receipt_digest).to eq(Digest::SHA256.hexdigest(query["receipt"]))
       expect(stored.expires_at).to be_within(5.seconds).of(60.seconds.from_now)
-      handoff = RizzClaimHandoff.last
-      expect(handoff.consumed_at).to be_present
-      expect(handoff).to have_attributes(first_name: "Marcus", last_name: "Tate")
-      expect(handoff.encrypted_password).to match(/\A\$2/)
+      expect(RizzClaimHandoff.last).to have_attributes(first_name: "Marcus", last_name: "Tate")
+      expect(RizzClaimHandoff.last.consumed_at).to be_present
+      expect(RizzClaimHandoff.last.encrypted_password).to match(/\A\$2/)
       expect(set_cookies).to match(/rizz_create_local=;|rizz_create_local=$/)
       expect(request.env["warden"].user(:voter)).to be_nil
+    end
 
-      receipt = query["receipt"]
-      reset!
-      exchange(receipt: receipt)
+    it "creates a confirmed, independently usable Voter with the Rizz binding when the receipt is spent" do
+      spend submit_for_receipt
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body).to eq("ok" => true, "local_handle" => "@marcus_tate", "has_independent_recovery" => true)
       voter = Voter.find_by!(email: email)
@@ -282,14 +294,25 @@ RSpec.describe "Rizz create", type: :request do
       expect(voter).to be_confirmed
       expect(voter.valid_password?("hardwood-9")).to be(true)
       expect(VoterRizzBinding.last).to have_attributes(voter_id: voter.id, rizz_sub: "pairwise-sub-1", operation_id: "op-1", status: "active", rizz_session_epoch: 3)
-      expect(handoff.reload).to have_attributes(email: nil, first_name: nil, last_name: nil, encrypted_password: nil)
-      expect(stored.reload.consumed_at).to be_present
+    end
 
+    it "discards the held details and marks the receipt spent" do
+      spend submit_for_receipt
+      expect(RizzClaimHandoff.last).to have_attributes(email: nil, first_name: nil, last_name: nil, encrypted_password: nil)
+      expect(RizzClaimReceipt.last.consumed_at).to be_present
+    end
+
+    it "answers a repeated exchange without creating a second Voter" do
+      receipt = submit_for_receipt
+      spend receipt
       exchange(receipt: receipt)
       expect(response).to have_http_status(:ok)
       expect(Voter.where(email: email).count).to eq(1)
       expect(VoterRizzBinding.count).to eq(1)
+    end
 
+    it "refuses a receipt it never issued" do
+      spend submit_for_receipt
       exchange(receipt: "different-receipt")
       expect(response).to have_http_status(:bad_request)
       expect(response.parsed_body).to eq("error" => "invalid_receipt")
