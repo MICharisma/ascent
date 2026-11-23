@@ -45,7 +45,7 @@ RSpec.describe "Public mountains", type: :request do
     image_url = page.at_css("meta[property='og:image']")["content"]
     expect(image_url).to start_with(public_mountain_url(publication, format: :png))
     expect(page.at_css("meta[property='og:image:width']")["content"]).to eq("1200")
-    expect(page.css("form, input[name='ratings']")).to be_empty
+    expect(page.css("main form, input[name='ratings']")).to be_empty
     expect(page.at_css(".public-mountain-ratings").text).to include("Dana Okafor", "360", "Approved")
     expect(response.headers["Cache-Control"]).to include("no-store")
 

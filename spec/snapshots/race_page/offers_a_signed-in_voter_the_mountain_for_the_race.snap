@@ -1,0 +1,48 @@
+---
+source: Race page offers a signed-in voter the mountain for the race
+expression: String
+---
+- header:
+  - nav "Breadcrumb":
+    - link "Elections" → /elections
+    - text "/"
+    - link "Springfield General Election 2026" → /elections/:id
+    - text "/"
+    - text "Mayor"
+  - text "Springfield · Fri Nov 20, 2026"
+  - heading "Mayor" [level=1]
+  - text "active"
+  - text "2 candidates on the ballot. Election day is in 31 days."
+  - link "Pretend vote" → /mountains/:id/edit
+  - nav "Actions for Mayor of Springfield - 2026":
+    - form:
+      - button "Save"
+    - form:
+      - button "Favorite"
+    - form:
+      - button "Follow"
+    - form:
+      - button "Hide"
+    - button "Share"
+- heading "On the ballot" [level=2]
+- text "2 candidates"
+- list:
+  - link "Alice Johnson" → /candidacies/:id
+  - text "Democratic Party"
+  - link "Bob Smith" → /candidacies/:id
+  - text "Independent"
+- aside "About this race":
+  - heading "The office" [level=2]
+  - text "Office"
+  - link "Mayor of Springfield" → /offices/:id
+  - text "Position"
+  - link "Mayor" → /positions/:id
+  - text "Where"
+  - link "Springfield" → /municipalities/:id
+  - heading "The election" [level=2]
+  - text "Election"
+  - link "Springfield General Election 2026" → /elections/:id
+  - text "Date"
+  - text "Nov 20, 2026 · in 31 days"
+  - text "Kind"
+  - text "General"

@@ -114,6 +114,9 @@ group :test do
   # Code coverage reporting [https://github.com/simplecov-ruby/simplecov]
   gem "simplecov", require: false
   gem "simplecov-html", require: false
+
+  gem "rails-jsdom", "~> 0.2.1"
+  gem "insta", "~> 0.3.0", require: false
 end
 
 gem "ruby-lsp", "~> 0.26.11"

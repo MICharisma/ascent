@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# The insta CLI, pointed at spec/snapshots like spec/support/interface_outline.rb.
+require "bundler/setup"
+require "insta/cli"
+
+Insta.configure { |config| config.snapshot_path = "spec/snapshots" }
+Insta::CLI.new(ARGV).run

@@ -42,3 +42,10 @@
 
 # puma-dev loads development secrets from Doppler through this file.
 /.pumaenv
+/spec/examples.txt
+
+/node_modules
+
+# insta writes pending snapshots and run state next to the reviewed ones.
+/spec/snapshots/**/*.snap.new
+/spec/snapshots/.insta-*

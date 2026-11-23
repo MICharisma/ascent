@@ -1,5 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
-import { gsap } from "gsap"
+
+// GSAP runs a ticker as soon as it loads, so load it only where a mountain range connects.
+let loadingGsap
+const withGsap = (use) => (loadingGsap ||= import("gsap").then((module) => module.gsap)).then(use)
 
 // Draws each candidate's rating as a peak and moves the range with GSAP: peaks spring up on arrival,
 // follow a drag, and a summit pulses lime as it breaks through the baseline. It owns every position
@@ -30,7 +33,8 @@ export default class extends Controller {
 
   disconnect() {
     this.resizeObserver?.disconnect()
-    gsap.killTweensOf([ this.line, ...this.peaks.values() ])
+    const targets = [ this.line, ...this.peaks.values() ]
+    withGsap((gsap) => gsap.killTweensOf(targets))
   }
 
   rate({ detail: { candidacyId, rating, glide } }) {
@@ -52,26 +56,26 @@ export default class extends Controller {
 
   // A drag follows the pointer closely; a nudge glides and settles.
   tween(target, vars, glide, onUpdate) {
-    gsap.to(target, {
+    withGsap((gsap) => gsap.to(target, {
       ...vars,
       duration: this.motionAllowed() ? (glide ? 0.45 : 0.12) : 0,
       ease: glide ? "back.out(2)" : "power2.out",
       overwrite: true,
       onUpdate
-    })
+    }))
   }
 
   riseIntoView() {
     if (!this.motionAllowed()) return
 
     const peaks = Array.from(this.peaks.values())
-    gsap.from(peaks, {
+    withGsap((gsap) => gsap.from(peaks, {
       height: 0,
       duration: 1.1,
       ease: "elastic.out(1, 0.6)",
       stagger: 0.07,
       onUpdate: () => this.drawAll()
-    })
+    }))
   }
 
   startingPeak(column) {
@@ -160,7 +164,7 @@ export default class extends Controller {
     if (!this.motionAllowed()) return
 
     const dot = column.querySelector("[data-role='rating-dot']")
-    gsap.fromTo(dot, { scale: 1.8 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, 0.4)", overwrite: true })
+    withGsap((gsap) => gsap.fromTo(dot, { scale: 1.8 }, { scale: 1, duration: 0.6, ease: "elastic.out(1, 0.4)", overwrite: true }))
     this.log(`Summit cleared the baseline in ${column.dataset.candidacyId}`)
   }
 

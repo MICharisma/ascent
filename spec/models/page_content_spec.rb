@@ -54,4 +54,3 @@ RSpec.describe PageContent do
     end
   end
 end
-

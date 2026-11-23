@@ -1,7 +1,10 @@
 require "rails_helper"
+require "tmpdir"
 
 RSpec.describe Seeds::BallotManifestConverter do
-  let(:root) { Rails.root.join("tmp", "ballot_manifest_converter_spec") }
+  # A fresh folder for each example: reusing one folder across examples let a
+  # username issued in one example leak into the next.
+  let(:root) { Pathname.new(Dir.mktmpdir("ballot_manifest_converter")) }
 
   def row(office, district, name, party, status: "certified", level: nil, county: "", jurisdiction: "", notes: "")
     {
@@ -72,7 +75,6 @@ RSpec.describe Seeds::BallotManifestConverter do
   end
 
   before do
-    FileUtils.rm_rf(root)
     write("us_states.yml", { "states" => [ { "code" => "NY", "name" => "New York", "country_code" => "US" } ] }.to_yaml)
     write_foundation
     write_offices("Sheriff" => "POSITION-SHERIFF", "Town Supervisor" => "POSITION-TOWN_SUPERVISOR", "Town Clerk" => "POSITION-TOWN_CLERK",

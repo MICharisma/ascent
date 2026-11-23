@@ -1,10 +1,9 @@
 require "rails_helper"
 
+# Analytics depend on Turbo visits, the share sheet and the clipboard, and the
+# mountain editor animates with GSAP, which never settles in jsdom, so these
+# stay in Chrome.
 RSpec.describe "Browser analytics", type: :system do
-  before do
-    driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 1000 ]
-  end
-
   let(:voter) { create(:voter, first_name: "Rosa", last_name: "Delgado") }
   let(:race) { create(:race, :active) }
   let!(:candidate) { create(:candidacy, race: race) }

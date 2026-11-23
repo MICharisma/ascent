@@ -14,7 +14,8 @@ RSpec.describe "UUIDv7 primary keys" do
     expect(first.id[14]).to eq("7")
     expect(second.id).to match(ApplicationRecord::UUID_FORMAT)
     expect(second.id[14]).to eq("7")
-    expect(second.id).to be > first.id
+    # Ordered by their millisecond timestamp; two ids in the same millisecond can sort either way.
+    expect(second.id.delete("-")[0, 12]).to be >= first.id.delete("-")[0, 12]
     expect(preset.id).to eq(preset_id)
   end
 

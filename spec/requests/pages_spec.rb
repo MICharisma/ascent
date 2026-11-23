@@ -15,7 +15,8 @@ RSpec.describe "Pages", type: :request do
     it "shows active race previews when data exists" do
       race = create(:race, :active)
       election = race.election
-      election.update!(description: "A model election for the landing page.")
+      # A fixed name: Faker cities can include an apostrophe, which the page escapes.
+      election.update!(name: "Springfield General Election 2026", description: "A model election for the landing page.")
 
       get root_path
 
@@ -119,4 +120,3 @@ RSpec.describe "Pages", type: :request do
     end
   end
 end
-

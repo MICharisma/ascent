@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe "Map explorer", type: :request do
-  include ActiveSupport::Testing::TimeHelpers
-
   around { |example| travel_to(Time.zone.local(2026, 10, 31, 12)) { example.run } }
   let(:country) { create(:country, code: "US", name: "United States") }
   let(:state) { create(:state, :with_jurisdiction, code: "NY", name: "New York", country: country) }

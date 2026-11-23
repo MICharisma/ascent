@@ -36,9 +36,13 @@ This app loads Ruby 4.0.9 through mise, pinned in `mise.toml`. A `ruby` already 
 - `bin/rails restart` - Restart Rails server (after adding gems, configs, lib - normal code changes do not require restart)
 
 ### Testing
-- `bundle exec rspec` - Run all tests
-- `bundle exec rspec spec/path/to/file_spec.rb` - Run specific test file
-- `bundle exec rspec spec/path/to/file_spec.rb:line_number` - Run specific test
+Read `docs/testing.md` before writing or changing a spec. It covers which layer to test in, the bug-fix recipe, interaction specs that run Stimulus and Turbo without a browser, and interface snapshots for pages with several permutations.
+
+- `npm install` - Install jsdom and esbuild for interaction specs (once per checkout)
+- `bundle exec rspec` - Run all specs in random order; `--only-failures` reruns what failed
+- `bundle exec rspec spec/path/to/file_spec.rb:line_number` - Run one example
+- `node --experimental-vm-modules --test spec/javascript/` - Run the browser analytics unit test
+- `bin/insta review` - Review changed interface snapshots
 
 ### Database
 - `bin/rails db:migrate` - Run migrations
@@ -89,9 +93,8 @@ Quick summary:
 - Colors must use CSS variables defined in `tailwind/variables/colors.css` files
 
 ### Testing Strategy
-- Specs are discretionary; write one when it is the best way to establish the behavior
+- Specs are discretionary; write one when it is the best way to establish the behavior. `docs/testing.md` explains how.
 - Use FactoryBot with highly descriptive data (serves as documentation)
-- Use Shoulda Matchers for common Rails validations
 - Don't test ActiveRecord macros, focus on compound interactions
 - Multiple factory options with descriptive data for domain understanding
 

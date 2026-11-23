@@ -123,7 +123,7 @@ RSpec.describe "Engagements", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("<h2>Saved</h2>", "<h2>Following</h2>")
       expect(response.body).not_to include("<h2>Favorites</h2>")
-      expect(response.body).to include("Affordable Housing Shortage", candidacy.name)
+      expect(response.body).to include("Affordable Housing Shortage", ERB::Util.html_escape(candidacy.name))
       expect(response.body).to include(%(id="follow_action_bar_candidacy_#{candidacy.id}"))
       expect(response.body).to include(%(data-engagement-bar="action_bar_candidacy_#{candidacy.id}"))
       expect(response.body).to include(%(href="/saved"))

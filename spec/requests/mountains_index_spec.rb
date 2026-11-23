@@ -34,8 +34,8 @@ RSpec.describe "Mountains", type: :request do
         get mountains_path
 
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include(active_race.office.name)
-        expect(response.body).to include(active_race.election.name)
+        expect(response.body).to include(ERB::Util.html_escape(active_race.office.name))
+        expect(response.body).to include(ERB::Util.html_escape(active_race.election.name))
         expect(response.body).to include("2 candidates")
         expect(response.body).to include("Mock election")
         expect(response.body).to include("View Mountain")
@@ -100,7 +100,7 @@ RSpec.describe "Mountains", type: :request do
       get mountain_path(race, voter_id: voter.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(race.office.name)
+      expect(response.body).to include(ERB::Util.html_escape(race.office.name))
     end
 
     it "returns not found when the race does not exist" do
@@ -121,7 +121,7 @@ RSpec.describe "Mountains", type: :request do
       get edit_mountain_path(race, voter_id: voter.id)
 
       expect(response).to have_http_status(:ok)
-      expect(response.body).to include(race.office.name)
+      expect(response.body).to include(ERB::Util.html_escape(race.office.name))
       expect(response.body).to include('data-controller="mountain-editor"')
       expect(response.body).to include("rating-input-#{candidacy.id}")
       expect(response.body).to include("mountain-save-bar")

@@ -3,8 +3,6 @@
 require "rails_helper"
 
 RSpec.describe BoundaryOutline do
-  include ActiveSupport::Testing::TimeHelpers
-
   around { |example| travel_to(Time.zone.local(2026, 10, 31, 12)) { example.run } }
 
   let(:country) { create(:country, code: "US", name: "United States") }

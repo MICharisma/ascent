@@ -23,7 +23,7 @@ RSpec.describe "Roles, heaven-banning, and channel reviews", type: :request do
       get voter_path(voter)
       expect(response).to have_http_status(:ok)
       expect(response.body).to include("Hide profile")
-      expect(response.body).not_to include("Races taken part in", "baseline 237", race.office.name)
+      expect(response.body).not_to include("Races taken part in", "baseline 237", ERB::Util.html_escape(race.office.name))
 
       [ rating_path(rating), voter_race_baseline_path(baseline) ].each do |path|
         get path
@@ -36,7 +36,7 @@ RSpec.describe "Roles, heaven-banning, and channel reviews", type: :request do
         sign_in actor
         get voter_path(voter)
         expect(response).to have_http_status(:ok)
-        expect(response.body).to include("Races taken part in", "baseline 237", race.office.name)
+        expect(response.body).to include("Races taken part in", "baseline 237", ERB::Util.html_escape(race.office.name))
       end
     end
   end

@@ -1,8 +1,6 @@
 require "rails_helper"
 
 RSpec.describe MountainDiscovery do
-  include ActiveSupport::Testing::TimeHelpers
-
   let(:now) { Time.zone.local(2026, 10, 31, 12) }
   let(:old_time) { now - 8.days }
   let(:ranked) { described_class.new(Race.active, now: now).races }

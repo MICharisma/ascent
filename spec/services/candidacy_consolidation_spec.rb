@@ -3,8 +3,16 @@ require "rails_helper"
 RSpec.describe CandidacyConsolidation do
   let(:citizen) { create(:citizen) }
   let(:race) { create(:race) }
-  let!(:survivor) { create(:candidacy, citizen: citizen, race: race, announcement_date: nil, platform_summary: nil, party_label: nil, entity_code: "CANDIDACY-MARISOL-COUNCIL-A") }
-  let!(:duplicate) { create(:candidacy, citizen: citizen, race: race, announcement_date: nil, platform_summary: nil, party_label: nil, entity_code: "CANDIDACY-MARISOL-COUNCIL-B") }
+  # Both candidacies are active and coded, so the lower id survives. Two rows
+  # made in the same millisecond can get UUIDv7 ids in either order, so sort
+  # them rather than assume the first created survives.
+  let!(:pair) do
+    %w[A B].map do |suffix|
+      create(:candidacy, citizen: citizen, race: race, announcement_date: nil, platform_summary: nil, party_label: nil, entity_code: "CANDIDACY-MARISOL-COUNCIL-#{suffix}")
+    end.sort_by(&:id)
+  end
+  let(:survivor) { pair.first }
+  let(:duplicate) { pair.last }
 
   before do
     CitizenMerge.create!(old_citizen_id: 987654321, citizen: citizen, rizz_entity_id: SecureRandom.uuid, performed_by: "maintainer", snapshot: {})

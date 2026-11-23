@@ -1,6 +1,9 @@
-import "ahoy"
+import * as ahoyModule from "ahoy"
 
-const ahoy = globalThis.ahoy
+// Ahoy.js is a UMD script: loaded by the import map it sets globalThis.ahoy,
+// and bundled (as rails-jsdom does in specs) it exports itself instead.
+const ahoy = globalThis.ahoy || ahoyModule.default
+globalThis.ahoy = ahoy
 ahoy.configure({ trackVisits: false })
 
 export function cleanPath(value) {

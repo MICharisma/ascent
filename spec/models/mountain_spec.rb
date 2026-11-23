@@ -4,7 +4,6 @@ require "rails_helper"
 # draft into ratings and the baseline, archives what it replaces, and sorts the mountain into residents or
 # visitors. Ratings change freely; a saved baseline changes at most five times a day per race.
 RSpec.describe Mountain do
-  include ActiveSupport::Testing::TimeHelpers
   include_context "Port Merritt ballot"
 
   let(:race) { create_race_for(office_in(port_merritt, "Mayor"), :active) }

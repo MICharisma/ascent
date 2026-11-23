@@ -1,0 +1,44 @@
+---
+source: Race page invites a signed-out visitor to sign in before rating
+expression: String
+---
+- header:
+  - nav "Breadcrumb":
+    - link "Elections" → /elections
+    - text "/"
+    - link "Springfield General Election 2026" → /elections/:id
+    - text "/"
+    - text "Mayor"
+  - text "Springfield · Fri Nov 20, 2026"
+  - heading "Mayor" [level=1]
+  - text "active"
+  - text "2 candidates on the ballot. Election day is in 31 days."
+  - link "Sign in to build a mountain" → /voters/sign_in
+  - nav "Actions for Mayor of Springfield - 2026":
+    - link "Save" → /voters/sign_in
+    - link "Favorite" → /voters/sign_in
+    - link "Follow" → /voters/sign_in
+    - link "Hide" → /voters/sign_in
+    - button "Share"
+- heading "On the ballot" [level=2]
+- text "2 candidates"
+- list:
+  - link "Alice Johnson" → /candidacies/:id
+  - text "Democratic Party"
+  - link "Bob Smith" → /candidacies/:id
+  - text "Independent"
+- aside "About this race":
+  - heading "The office" [level=2]
+  - text "Office"
+  - link "Mayor of Springfield" → /offices/:id
+  - text "Position"
+  - link "Mayor" → /positions/:id
+  - text "Where"
+  - link "Springfield" → /municipalities/:id
+  - heading "The election" [level=2]
+  - text "Election"
+  - link "Springfield General Election 2026" → /elections/:id
+  - text "Date"
+  - text "Nov 20, 2026 · in 31 days"
+  - text "Kind"
+  - text "General"
