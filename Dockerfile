@@ -8,7 +8,7 @@
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-ARG RUBY_VERSION=4.0.9
+ARG RUBY_VERSION=4.0.10
 
 FROM scratch AS submodules
 ADD https://github.com/MICharisma/ascent_seed_data.git#461f6e8abd53a605a467876b4752fa0c81224985 /db/seeds/ascent_seed_data

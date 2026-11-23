@@ -1,0 +1,12 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Redirect",
+      "fingerprint": "4c44a3a3647a46badf85ea3e29fef13c7fa9971b92fea668a6f19c94ba1e474c",
+      "file": "app/controllers/rizz_auth/creations_controller.rb",
+      "line": 64,
+      "note": "RizzClaimHandoff#return_url starts from callback_uri, which comes from Rizz's signed handoff claims and is accepted only when RizzSignIn.configuration.issuer_origin? confirms it is Rizz's own origin."
+    }
+  ],
+  "brakeman_version": "8.1.1"
+}
