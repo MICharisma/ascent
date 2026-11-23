@@ -159,33 +159,3 @@
 .nav-primary-link {
   @apply gap-2;
 }
-
-.devise-links .google-sign-in {
-  gap: 10px;
-  min-height: 40px;
-  padding: 8px 12px;
-  border-radius: 999px;
-}
-
-.devise-links .google-sign-in img {
-  width: 18px;
-  height: 18px;
-}
-
-.devise-links .google-sign-in-site {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-}
-
-@media (pointer: coarse) {
-  .devise-links .google-sign-in {
-    min-height: 44px;
-  }
-}
-
-@media (max-width: 700px) {
-  .devise-links .google-sign-in-label {
-    display: none;
-  }
-}

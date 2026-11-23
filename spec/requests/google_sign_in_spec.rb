@@ -33,30 +33,6 @@ RSpec.describe "Google sign-in", type: :request do
     expect(response.body).to include("Continue with Google")
   end
 
-  it "shows the branded Google button in the top navigation when enabled, falling back to Sign Up when disabled" do
-    get issues_path
-    doc = Nokogiri::HTML(response.body)
-    nav_auth = doc.at_css(".nav-auth .devise-links")
-    expect(nav_auth).to be_present
-    form = nav_auth.at_css("form.google-sign-in-form")
-    expect(form).to be_present
-    expect(form["data-turbo"]).to eq("false")
-    expect(form["action"]).to eq(voter_google_oauth2_omniauth_authorize_path(origin: issues_path))
-    button = form.at_css("button.google-sign-in")
-    expect(button["aria-label"]).to eq("Get In with Google to Ascent")
-    expect(button.text).to include("Get In")
-    expect(button.at_css("img[src='/google-g.png']")).to be_present
-    expect(button.at_css("img.google-sign-in-site[src='/icon.svg']")).to be_present
-    expect(nav_auth.at_css(".sign-up-link")).to be_nil
-
-    allow(Voter).to receive(:google_sign_in_available?).and_return(false)
-    get issues_path
-    fallback_nav = Nokogiri::HTML(response.body).at_css(".nav-auth .devise-links")
-    expect(fallback_nav.at_css("button.google-sign-in")).to be_nil
-    expect(fallback_nav.at_css(".sign-in-link")).to be_present
-    expect(fallback_nav.at_css(".sign-up-link")).to be_present
-  end
-
   it "makes a confirmed voter from a new Google account and signs them in" do
     expect { sign_in_with(google_account) }.to change(Voter, :count).by(1)
 

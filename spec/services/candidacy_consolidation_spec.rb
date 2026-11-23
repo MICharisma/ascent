@@ -32,7 +32,7 @@ RSpec.describe CandidacyConsolidation do
     feature = CommunicationFeature.create!(communication: communication, candidacy: duplicate)
     result = OfficialResult.create!(race: race, candidacy: duplicate, votes: 1200)
     channel = Channel.create!(owner: duplicate, platform: "website", handle: "marisolvega.example", url: "https://marisolvega.example")
-    engagement = Engagements::Engagement.create!(actor: voter, engageable: duplicate, kind: "follow")
+    engagement = Engagement.create!(voter: voter, engageable: duplicate, kind: "follow")
     image = Image.create!(url: "https://marisolvega.example/profile.jpg")
     placement = ImagePlacement.create!(subject: duplicate, image: image, position: 1)
     draft = MountainDraft.create!(voter: voter, race: race, ratings: { duplicate.id.to_s => nil })

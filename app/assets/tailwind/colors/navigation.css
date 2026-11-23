@@ -67,9 +67,3 @@
   border-color: var(--brand-mist);
   color: var(--brand-ink);
 }
-
-.devise-links .google-sign-in {
-  background: #fff;
-  color: #1f1f1f;
-  border: 1px solid #747775;
-}

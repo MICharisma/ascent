@@ -26,7 +26,7 @@ RSpec.describe CitizenConsolidation do
     candidacy = create(:candidacy, citizen: duplicate)
     rating = create(:rating, candidacy: candidacy)
     voter = create(:voter)
-    engagement = Engagements::Engagement.create!(actor: voter, engageable: duplicate, kind: "follow")
+    engagement = Engagement.create!(voter: voter, engageable: duplicate, kind: "follow")
     channel = Channel.create!(owner: duplicate, platform: "website", handle: "marisolvega.example", url: "https://marisolvega.example")
     image = Image.create!(url: "https://marisolvega.example/portrait.jpg")
     placement = ImagePlacement.create!(subject: duplicate, image: image, position: 0)
@@ -73,10 +73,10 @@ RSpec.describe CitizenConsolidation do
 
   it "deduplicates identical engagements with the originals retained in the audit" do
     voter = create(:voter)
-    Engagements::Engagement.create!(actor: voter, engageable: survivor, kind: "follow")
-    old = Engagements::Engagement.create!(actor: voter, engageable: duplicate, kind: "follow")
+    Engagement.create!(voter: voter, engageable: survivor, kind: "follow")
+    old = Engagement.create!(voter: voter, engageable: duplicate, kind: "follow")
     described_class.apply(described_class.preview, performed_by: "maintainer")
-    expect(Engagements::Engagement.where(actor: voter, engageable: survivor, kind: "follow").count).to eq(1)
+    expect(Engagement.where(voter: voter, engageable: survivor, kind: "follow").count).to eq(1)
     expect(CitizenMerge.last.snapshot.fetch("engagements").map { it.fetch("id") }).to include(old.id)
   end
 

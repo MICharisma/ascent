@@ -213,7 +213,7 @@ class Views::Elections::IndexView < Views::ApplicationView
   end
 
   def engagements
-    @engagements ||= Engagements::Summary.new(@elections.to_a, current_voter)
+    @engagements ||= EngagementSummary.new(@elections.to_a, current_voter)
   end
 
   def empty_state

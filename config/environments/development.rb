@@ -21,7 +21,6 @@ Rails.application.configure do
   # The MICharisma Local Apps tunnel serves this app publicly at dev.ascent.ing, with the Host kept
   # intact, so Google sign-in can call back to a real domain.
   config.hosts << "dev.ascent.ing"
-  config.hosts << "build.ascent.ing"
 
   # Enable server timing.
   config.server_timing = true

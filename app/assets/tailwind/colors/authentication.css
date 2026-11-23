@@ -15,10 +15,7 @@
 .auth-landscape .brand-mark-near { fill: var(--auth-cream); }
 .auth-heading .auth-eyebrow, .auth-heading > p:last-child, .auth-hint, .auth-links, .auth-credit { color: var(--auth-muted); }
 .auth-page .auth-input { background: #fff; border-color: #aaa0b1; color: var(--auth-night); }
-.auth-google { background: #fff; color: #1f1f1f; border-color: #15201b; box-shadow: 0 4px 12px rgba(21, 32, 27, 0.14); }
-.auth-google-callout { background: #f6f3ee; border-color: #cfc6d5; }
-.auth-google-callout-title { color: var(--auth-night); }
-.auth-cancel { background: transparent; color: var(--auth-muted); border-color: var(--auth-line); }
+.auth-google { background: #fff; color: #1f1f1f; border-color: #747775; }
 .auth-submit { background: var(--auth-night); color: var(--auth-cream); border-color: var(--auth-night); }
 .auth-divider { color: var(--auth-muted); }
 .auth-remember input { accent-color: var(--auth-night); }

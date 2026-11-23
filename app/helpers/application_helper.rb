@@ -19,7 +19,6 @@ module ApplicationHelper
   def font_list
     {
       "Bricolage Grotesque" => "Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,200..800",
-      "Google Sans" => "Google+Sans:wght@500;600",
       "Martian Mono" => "Martian+Mono:wdth,wght@75..112.5,300..700"
     }
   end

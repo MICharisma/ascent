@@ -98,18 +98,6 @@
   @apply font-['Bricolage_Grotesque'] text-lg;
 }
 
-.saved-undo-message {
-  @apply font-['Bricolage_Grotesque'] text-sm;
-}
-
-.saved-undo-name {
-  @apply font-semibold;
-}
-
-.saved-undo-button {
-  @apply font-['Bricolage_Grotesque'] text-xs font-semibold;
-}
-
 .resource-action,
 .resource-action > span,
 .scaffold .resource-action > span {

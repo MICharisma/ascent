@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/MICharisma/engagements.git
-  revision: ba0dd1a6476e16b4b20a923055ea998b2e1ab48a
-  ref: ba0dd1a6476e16b4b20a923055ea998b2e1ab48a
-  specs:
-    engagements (0.1.0)
-      rails (>= 8.1)
-      turbo-rails
-
-GIT
   remote: https://github.com/MICharisma/rizz-integration.git
   revision: 2069a5225f708927b5b05ea032e10be6c71e17ae
   ref: 2069a5225f708927b5b05ea032e10be6c71e17ae
@@ -15,15 +6,6 @@ GIT
   specs:
     shared-ratings (0.1.0)
       ruby_llm (~> 1.16.0)
-
-GIT
-  remote: https://github.com/MICharisma/rizz-integration.git
-  revision: 72ce12caf426f699d2f995bb6781eb0fd3c98fcb
-  ref: 72ce12caf426f699d2f995bb6781eb0fd3c98fcb
-  glob: packages/rizz-auth/*.gemspec
-  specs:
-    rizz-auth (0.1.0)
-      jwt (>= 2.9, < 4)
 
 GIT
   remote: https://github.com/MICharisma/rizz.git
@@ -617,7 +599,6 @@ DEPENDENCIES
   csv (~> 3.3)
   debug
   devise
-  engagements!
   factory_bot_rails
   faker
   image_processing (~> 1.14)
@@ -638,7 +619,6 @@ DEPENDENCIES
   rails (~> 8.1, >= 8.1.2)
   rails-controller-testing
   rgeo-geojson (~> 2.2)
-  rizz-auth!
   rizz-client!
   rspec-rails
   rubocop-rails-omakase

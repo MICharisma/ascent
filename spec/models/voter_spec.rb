@@ -21,71 +21,6 @@ RSpec.describe Voter, type: :model do
     end
   end
 
-  describe 'account shape' do
-    it 'normalizes username and display name' do
-      voter = build(:voter, username: '  Mixed_Case1 ', display_name: "  Jane\u0007 Smith \n")
-
-      expect(voter.username).to eq('mixed_case1')
-      expect(voter.display_name).to eq('Jane Smith')
-      expect(build(:voter, username: ' ', display_name: ' ').attributes.values_at('username', 'display_name')).to eq([ nil, nil ])
-    end
-
-    it 'allows a missing username and display name' do
-      expect(build(:voter, username: nil, display_name: nil)).to be_valid
-    end
-
-    it 'requires usernames of 3 to 24 characters' do
-      expect(build(:voter, username: 'ab')).not_to be_valid
-      expect(build(:voter, username: 'abc')).to be_valid
-      expect(build(:voter, username: 'a' * 24)).to be_valid
-      expect(build(:voter, username: 'a' * 25)).not_to be_valid
-    end
-
-    it 'restricts username characters' do
-      voter = build(:voter, username: 'no spaces!')
-
-      expect(voter).not_to be_valid
-      expect(voter.errors[:username]).to include('can only contain letters, numbers, and underscores')
-      expect(build(:voter, username: 'ok_name_9')).to be_valid
-    end
-
-    it 'excludes reserved usernames' do
-      Voter::RESERVED_USERNAMES.each do |name|
-        expect(build(:voter, username: name.upcase)).not_to be_valid
-      end
-      expect(Voter::RESERVED_USERNAMES).to include('ascent', 'rizz', 'micharisma')
-    end
-
-    it 'enforces case-insensitive uniqueness in the model' do
-      create(:voter, username: 'jane_taken')
-
-      expect(build(:voter, username: 'Jane_Taken')).not_to be_valid
-    end
-
-    it 'enforces case-insensitive uniqueness in the database' do
-      create(:voter, username: 'jane_taken')
-      other = create(:voter, username: 'jane_other')
-
-      expect { other.update_columns(username: 'JANE_TAKEN') }.to raise_error(ActiveRecord::RecordNotUnique)
-    end
-
-    it 'allows many voters without a username' do
-      create(:voter, username: nil)
-
-      expect { create(:voter, username: nil) }.not_to raise_error
-    end
-
-    it 'builds a handle only when a username exists' do
-      expect(build(:voter, username: 'jane_taken').handle).to eq('@jane_taken')
-      expect(build(:voter, username: nil).handle).to be_nil
-    end
-
-    it 'caps display name at 60 characters' do
-      expect(build(:voter, display_name: 'a' * 60)).to be_valid
-      expect(build(:voter, display_name: 'a' * 61)).not_to be_valid
-    end
-  end
-
   describe 'devise modules' do
     it 'includes database_authenticatable' do
       expect(Voter.devise_modules).to include(:database_authenticatable)
@@ -187,33 +122,6 @@ RSpec.describe Voter, type: :model do
         history = voter.residence_history
         expect(history).to eq([ residence3, residence2, residence1 ])
       end
-    end
-  end
-
-  describe '.build_with_password_digest' do
-    let(:digest) { Devise::Encryptor.digest(Voter, 'hardwood-9') }
-    let(:attributes) { { first_name: 'Marcus', last_name: 'Tate', email: 'marcus.tate@example.test', username: 'marcus_tate' } }
-
-    it 'accepts a non-blank bcrypt digest without requiring plaintext password params' do
-      voter = Voter.build_with_password_digest(digest, **attributes)
-
-      expect(voter).to be_valid
-      expect(voter.valid_password?('hardwood-9')).to be(true)
-    end
-
-    it 'still requires a password when the supplied digest is blank' do
-      voter = Voter.build_with_password_digest('', **attributes)
-
-      expect(voter).not_to be_valid
-      expect(voter.errors[:password]).to include("can't be blank")
-    end
-
-    it 'still runs Devise password validations if a plaintext password is later assigned' do
-      voter = Voter.build_with_password_digest(digest, **attributes)
-      voter.password = 'abc'
-
-      expect(voter).not_to be_valid
-      expect(voter.errors[:password]).to be_present
     end
   end
 end

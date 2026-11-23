@@ -12,9 +12,8 @@
 .auth-field .field_with_errors { display: contents; }
 .auth-page .auth-input { display: block; width: 100%; }
 .auth-options { display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
-.auth-remember, .auth-google, .auth-cancel { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; }
-.auth-google, .auth-cancel { width: 100%; gap: 10px; }
-.auth-google-callout { display: grid; gap: .65rem; }
+.auth-remember, .auth-google { display: inline-flex; align-items: center; justify-content: center; gap: .75rem; }
+.auth-google { width: 100%; gap: 10px; }
 .auth-google img { flex-shrink: 0; }
 .auth-divider { display: flex; align-items: center; gap: 1rem; }
 .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--auth-line); }

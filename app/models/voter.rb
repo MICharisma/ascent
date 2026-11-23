@@ -12,8 +12,6 @@ class Voter < ApplicationRecord
   has_many :inviters, through: :received_invites, source: :inviter
   has_many :voter_links, -> { ordered }, dependent: :destroy, inverse_of: :voter
   has_many :voter_statements, -> { ordered }, dependent: :destroy, inverse_of: :voter
-  has_many :rizz_bindings, class_name: "VoterRizzBinding", dependent: :destroy
-  has_one :active_rizz_binding, -> { active }, class_name: "VoterRizzBinding", inverse_of: :voter
 
   has_many :ahoy_visits, class_name: "Ahoy::Visit", foreign_key: :user_id, dependent: :nullify
   has_many :ahoy_events, class_name: "Ahoy::Event", foreign_key: :user_id, dependent: :nullify
@@ -25,7 +23,7 @@ class Voter < ApplicationRecord
   has_many :dimension_rating_revisions, dependent: :delete_all
   has_many :voter_race_baselines, dependent: :destroy
   has_many :voter_race_baseline_archives, dependent: :delete_all
-  include Engagements::Engager
+  has_many :engagements, dependent: :destroy
   has_many :voter_race_preferences, dependent: :delete_all
   has_many :mountain_drafts, dependent: :delete_all
   has_many :public_mountains, dependent: :destroy
@@ -33,26 +31,11 @@ class Voter < ApplicationRecord
   has_many :reviewed_channels, class_name: "Channel", foreign_key: :reviewed_by_id, dependent: :nullify
 
   ROLES = %w[admin moderator reviewer].freeze
-  RESERVED_USERNAMES = %w[admin administrator moderator support system staff help rizz micharisma ascent].freeze
 
   enum :role, ROLES.index_with(&:itself), validate: { allow_nil: true }
 
-  attr_accessor :password_digest_supplied
-
   validates :first_name, presence: true
   validates :last_name, presence: true
-  validates :uid, uniqueness: { scope: :provider }, allow_nil: true
-
-  normalizes :username, with: ->(value) { value.to_s.strip.downcase.presence }
-  normalizes :display_name, with: ->(value) { value.to_s.gsub(/[[:cntrl:]]/, "").strip.presence }
-
-  validates :username,
-            length: { in: 3..24 },
-            format: { with: /\A[a-z0-9_]+\z/, message: "can only contain letters, numbers, and underscores" },
-            uniqueness: { case_sensitive: false },
-            exclusion: { in: RESERVED_USERNAMES },
-            allow_nil: true
-  validates :display_name, length: { maximum: 60 }, allow_nil: true
   # validates :is_verified, inclusion: { in: [true, false] }
 
   scope :publicly_visible, -> { where(profile_hidden: false) }
@@ -73,18 +56,6 @@ class Voter < ApplicationRecord
 
   def self.google_sign_in_available?
     Devise.omniauth_configs.key?(:google_oauth2)
-  end
-
-  def self.find_by_google_uid(uid)
-    find_by(provider: "google_oauth2", uid: uid.to_s) if uid.present?
-  end
-
-  def self.build_with_password_digest(digest, **attributes)
-    voter = new(**attributes)
-    voter.encrypted_password = digest
-    voter.password_digest_supplied = true
-    voter.skip_confirmation!
-    voter
   end
 
   # The voter a Google account signs in as: the one already linked to it, else the one with its
@@ -138,10 +109,6 @@ class Voter < ApplicationRecord
 
   def publicly_visible_to?(viewer)
     !profile_hidden? || viewer == self
-  end
-
-  def handle
-    "@#{username}" if username.present?
   end
 
   def full_name
@@ -236,11 +203,5 @@ class Voter < ApplicationRecord
 
   def residence_history
     residences.chronological
-  end
-
-  private
-
-  def password_required?
-    !(password_digest_supplied && encrypted_password.present? && password.nil? && password_confirmation.nil?) && super
   end
 end

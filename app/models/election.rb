@@ -9,7 +9,7 @@ class Election < ApplicationRecord
   LISTING_TABS = %w[upcoming past mock historical all].freeze
   KIND_GROUPS = { "general" => %w[general], "primary" => PRIMARY_KINDS, "special" => %w[special] }.freeze
 
-  include Engagements::Engageable
+  include Engageable
 
   belongs_to :jurisdiction
   belongs_to :year

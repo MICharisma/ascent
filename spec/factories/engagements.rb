@@ -1,7 +1,7 @@
 FactoryBot.define do
-  factory :engagement, class: "Engagements::Engagement" do
+  factory :engagement do
     # A voter saving an issue to read about later
-    association :actor, factory: :voter
+    association :voter
     association :engageable, factory: :affordable_housing_issue
     kind { :bookmark }
 

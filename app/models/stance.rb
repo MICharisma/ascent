@@ -1,5 +1,5 @@
 class Stance < ApplicationRecord
-  include Engagements::Engageable
+  include Engageable
 
   belongs_to :candidacy
   belongs_to :approach

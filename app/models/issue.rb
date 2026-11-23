@@ -1,5 +1,5 @@
 class Issue < ApplicationRecord
-  include Engagements::Engageable
+  include Engageable
   include Titled
 
   belongs_to :topic

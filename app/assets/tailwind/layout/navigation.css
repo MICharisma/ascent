@@ -120,22 +120,3 @@
 .nav-primary-link {
   @apply inline-flex items-center;
 }
-
-.devise-links .google-sign-in-form {
-  display: inline-flex;
-  max-width: 100%;
-  margin: 0;
-  vertical-align: middle;
-}
-
-.devise-links .google-sign-in {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  max-width: 100%;
-}
-
-.devise-links .google-sign-in img {
-  flex: none;
-  object-fit: contain;
-}
