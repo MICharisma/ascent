@@ -1,10 +1,11 @@
 class Views::Engagements::IndexView < Views::ApplicationView
   SECTIONS = { "bookmark" => "Saved", "favorite" => "Favorites", "follow" => "Following", "hide" => "Hidden" }.freeze
 
-  prop :engagements, ActiveRecord::Relation
+  prop :engagements, _Enumerable(Engagements::Engagement)
+  prop :summary, _Nilable(Engagements::Summary)
 
   def view_template
-    div(class: "saved-page", id: "saved") do
+    div(class: "saved-page", id: "saved", data: { controller: "saved-patch" }) do
       h1 { "Saved" }
 
       if @engagements.any?
@@ -24,15 +25,9 @@ class Views::Engagements::IndexView < Views::ApplicationView
     section(class: "saved-section saved-#{kind}") do
       h2 { title }
 
-      engagements.each { saved_item(it.engageable) }
-    end
-  end
-
-  def saved_item(record)
-    div(class: "saved-item", id: dom_id(record, :saved)) do
-      span(class: "saved-type") { record.model_name.human }
-      link_to record.name, record, class: "link saved-name"
-      ActionBar(record: record, summary: summary)
+      engagements.each do |engagement|
+        render Views::Engagements::SavedRow.new(record: engagement.engageable, kind: kind, summary: summary)
+      end
     end
   end
 
@@ -41,6 +36,6 @@ class Views::Engagements::IndexView < Views::ApplicationView
   end
 
   def summary
-    @summary ||= EngagementSummary.new(@engagements.map(&:engageable).uniq, current_voter)
+    @summary ||= Engagements::Summary.new(@engagements.map(&:engageable).uniq, current_voter)
   end
 end

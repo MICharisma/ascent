@@ -21,7 +21,7 @@ RSpec.describe Citizen, type: :model do
     citizen = create(:citizen)
     engagement = create(:engagement, engageable: citizen, kind: :hide)
 
-    expect(Citizen.visible_to(engagement.voter)).not_to include(citizen)
+    expect(Citizen.visible_to(engagement.actor)).not_to include(citizen)
     expect(Citizen.visible_to(create(:voter))).to include(citizen)
     expect(Citizen.visible_to(nil)).to include(citizen)
   end

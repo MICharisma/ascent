@@ -112,6 +112,15 @@ select {
 
 .saved-item {
   @apply flex flex-wrap items-center;
+  overflow: hidden;
+}
+
+.saved-undo-form {
+  @apply inline-flex items-center;
+}
+
+.saved-undo-button {
+  @apply inline-flex items-center;
 }
 
 /* Off-screen field the share button copies through on http pages */

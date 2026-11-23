@@ -29,6 +29,11 @@ class Views::ApplicationView < Phlex::HTML
     auto_include_namespace_module subclass
   end
 
+  def url_options(...)
+    options = super
+    view_context.controller.is_a?(Engagements::ApplicationController) ? options.merge(script_name: "") : options
+  end
+
   private
 
   def default_authorization_policy_class

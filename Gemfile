@@ -24,6 +24,12 @@ if ENV["RIZZ_CLIENT_PATH"]
 else
   gem "rizz-client", git: "https://github.com/MICharisma/rizz.git", ref: "5f64cfea8e3e044a1696f36cc77ac55bbc9dfedd", glob: "clients/rizz-client/*.gemspec"
 end
+
+if ENV["ENGAGEMENTS_PATH"]
+  gem "engagements", path: ENV.fetch("ENGAGEMENTS_PATH")
+else
+  gem "engagements", git: "https://github.com/MICharisma/engagements.git", ref: "ba0dd1a6476e16b4b20a923055ea998b2e1ab48a"
+end
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]

@@ -31,6 +31,11 @@
   @apply no-underline;
 }
 
+.devise-links .google-sign-in {
+  font: 500 14px/20px "Google Sans", Arial, sans-serif;
+  white-space: nowrap;
+}
+
 .voter-greeting {
   @apply font-['Bricolage_Grotesque'] text-sm font-semibold;
 }

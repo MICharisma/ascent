@@ -3,7 +3,7 @@ class CandidacyConsolidation
 
   PROFILE_FIELDS = %w[status announcement_date platform_summary].freeze
   CHILDREN = [ Rating, RatingArchive, BallotLine, Endorsement, Stance, CommunicationFeature, OfficialResult ].freeze
-  LINKS = { Channel => [ :owner_type, :owner_id ], Engagement => [ :engageable_type, :engageable_id ],
+  LINKS = { Channel => [ :owner_type, :owner_id ], Engagements::Engagement => [ :engageable_type, :engageable_id ],
     ImagePlacement => [ :subject_type, :subject_id ] }.freeze
 
   def self.preview
@@ -102,7 +102,7 @@ class CandidacyConsolidation
       move_rows(source.official_results, survivor, unique: %w[race_id])
       LINKS.each do |model, (type, key)|
         unique = case model.name
-        when "Engagement" then %w[voter_id kind]
+        when "Engagements::Engagement" then %w[actor_type actor_id kind]
         when "ImagePlacement" then %w[image_id]
         else []
         end

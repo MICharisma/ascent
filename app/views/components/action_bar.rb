@@ -11,10 +11,14 @@ class Views::Components::ActionBar < Views::ApplicationView
   }.freeze
 
   prop :record, ActiveRecord::Base
-  prop :summary, _Nilable(EngagementSummary)
+  prop :summary, _Nilable(Engagements::Summary)
+  prop :bar_id, _Nilable(String)
 
   def view_template
-    nav(class: "action-bar", id: dom_id(@record, :action_bar), aria: { label: "Actions for #{@record.name}" }) do
+    engagement_bar = dom_id(@record, :action_bar)
+    nav(class: "action-bar", id: @bar_id || engagement_bar,
+      data: { engagement_bar: engagement_bar },
+      aria: { label: "Actions for #{@record.name}" }) do
       ACTIONS.each { |kind, look| engagement_action(kind, **look) }
       share_action
     end
@@ -36,12 +40,12 @@ class Views::Components::ActionBar < Views::ApplicationView
     engagement = summary.engagement(@record, kind)
 
     if engagement
-      button_to engagement_path(engagement), method: :delete, class: "action-button action-#{kind} marked",
+      button_to Engagements::Engine.routes.url_helpers.engagement_path(engagement), method: :delete, class: "action-button action-#{kind} marked",
         form_class: "action-form", aria: { pressed: true } do
         action_content(kind, marked_label, marked_icon_name)
       end
     else
-      button_to engagements_path, params: { engageable_type: @record.class.polymorphic_name, engageable_id: @record.id, kind: kind },
+      button_to Engagements::Engine.routes.url_helpers.engagements_path, params: { engageable_type: @record.class.polymorphic_name, engageable_id: @record.id, kind: kind },
         class: "action-button action-#{kind}", form_class: "action-form", aria: { pressed: false } do
         action_content(kind, label, icon_name)
       end
@@ -51,7 +55,7 @@ class Views::Components::ActionBar < Views::ApplicationView
   def action_content(kind, label, icon_name)
     icon(icon_name)
     span(class: "action-label") { label }
-    count = summary.count(@record, kind) if Engagement::PUBLIC_KINDS.include?(kind.to_s)
+    count = summary.count(@record, kind) if Engagements.public_kinds.include?(kind.to_s)
     span(class: "action-count") { count.to_s } if count&.positive?
   end
 
@@ -66,6 +70,6 @@ class Views::Components::ActionBar < Views::ApplicationView
   end
 
   def summary
-    @summary ||= EngagementSummary.new([ @record ], current_voter)
+    @summary ||= Engagements::Summary.new([ @record ], current_voter)
   end
 end

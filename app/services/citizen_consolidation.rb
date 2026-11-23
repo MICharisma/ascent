@@ -3,8 +3,8 @@ class CitizenConsolidation
 
   PROFILE_FIELDS = %w[email birth_date bio].freeze
   LINKS = { Channel => [ :owner_type, :owner_id ], Endorsement => [ :endorser_type, :endorser_id ],
-    Engagement => [ :engageable_type, :engageable_id ], ImagePlacement => [ :subject_type, :subject_id ] }.freeze
-  UNIQUE_LINKS = { Endorsement => %w[candidacy_id kind], Engagement => %w[voter_id kind], ImagePlacement => %w[image_id] }.freeze
+    Engagements::Engagement => [ :engageable_type, :engageable_id ], ImagePlacement => [ :subject_type, :subject_id ] }.freeze
+  UNIQUE_LINKS = { Endorsement => %w[candidacy_id kind], Engagements::Engagement => %w[actor_type actor_id kind], ImagePlacement => %w[image_id] }.freeze
 
   def self.preview
     entities = RizzSync.where(state: "merge_needed").distinct.pluck(:rizz_entity_id)

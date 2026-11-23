@@ -81,12 +81,12 @@ class Views::Mountains::EditView < Views::ApplicationView
   def follow_button
     following = current_voter.engagements.follow.find_by(engageable: @race)
     if following
-      button_to engagement_path(following), method: :delete, class: "pill-button pill-button-outline is-following", form_class: "inline-form" do
+      button_to Engagements::Engine.routes.url_helpers.engagement_path(following), method: :delete, class: "pill-button pill-button-outline is-following", form_class: "inline-form" do
         icon(:bell_ring)
         plain "Following"
       end
     else
-      button_to engagements_path, params: { engageable_type: "Race", engageable_id: @race.id, kind: "follow" },
+      button_to Engagements::Engine.routes.url_helpers.engagements_path, params: { engageable_type: "Race", engageable_id: @race.id, kind: "follow" },
         class: "pill-button pill-button-outline", form_class: "inline-form" do
         icon(:bell)
         plain "Follow race"

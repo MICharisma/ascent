@@ -1,5 +1,5 @@
 class Candidacy < ApplicationRecord
-  include Engageable
+  include Engagements::Engageable
   include Illustrated
 
   # Loading a candidacy's citizen loads the names Rizz authorizes with it.

@@ -210,6 +210,22 @@ select.error {
   color: var(--action-muted-text);
 }
 
+.saved-undo-patch {
+  background-color: color-mix(in oklab, var(--action-bg) 55%, transparent);
+  border-style: dashed;
+  border-color: var(--action-border);
+}
+
+.saved-undo-message {
+  color: var(--action-muted-text);
+}
+
+.saved-undo-button {
+  background-color: var(--action-bg);
+  border-color: var(--action-border);
+  color: var(--brand-ink);
+}
+
 /* A favorited heart fills in */
 .action-bar .action-favorite.marked .icon-heart {
   fill: currentColor;

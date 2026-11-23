@@ -56,8 +56,8 @@ RSpec.describe "Municipality page", type: :request do
   it "can be bookmarked, and shows up under Saved" do
     sign_in voter
 
-    post engagements_path, params: { engageable_type: "Municipality", engageable_id: city.id, kind: "bookmark" }
-    get engagements_path
+    post "/saved", params: { engageable_type: "Municipality", engageable_id: city.id, kind: "bookmark" }
+    get "/saved"
 
     expect(voter.engagements.bookmark.sole.engageable).to eq(city)
     expect(response.body).to include("Port Merritt")

@@ -25,7 +25,7 @@ class Voter < ApplicationRecord
   has_many :dimension_rating_revisions, dependent: :delete_all
   has_many :voter_race_baselines, dependent: :destroy
   has_many :voter_race_baseline_archives, dependent: :delete_all
-  has_many :engagements, dependent: :destroy
+  include Engagements::Engager
   has_many :voter_race_preferences, dependent: :delete_all
   has_many :mountain_drafts, dependent: :delete_all
   has_many :public_mountains, dependent: :destroy

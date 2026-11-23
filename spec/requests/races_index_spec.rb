@@ -97,7 +97,7 @@ RSpec.describe "Races Index", type: :request do
 
     it "keeps hidden races excluded when searching" do
       voter = create(:voter)
-      create(:engagement, voter: voter, engageable: mayor_race, kind: "hide")
+      create(:engagement, actor: voter, engageable: mayor_race, kind: "hide")
       sign_in voter
 
       get races_path, params: { q: "Karen" }

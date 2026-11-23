@@ -62,3 +62,18 @@
 .main-navigation[data-menu-open="true"] .nav-menu-toggle {
   background-color: var(--brand-glacier);
 }
+
+.devise-links .google-sign-in {
+  cursor: pointer;
+  transition: transform 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+}
+
+.devise-links .google-sign-in:hover {
+  background: #f2f2f2;
+  transform: translateY(-1px);
+}
+
+.devise-links .google-sign-in:focus-visible {
+  outline: 3px solid #1d4ed8;
+  outline-offset: 3px;
+}

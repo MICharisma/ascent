@@ -9,15 +9,16 @@ RSpec.describe "Engagements", type: :request do
   let(:turbo_stream) { { "Accept" => "text/vnd.turbo-stream.html" } }
 
   def mark(record, kind, headers: turbo_stream)
-    post engagements_path, params: { engageable_type: record.class.name, engageable_id: record.id, kind: kind }, headers: headers
+    post "/saved", params: { engageable_type: record.class.name, engageable_id: record.id, kind: kind }, headers: headers
   end
 
   describe "marking a record" do
     it "asks a signed-out visitor to sign in instead of saving anything" do
+      sign_in_path = new_voter_session_path
       mark housing_issue, :bookmark, headers: {}
 
-      expect(response).to redirect_to(new_voter_session_path)
-      expect(Engagement.count).to eq(0)
+      expect(response).to redirect_to(sign_in_path)
+      expect(Engagements::Engagement.count).to eq(0)
     end
 
     it "saves the mark and replaces the record's action bar with the marked state" do
@@ -27,7 +28,10 @@ RSpec.describe "Engagements", type: :request do
 
       expect(lansing_voter.engagements.bookmark.where(engageable: housing_issue)).to exist
       expect(response.media_type).to eq("text/vnd.turbo-stream.html")
-      expect(response.body).to include(%(<turbo-stream action="replace" target="action_bar_issue_#{housing_issue.id}">))
+      fragment = Nokogiri::HTML.fragment(response.body)
+      expect(fragment.at_css("turbo-stream[action='replace'][target='saved_bookmark_issue_#{housing_issue.id}']")).to be_present
+      stream = fragment.at_css("turbo-stream[action='replace'][targets]")
+      expect(stream["targets"]).to eq("[id='action_bar_issue_#{housing_issue.id}'], [data-engagement-bar='action_bar_issue_#{housing_issue.id}']")
       expect(response.body).to match(%r{aria-pressed="true"[^>]*><svg[^>]*icon-bookmark-check.*?</svg><span class="action-label">Saved</span>})
     end
 
@@ -41,48 +45,49 @@ RSpec.describe "Engagements", type: :request do
 
     it "goes back to the page without JavaScript" do
       sign_in lansing_voter
+      return_to = issues_url
 
-      mark housing_issue, :follow, headers: { "HTTP_REFERER" => issues_url }
+      mark housing_issue, :follow, headers: { "HTTP_REFERER" => return_to }
 
-      expect(response).to redirect_to(issues_url)
+      expect(response).to redirect_to(return_to)
     end
 
     it "refuses records visitors cannot engage with and unknown kinds" do
       sign_in lansing_voter
 
-      post engagements_path, params: { engageable_type: "Voter", engageable_id: flint_voter.id, kind: "bookmark" }, headers: turbo_stream
+      post "/saved", params: { engageable_type: "Voter", engageable_id: flint_voter.id, kind: "bookmark" }, headers: turbo_stream
       expect(response).to have_http_status(:not_found)
 
       mark housing_issue, :endorse
       expect(response).to have_http_status(:unprocessable_content)
-      expect(Engagement.count).to eq(0)
+      expect(Engagements::Engagement.count).to eq(0)
     end
   end
 
   describe "removing a mark" do
-    let!(:favorite) { create(:engagement, voter: lansing_voter, engageable: housing_issue, kind: :favorite) }
+    let!(:favorite) { create(:engagement, actor: lansing_voter, engageable: housing_issue, kind: :favorite) }
 
     it "lets the voter who made it take it back" do
       sign_in lansing_voter
 
-      delete engagement_path(favorite), headers: turbo_stream
+      delete engagements.engagement_path(favorite), headers: turbo_stream
 
-      expect(Engagement.exists?(favorite.id)).to be(false)
+      expect(Engagements::Engagement.exists?(favorite.id)).to be(false)
       expect(response.body).to match(%r{aria-pressed="false"[^>]*><svg[^>]*icon-heart.*?</svg><span class="action-label">Favorite</span>})
     end
 
     it "does not let another voter remove it" do
       sign_in flint_voter
 
-      delete engagement_path(favorite), headers: turbo_stream
+      delete engagements.engagement_path(favorite), headers: turbo_stream
 
-      expect(Engagement.exists?(favorite.id)).to be(true)
+      expect(Engagements::Engagement.exists?(favorite.id)).to be(true)
     end
   end
 
   it "shows other visitors how many people favorite a record, but not who saved it" do
-    create(:engagement, voter: lansing_voter, engageable: housing_issue, kind: :favorite)
-    create(:engagement, voter: lansing_voter, engageable: housing_issue, kind: :bookmark)
+    create(:engagement, actor: lansing_voter, engageable: housing_issue, kind: :favorite)
+    create(:engagement, actor: lansing_voter, engageable: housing_issue, kind: :bookmark)
 
     get issue_path(housing_issue)
 
@@ -93,7 +98,7 @@ RSpec.describe "Engagements", type: :request do
 
   it "takes a hidden record out of that voter's lists only" do
     school_issue = create(:school_funding_issue)
-    create(:engagement, voter: lansing_voter, engageable: school_issue, kind: :hide)
+    create(:engagement, actor: lansing_voter, engageable: school_issue, kind: :hide)
 
     sign_in lansing_voter
     get issues_path
@@ -108,9 +113,9 @@ RSpec.describe "Engagements", type: :request do
   describe "the saved page" do
     it "groups a voter's marks by kind, with the bar to undo each" do
       candidacy = create(:candidacy)
-      create(:engagement, voter: lansing_voter, engageable: housing_issue, kind: :bookmark)
-      create(:engagement, voter: lansing_voter, engageable: candidacy, kind: :follow)
-      create(:engagement, voter: flint_voter, engageable: candidacy, kind: :favorite)
+      create(:engagement, actor: lansing_voter, engageable: housing_issue, kind: :bookmark)
+      create(:engagement, actor: lansing_voter, engageable: candidacy, kind: :follow)
+      create(:engagement, actor: flint_voter, engageable: candidacy, kind: :favorite)
 
       sign_in lansing_voter
       get engagements_path
@@ -119,13 +124,18 @@ RSpec.describe "Engagements", type: :request do
       expect(response.body).to include("<h2>Saved</h2>", "<h2>Following</h2>")
       expect(response.body).not_to include("<h2>Favorites</h2>")
       expect(response.body).to include("Affordable Housing Shortage", candidacy.name)
-      expect(response.body).to include(%(id="action_bar_candidacy_#{candidacy.id}"))
+      expect(response.body).to include(%(id="follow_action_bar_candidacy_#{candidacy.id}"))
+      expect(response.body).to include(%(data-engagement-bar="action_bar_candidacy_#{candidacy.id}"))
+      expect(response.body).to include(%(href="/saved"))
+      expect(response.body).to include(%(data-share-url-value="http://www.example.com/candidacies/#{candidacy.id}"))
+      expect(response.body).not_to include("/saved/saved", "/saved/candidacies", "/saved/voters")
     end
 
     it "is only for signed-in voters" do
-      get engagements_path
+      sign_in_path = new_voter_session_path
+      get "/saved"
 
-      expect(response).to redirect_to(new_voter_session_path)
+      expect(response).to redirect_to(sign_in_path)
     end
   end
 end

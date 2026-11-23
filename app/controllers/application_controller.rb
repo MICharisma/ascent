@@ -75,7 +75,7 @@ class ApplicationController < ActionController::Base
   end
 
   def handle_unauthorized!(_exception)
-    destination = current_voter ? root_path : new_voter_session_path
+    destination = current_voter ? main_app.root_path : main_app.new_voter_session_path
     message = current_voter ? "You are not authorized to perform that action." : "Please sign in to continue."
 
     redirect_to destination, alert: message

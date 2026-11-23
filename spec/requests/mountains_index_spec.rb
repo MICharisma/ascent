@@ -74,7 +74,7 @@ RSpec.describe "Mountains", type: :request do
       single_race = create(:race, :active)
       create(:candidacy, race: single_race)
       voter = create(:voter)
-      create(:engagement, voter: voter, engageable: hidden_race, kind: "hide")
+      create(:engagement, actor: voter, engageable: hidden_race, kind: "hide")
       sign_in voter
 
       get mountains_path

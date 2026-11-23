@@ -24,7 +24,7 @@ class Views::Components::PageHeader < Views::ApplicationView
       div(class: "page-header-chips") { @chips.call } if @chips
       p(class: "ballot-lede") { @lede } if @lede
       div(class: "place-actions", &actions) if actions
-      ActionBar(record: @record) if @record.is_a?(Engageable)
+      ActionBar(record: @record) if @record.is_a?(Engagements::Engageable)
     end
   end
 

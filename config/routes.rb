@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   get "inquiries" => "inquiries#new", as: :new_inquiry
   post "inquiries" => "inquiries#create", as: :inquiries
 
-  resources :engagements, only: [ :index, :create, :destroy ], path: "saved"
+  mount Engagements::Engine => "/saved", as: :engagements
   concern :dimension_rated do
     resources :dimension_ratings, only: :create
     delete "dimension_ratings", to: "dimension_ratings#destroy"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_193000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "btree_gist"
   enable_extension "pg_catalog.plpgsql"
@@ -207,8 +207,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
     t.uuid "citizen_id", null: false
     t.index ["citizen_id"], name: "index_citizen_name_readings_on_citizen_id", unique: true
     t.index ["outcome"], name: "index_citizen_name_readings_on_outcome"
-    t.check_constraint "(outcome::text <> ALL (ARRAY['jev'::character varying, 'settled'::character varying]::text[])) OR parts IS NOT NULL", name: "citizen_name_readings_parts"
-    t.check_constraint "outcome::text = ANY (ARRAY['jev'::character varying, 'overflow'::character varying, 'settled'::character varying, 'rejected'::character varying]::text[])", name: "citizen_name_readings_outcome"
+    t.check_constraint "(outcome::text <> ALL (ARRAY['jev'::character varying::text, 'settled'::character varying::text])) OR parts IS NOT NULL", name: "citizen_name_readings_parts"
+    t.check_constraint "outcome::text = ANY (ARRAY['jev'::character varying::text, 'overflow'::character varying::text, 'settled'::character varying::text, 'rejected'::character varying::text])", name: "citizen_name_readings_outcome"
   end
 
   create_table "citizens", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -290,7 +290,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
     t.uuid "rated_id", null: false
     t.index ["rated_type", "rated_id"], name: "index_dimension_rating_revisions_on_rated_type_and_rated_id"
     t.index ["voter_id"], name: "index_dimension_rating_revisions_on_voter_id"
-    t.check_constraint "event::text = ANY (ARRAY['rate'::character varying, 'change'::character varying, 'clear'::character varying]::text[])", name: "dimension_rating_revisions_event"
+    t.check_constraint "event::text = ANY (ARRAY['rate'::character varying::text, 'change'::character varying::text, 'clear'::character varying::text])", name: "dimension_rating_revisions_event"
   end
 
   create_table "dimension_ratings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -364,11 +364,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
     t.string "engageable_type", null: false
     t.string "kind", null: false
     t.datetime "updated_at", null: false
-    t.uuid "voter_id", null: false
+    t.uuid "actor_id", null: false
     t.uuid "engageable_id", null: false
+    t.string "actor_type", null: false
+    t.index ["actor_type", "actor_id", "engageable_type", "engageable_id", "kind"], name: "index_engagements_once_per_actor_record_and_kind", unique: true
+    t.index ["actor_type", "actor_id"], name: "index_engagements_on_actor"
     t.index ["engageable_type", "engageable_id", "kind"], name: "index_engagements_on_record_and_kind"
-    t.index ["voter_id", "engageable_type", "engageable_id", "kind"], name: "index_engagements_once_per_voter_record_and_kind", unique: true
-    t.index ["voter_id"], name: "index_engagements_on_voter_id"
     t.check_constraint "kind::text = ANY (ARRAY['bookmark'::character varying::text, 'favorite'::character varying::text, 'follow'::character varying::text, 'hide'::character varying::text])", name: "engagements_kind_is_known"
   end
 
@@ -716,7 +717,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
     t.index ["handoff_jti"], name: "index_rizz_claim_handoffs_on_handoff_jti", unique: true
     t.index ["operation_id"], name: "index_rizz_claim_handoffs_on_operation_id"
     t.index ["verified_voter_id"], name: "index_rizz_claim_handoffs_on_verified_voter_id"
-    t.check_constraint "intent::text = ANY (ARRAY['claim'::character varying, 'create'::character varying]::text[])", name: "rizz_claim_handoffs_intent"
+    t.check_constraint "intent::text = ANY (ARRAY['claim'::character varying::text, 'create'::character varying::text])", name: "rizz_claim_handoffs_intent"
   end
 
   create_table "rizz_claim_receipts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -763,7 +764,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
     t.uuid "citizen_id", null: false
     t.index ["citizen_id", "purpose"], name: "index_rizz_names_on_citizen_id_and_purpose", unique: true
     t.index ["purpose", "rizz_entity_id"], name: "index_rizz_names_on_purpose_and_rizz_entity_id"
-    t.check_constraint "state::text = ANY (ARRAY['current'::character varying, 'invalidated'::character varying]::text[])", name: "rizz_names_state"
+    t.check_constraint "state::text = ANY (ARRAY['current'::character varying::text, 'invalidated'::character varying::text])", name: "rizz_names_state"
   end
 
   create_table "rizz_syncs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -781,7 +782,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
     t.index ["citizen_id"], name: "index_rizz_syncs_on_citizen_id", unique: true
     t.index ["rizz_entity_id"], name: "index_rizz_syncs_on_rizz_entity_id"
     t.index ["state"], name: "index_rizz_syncs_on_state"
-    t.check_constraint "state::text = ANY (ARRAY['pending'::character varying, 'synced'::character varying, 'review'::character varying, 'merge_needed'::character varying, 'failed'::character varying, 'skipped'::character varying, 'held'::character varying]::text[])", name: "rizz_syncs_state"
+    t.check_constraint "state::text = ANY (ARRAY['pending'::character varying::text, 'synced'::character varying::text, 'review'::character varying::text, 'merge_needed'::character varying::text, 'failed'::character varying::text, 'skipped'::character varying::text, 'held'::character varying::text])", name: "rizz_syncs_state"
   end
 
   create_table "rule_conditions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -952,7 +953,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
     t.index ["voter_id"], name: "index_voter_rizz_bindings_on_voter_id"
     t.index ["voter_id"], name: "index_voter_rizz_bindings_one_active_per_voter", unique: true, where: "((status)::text = 'active'::text)"
     t.check_constraint "rizz_session_epoch > 0", name: "voter_rizz_bindings_epoch_positive"
-    t.check_constraint "status::text = ANY (ARRAY['active'::character varying, 'disconnected'::character varying]::text[])", name: "voter_rizz_bindings_status"
+    t.check_constraint "status::text = ANY (ARRAY['active'::character varying::text, 'disconnected'::character varying::text])", name: "voter_rizz_bindings_status"
   end
 
   create_table "voter_statements", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -1036,7 +1037,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_150000) do
   add_foreign_key "elections", "years"
   add_foreign_key "endorsements", "ballot_lines"
   add_foreign_key "endorsements", "candidacies"
-  add_foreign_key "engagements", "voters"
   add_foreign_key "governing_bodies", "governance_types"
   add_foreign_key "governing_bodies", "jurisdictions"
   add_foreign_key "image_placements", "images"

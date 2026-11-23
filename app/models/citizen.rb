@@ -1,5 +1,5 @@
 class Citizen < ApplicationRecord
-  include Engageable
+  include Engagements::Engageable
   include Illustrated
   include DimensionRated
 

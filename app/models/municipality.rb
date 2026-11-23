@@ -1,7 +1,7 @@
 class Municipality < ApplicationRecord
   include JurisdictionOwner
   include AdoptsRizzCode
-  include Engageable
+  include Engagements::Engageable
 
   belongs_to :state
   belongs_to :county, optional: true

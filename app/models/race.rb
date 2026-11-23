@@ -3,7 +3,7 @@ class Race < ApplicationRecord
   # How a finished race was officially decided, shown beside a historical replay.
   DECIDED_BY = %w[plurality majority_runoff ranked_choice approval top_two].freeze
 
-  include Engageable
+  include Engagements::Engageable
 
   belongs_to :election
   belongs_to :office
