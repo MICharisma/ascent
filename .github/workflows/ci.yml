@@ -107,7 +107,7 @@ jobs:
           node --experimental-vm-modules --test spec/javascript/
 
       - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: screenshots
