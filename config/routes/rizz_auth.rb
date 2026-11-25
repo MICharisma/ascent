@@ -19,6 +19,7 @@ constraints ->(_request) { RizzSignIn.enabled? } do
   post "auth/rizz/create", to: "rizz_auth/creations#create"
   post "auth/rizz/create/cancel", to: "rizz_auth/creations#cancel", as: :rizz_create_cancel
   post "auth/rizz/claim/exchange", to: "rizz_auth/exchanges#create"
+  post "auth/rizz/usernames/check", to: "rizz_auth/usernames#check"
 end
 
 constraints ->(_request) { RizzSignIn.configuration.configured? } do
