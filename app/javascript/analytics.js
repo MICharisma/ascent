@@ -6,6 +6,15 @@ const ahoy = globalThis.ahoy || ahoyModule.default
 globalThis.ahoy = ahoy
 ahoy.configure({ trackVisits: false })
 
+const UMAMI_CUSTOM_EVENTS = new Set([
+  "browse_refined",
+  "rating_changed",
+  "baseline_changed",
+  "share_action",
+  "frame_opened",
+  "ui_interaction"
+])
+
 export function cleanPath(value) {
   const url = new URL(value, window.location.origin)
   return url.pathname.replace(/^\/(invite|influencers)\/[^/]+/, "/$1/:token")
@@ -15,14 +24,58 @@ function pageContext() {
   return JSON.parse(document.querySelector('meta[name="ascent-analytics"]').content)
 }
 
-export function track(name, properties = {}) {
+function compactObject(entries) {
+  const result = {}
+  for (const [key, value] of entries) {
+    if (value !== undefined && value !== null && value !== "") result[key] = value
+  }
+  return result
+}
+
+export function forwardToUmami(name, properties = {}) {
+  const tracker = window.umami?.track
+  if (typeof tracker !== "function") return false
+
+  const shouldForward = UMAMI_CUSTOM_EVENTS.has(name) ||
+    (name === "navigation_used" && (properties.external === true || properties.umami === true))
+  if (!shouldForward) return false
+
+  const payload = compactObject(
+    Object.entries(properties)
+      .filter(([key]) => !["record_id", "enabled", "umami"].includes(key))
+      .map(([key, value]) => [key, Array.isArray(value) ? value.join(",") : value])
+  )
+
+  try {
+    tracker(name, payload)
+    return true
+  } catch (_) {
+    return false
+  }
+}
+
+export function track(name, properties = {}, options = {}) {
   const { enabled, ...context } = pageContext()
   if (!enabled) return
 
-  ahoy.track(name, { ...context, ...properties })
-  if (["rating_changed", "baseline_changed", "navigation_used", "share_action"].includes(name) || name === "browse_refined" && properties.method === "map_selection") {
+  const payload = { ...context, ...properties }
+  ahoy.track(name, payload)
+  forwardToUmami(name, { ...payload, ...(options.umami ? { umami: true } : {}) })
+  if (["rating_changed", "baseline_changed", "navigation_used", "share_action", "frame_opened", "ui_interaction"].includes(name) || name === "browse_refined" && properties.method === "map_selection") {
     pageAnalytics.engage("interaction")
   }
+}
+
+function placementFor(element) {
+  const tagged = element.closest?.("[data-analytics-placement]")
+  if (tagged?.dataset?.analyticsPlacement) return tagged.dataset.analyticsPlacement
+
+  const area = element.closest?.("nav, header, footer, section, main")
+  return area?.getAttribute?.("aria-label") || area?.id || area?.className || area?.tagName?.toLowerCase()
+}
+
+function labelFor(element) {
+  return (element.getAttribute?.("aria-label") || element.textContent || "").trim().replace(/\s+/g, " ").slice(0, 160)
 }
 
 class PageAnalytics {
@@ -92,7 +145,17 @@ document.addEventListener("turbo:load", () => {
 document.addEventListener("turbo:before-cache", () => pageAnalytics.pause())
 document.addEventListener("turbo:before-visit", () => pageAnalytics.pause())
 document.addEventListener("turbo:frame-load", event => {
-  if (event.target.matches(".index-results")) navigatedFrame = event.target
+  const target = event.target
+  if (!target?.matches) return
+
+  if (target.matches("[data-analytics-frame]")) {
+    track("frame_opened", compactObject(Object.entries({
+      frame_id: target.id,
+      frame_name: target.dataset?.analyticsFrame || target.id,
+      source_path: target.src ? cleanPath(target.src) : undefined
+    })))
+  }
+  if (target.matches(".index-results")) navigatedFrame = target
 })
 document.addEventListener("visibilitychange", () => document.visibilityState === "visible" ? pageAnalytics.resume() : pageAnalytics.pause())
 window.addEventListener("focus", () => pageAnalytics.resume())
@@ -104,17 +167,31 @@ document.addEventListener("submit", event => {
 }, { capture: true })
 
 document.addEventListener("click", event => {
+  if (event.defaultPrevented || !event.target?.closest) return
+
   const link = event.target.closest("a[href]")
-  if (!link || event.defaultPrevented || link.closest("[data-analytics-ignore]")) return
+  if (link) {
+    if (link.closest("[data-analytics-ignore]")) return
 
-  const url = new URL(link.href, window.location.origin)
-  if (!["http:", "https:"].includes(url.protocol)) return
+    const url = new URL(link.href, window.location.origin)
+    if (!["http:", "https:"].includes(url.protocol)) return
 
-  const area = link.closest("nav, header, footer, section, main")
-  track("navigation_used", {
-    label: (link.getAttribute("aria-label") || link.textContent).trim().replace(/\s+/g, " ").slice(0, 160),
-    placement: area?.getAttribute("aria-label") || area?.id || area?.className || area?.tagName.toLowerCase(),
-    destination: cleanPath(url.href), external: url.origin !== window.location.origin,
-    destination_host: url.hostname
-  })
+    track("navigation_used", {
+      label: labelFor(link),
+      placement: placementFor(link),
+      destination: cleanPath(url.href),
+      external: url.origin !== window.location.origin,
+      destination_host: url.hostname
+    }, { umami: link.hasAttribute?.("data-analytics-umami") })
+    return
+  }
+
+  const control = event.target.closest("[data-analytics-event]")
+  if (!control || control.matches?.("form") || control.closest?.("[data-analytics-ignore]")) return
+
+  track(control.dataset?.analyticsEvent || "ui_interaction", compactObject(Object.entries({
+    action: control.dataset?.analyticsAction,
+    label: labelFor(control),
+    placement: placementFor(control)
+  })))
 }, { capture: true })
